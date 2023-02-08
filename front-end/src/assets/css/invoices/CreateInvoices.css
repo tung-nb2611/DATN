@@ -1,0 +1,458 @@
+.body-add-invoice {
+    width: 1200px;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: auto;
+    font-size: 14px;
+}
+
+.body-add-invoice>.title-add-invoice {
+    width: 1150px;
+    height: 100px;
+    margin-left: 30px;
+    display: flex;
+}
+
+.body-add-invoice>.title-add-invoice>.left-title-add-invoice {
+    width: 1000px;
+}
+
+.body-add-invoice>.title-add-invoice>.left-title-add-invoice>.back>.cancel-button {
+    width: 100px;
+    top: 50px;
+    bottom: 50px;
+    color: gray;
+    cursor: pointer;
+    border: 0px;
+    margin-left: -5px;
+}
+
+.body-add-invoice>.title-add-invoice>.left-title-add-invoice>.back>.cancel-button>span {
+    font-size: 20px;
+}
+
+.body-add-invoice>.title-add-invoice>.left-title-add-invoice>.name-page {
+    margin-top: 20px;
+}
+
+.body-add-invoice>.title-add-invoice>.left-title-add-invoice>.name-page>span {
+    display: inline-block;
+    margin-left: 10px;
+    font-size: 30px;
+}
+
+.body-add-invoice>.title-add-invoice>.right-title-add-invoice {
+    width: 50px;
+    margin-top: 50px;
+    margin-left: 20px;
+}
+
+
+
+
+.body-add-invoice>.content-add-invoice {
+    width: 1100px;
+    margin-left: 20px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.top-left-invoice {
+    width: 780px;
+    min-height: 300px;
+    background: white;
+    border-radius: 3px;
+    border: 1px solid #dddddd;
+    margin-bottom: 20px;
+    margin-right: -50px;
+    box-shadow: 0 2px 4px hsl(0deg 0% 66% / 25%);
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.top-left-invoice>.title-customer {
+    margin-left: 20px;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.top-left-invoice>.content-customer>.search-customer-vehicle {
+    width: 780px;
+    min-height: 100px;
+}
+
+
+
+
+
+/* =============== ===========================================*/
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.right-invoice>.top-right-invoice {
+    width: 350px;
+    float: right;
+    min-height: 150px;
+    background: white;
+    border-radius: 3px;
+    border: 1px solid #dddddd;
+    margin-bottom: 20px;
+    margin-right: -50px;
+    box-shadow: 0 2px 4px hsl(0deg 0% 66% / 25%);
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.right-invoice>.top-right-invoice>.title-employee {
+    margin-left: 20px;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+.body-add-invoice>.content-add-invoice>.main-invoice {
+    width: 1100px;
+    display: flex;
+    z-index: 0;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice {
+    width: 780px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material {
+    min-height: 280px;
+    border-radius: 3px;
+    border: 1px solid #dddddd;
+    background-color: white;
+    box-shadow: 0 2px 4px hsl(0deg 0% 66% / 25%);
+    width: 780px;
+    border-radius: 3px;
+    border: 1px solid #dddddd;
+    margin-bottom: 20px;
+
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.title-material {
+    margin-left: 20px;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material {
+    width: 780px;
+    height: 100px;
+
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.top-content {
+    width: 780px;
+
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content {
+    width: 780px;
+    min-height: 100px;
+    margin-top: 20px;
+    z-index: 0;
+    margin-bottom: 20px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table {
+    width: 780px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table {
+    width: 780px;
+    font-size: 12px;
+    background: white;
+    border-collapse: collapse;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>thead> {
+    height: 30px;
+    font-size: 12px;
+    font-weight: bolder;
+    width: max-content;
+    background: white;
+
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>thead>tr {
+    height: 30px;
+    font-size: 12px;
+    font-weight: bolder;
+    width: max-content;
+    background: white;
+
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>thead>tr>th>span {
+    display: inline-block;
+    margin-left: -15px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>thead>tr {
+    border-bottom: 1px solid #dddddd;
+    height: 40px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>thead>tr>.td-1 {
+    width: 200px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>thead>tr>.td-2 {
+    width: 400px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>thead>tr>.td-3 {
+    width: 200px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>thead>tr>.td-4 {
+    width: 200px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>thead>tr>.td-5 {
+    width: 100px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>tbody>tr {
+    border-bottom: 1px solid #dddddd;
+    height: 50px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>tbody>tr>.td-1 {
+    width: 200px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>tbody>tr>.td-2 {
+    width: 400px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>tbody>tr>.td-3 {
+    width: 200px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>tbody>tr>.td-3>span>input {
+    width: 60px;
+    height: 30px;
+    border: 1px solid #dddddd;
+    border-radius: 3px;
+    text-align: right;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>tbody>tr>.td-4 {
+    width: 200px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>tbody>tr>.td-5 {
+    width: 30px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>thead>tr>td>span {
+    display: inline-block;
+    font-weight: bold;
+    margin-left: 50px;
+
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>tbody>tr>td>span {
+    margin-left: 50px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>tbody>tr>td>input {
+    width: 50px;
+    height: 25px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #dddddd;
+    border-radius: 3px;
+    text-align: right;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>tbody>tr>.input {
+    text-align: center;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>thead>tr>.th-5 {
+    width: 20px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>tbody>tr>.delete-material {}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>tbody>tr>.delete-material>span {
+    cursor: pointer;
+    display: inline-block;
+    margin-left: 10px;
+
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>tbody>tr>.delete-material>span:hover {
+    color: red;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>tbody>tr>.delete-service>span {
+    cursor: pointer;
+    display: inline-block;
+    margin-left: 10px;
+
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.main-content>.table>table>tbody>tr>.delete-service>span:hover {
+    color: red;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.bottom-content {
+    width: 780px;
+    min-height: 50px;
+    z-index: 0;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.bottom-content>.total {
+
+    float: right;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.left-invoice>.material>.content-material>.bottom-content>.total>table {
+    min-width: 200px;
+    min-height: 80px;
+    font-size: 13px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.right-invoice {
+    width: 350px;
+    margin-left: 20px;
+    display: grid
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.right-invoice>.invoice {
+    width: 350px;
+    margin-bottom: 100px;
+    background-color: white;
+    box-shadow: 0 2px 4px hsl(0deg 0% 66% / 25%);
+    border: 1px solid #dddddd;
+    border-radius: 3px;
+
+
+}
+
+
+
+
+
+.body-add-invoice>.content-add-invoice>.bottom-invoice {
+    width: 780px;
+    margin-top: 20px;
+    display: flex;
+    z-index: -1;
+
+}
+
+.body-add-invoice>.content-add-invoice>.bottom-invoice>.left-invoice {
+    width: 300px;
+    min-height: 200px;
+    background: white;
+    margin-bottom: 100px;
+
+}
+
+.body-add-invoice>.content-add-invoice>.bottom-invoice>.left-invoice .note-invoice {
+    margin-top: 10px;
+    margin-left: 20px;
+}
+
+.body-add-invoice>.content-add-invoice>.bottom-invoice>.left-invoice .note-invoice label {
+    color: black;
+}
+
+.body-add-invoice>.content-add-invoice>.bottom-invoice>.left-invoice>.note-invoice>textarea {
+    margin-top: 10px;
+    min-width: 250px;
+    max-width: 250px;
+    height: 130px;
+    border: 1px solid #cccccc;
+    border-radius: 3px;
+}
+
+
+.body-add-invoice>.content-add-invoice>.bottom-invoice>.right-invoice {
+    width: 250px;
+    margin-left: 20px;
+    min-height: 350px;
+    background: white;
+    margin-bottom: 100px;
+
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.right-invoice>.invoice>.title-right-invoice {
+    width: 350px;
+    height: 40px;
+    border-bottom: 1px solid #dddddd;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.right-invoice>.invoice>.title-right-invoice>span {
+    display: inline-block;
+    margin-top: 10px;
+    margin-left: 20px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.right-invoice>.invoice>.content-pay-invoice {}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.right-invoice>.invoice>.content-pay-invoice>.pay-method {
+    width: 380px;
+    min-height: 150px;
+}
+
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.right-invoice>.invoice>.content-pay-invoice>.pay-method>.title-pay-method {
+    margin-top: 10px;
+    margin-left: 20px;
+    font-size: 14px;
+    width: 200px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.right-invoice>.invoice>.content-pay-invoice>.pay-method>.content-pay-method {
+    margin-top: 20px;
+    margin-left: 20px;
+    color: black;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.right-invoice>.invoice>.content-pay-invoice>.pay-method>.content-pay-method>.table>table>tbody>thead>tr>td>.tn {
+    margin-left: 75px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.right-invoice>.invoice>.content-pay-invoice>.pay-method>.tn {
+    margin-left: 75px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.right-invoice>.invoice>.content-pay-invoice>.pay-method>.tf {
+    margin-left: 60px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.right-invoice>.invoice>.content-pay-invoice>.pay-method>.content-pay-method>form>.pay-method-group>label {
+    color: black;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.right-invoice>.invoice>.content-pay-invoice>.total-pay {
+    width: 400px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.right-invoice>.invoice>.content-pay-invoice>.total-pay>table {
+    margin-top: 150px;
+    width: 300px;
+    font-size: 13px;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.right-invoice>.invoice>.content-pay-invoice>.total-pay>table>tr>th {
+    float: left;
+}
+
+.body-add-invoice>.content-add-invoice>.main-invoice>.right-invoice>.invoice>.content-pay-invoice>.total-pay>table>.total>th,
+.total-td {
+    color: red;
+}
+
+.delete-license>span {
+    margin-left: 290px;
+}
+
+.delete-name>span {
+    margin-left: 260px;
+}

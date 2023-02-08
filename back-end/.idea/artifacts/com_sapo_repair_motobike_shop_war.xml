@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="com.sapo.repair-motobike-shop:war">
+    <output-path>$PROJECT_DIR$/com.sapo.repair-motobike-shop/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>com.sapo.repair-motobike-shop</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="com.sapo.repair-motobike-shop.war">
+      <element id="artifact" artifact-name="com.sapo.repair-motobike-shop:war exploded" />
+    </root>
+  </artifact>
+</component>
