@@ -10,7 +10,7 @@ import '../../assets/css/invoices/InvoiceMaterialSearch.css'
 import MaterialService from "services/materialService";
 // import ServicesService from "services/ServicesService";
 import '../../assets/css/invoices/InvoiceServiceSearch.css'
-import InvoicesService from "services/InvoicesService";
+import InvoicesService from "../../services/InvoicesService";
 import CustomerService from "services/CustomerService";
 import { Popover } from "reactstrap";
 

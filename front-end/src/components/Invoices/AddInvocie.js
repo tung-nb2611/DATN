@@ -4,7 +4,7 @@ import "../../assets/css/invoices/CreateInvoices.css";
 import InvoicesService from "services/InvoicesService";
 // eslint-disable-next-line no-unused-vars
 import InvoiceSearch from "components/FiltersForm/InvoiceSearch";
-import { Filter, Search } from '@material-ui/icons';
+import { Add, Filter, Search, TextFields } from '@material-ui/icons';
 import '../../assets/css/search/InvoiceSearch.css'
 import CustomerService from "../../services/CustomerService";
 import EmployeeService from "../../services/EmployeeService";
@@ -22,10 +22,12 @@ import IconIncrease from "common/iconIncrease";
 import { NumberFormatBase } from "react-number-format";
 import AreaMenu from "./AreaMenu";
 import AreaService from "services/AreaService";
-import { Popover, TextField } from "@material-ui/core";
+import { Box, Fab, Popover, TextField } from "@material-ui/core";
 import { PopoverBody } from "reactstrap";
 import selectChevron from "../../common/selectChevron.svg";
 import cancelSmallMinor from "../../common/cancelSmallMinor.svg";
+import { AddCartIcon, AutoCompleteInfinite } from "@sapo-presentation/sapo-ui-components";
+import { useCallback } from "react";
 
 function AddInvoice(props) {
     React.useEffect(() => {
@@ -49,6 +51,7 @@ function AddInvoice(props) {
     const [customers, setCustomers] = useState([]);
     const typingTimeoutRef = useRef(null);
     const [listEmployeeClass, setListEmployeeClass] = useState('');
+    const [listAreaClass, setListAreaClass] = useState('');
     const [showInfoEmployee, setShowInfoEmployee] = useState('');
     const [employees, setEmployees] = useState([]);
     const [listCustomerVehicleClass, setListCustomerVehicleClass] = useState('');
@@ -166,6 +169,7 @@ function AddInvoice(props) {
         }
         fetchVehicleList();
     }, [filters]);
+
     useEffect(() => {
         async function fetchEmployeeList() {
             try {
@@ -500,6 +504,13 @@ function AddInvoice(props) {
             setListEmployeeClass('')
         }
     }
+    const showListArea = () => {
+        if (listEmployeeClass == '') {
+            setListAreaClass('info-employees');
+        } else {
+            setListAreaClass('')
+        }
+    }
     const showListCustomerVehicle = () => {
         if (listCustomerVehicleClass == '') {
             setListCustomerVehicleClass('info-customer-vehicle')
@@ -539,7 +550,7 @@ function AddInvoice(props) {
 
     const chooseArea = (area) => {
         setAreaChose(area);
-        setListEmployeeClass('')
+        setListAreaClass('')
         setShowInfoEmployee('info-name')
     }
 
@@ -769,7 +780,7 @@ function AddInvoice(props) {
         };
         InvoicesService.postInvoice(invoice)
             .then(() => {
-                props.history.push("/admin/invoices");
+                props.history.push("/admin/areas");
             }).catch(function (error) {
                 console.log(error.response)
                 if (error.response.data.errors) {
@@ -929,6 +940,49 @@ function AddInvoice(props) {
 
         }, 300);
     }
+    const [reason, setReason] = useState(vehicles);
+    const handleFetchOptions = useCallback(
+        async (filter) => {
+            try {
+                const res = { data: { reasons: vehicles } };
+                const data = res.data.reasons.filter((item) => item.name.includes(filter.query || ""));
+                return Promise.resolve({
+                    limit: 10,
+                    total: data.length,
+                });
+            } catch (error) { }
+        },
+        [vehicles]
+    );
+    const renderOption = useCallback((option) => option.name, []);
+    const onSubmit = useCallback(
+        async (query, value, vehicles) => {
+            if (value.name.toLocaleLowerCase() !== query.toLocaleLowerCase()) {
+                let selected
+                if (vehicles.length > 0) {
+                    const optionsReverse = [...vehicles].reverse();
+                    selected = optionsReverse.find((e) => e.name.toLocaleLowerCase() === query.toLocaleLowerCase());
+                }
+                onChange({
+                    id: selected?.id || 0,
+                    name: query,
+                });
+            }
+        },
+        [vehicles]
+    );
+    const onChange = (value) => {
+        setReason(value);
+    };
+    const onQueryChange = useCallback(
+        async (filter) => {
+            let dataSourceFilter = {
+                ...filter,
+                page: filter.page || 1, query: filter.query,
+            };
+            return dataSourceFilter;
+        },
+        [vehicles]);
 
     return (
         <div className="body-add-invoice">
@@ -962,22 +1016,28 @@ function AddInvoice(props) {
 
                     <div className="left-invoice">
                         <div className="top-left-invoice">
-                            <div className="title-customer"><span>Thông tin khách hàng</span></div>
                             <div className="content-customer">
                                 <div className="search-customer" >
-                                    <form>
-                                        <div className="search-invoice">
-                                            <Search className="icon-search" />
-                                            <input
-                                                type="text"
-                                                onChange={handleSearchTermChange}
-                                                onClick={showListCustomer}
-                                                placeholder="Tìm kiếm theo biển số xe"
-                                            />
-                                        </div>
-                                    </form>
+
+                                    <TextField
+                                        id="filled-search"
+                                        label="Thông tin xe"
+                                        type="search"
+                                        variant="outlined"
+                                        onChange={handleSearchTermChange}
+                                        onClick={showListCustomer}
+                                        style={{
+                                            marginLeft: "30px", width: "50%", marginTop: "20px",
+                                        }}
+                                        size="small"
+                                    />
+
                                     <div id="info-customers" className={listCustomerClass}>
-                                        <div className="license-plate" onClick={formAddCustomer}><span className="button-add-customers">+ Thêm phương tiện</span></div>
+                                        <div className="license-plate" onClick={formAddCustomer}>
+
+                                            <Add color="#0e90ff" onClick={formAddCustomer}> </Add> Thêm phương tiện
+                                        </div>
+
                                         {vehicles.map((vehicle) => (
                                             <div key={vehicle.id} >
                                                 <div className="license-plate" onClick={() => chooseVehicle(vehicle)}><span>{vehicle.licensePlate}</span></div>
@@ -1032,15 +1092,21 @@ function AddInvoice(props) {
                                 </div>
                                 <div id="search-customer-vehicle" className={customerClass} >
                                     <form>
-                                        <div className="search-invoice">
-                                            <Search className="icon-search" />
-                                            <input
-                                                type="text"
-                                                onChange={handleSearchTermChangeCustomerVehicle}
-                                                onClick={showListCustomerVehicle}
-                                                placeholder="Tìm kiếm theo tên"
-                                            />
-                                        </div>
+
+                                        <TextField
+                                            id="filled-search"
+                                            label="Thông tin khách hàng"
+                                            type="search"
+                                            variant="outlined"
+                                            onChange={handleSearchTermChangeCustomerVehicle}
+                                            onClick={showListCustomerVehicle}
+                                            style={{
+                                                marginLeft: "30px", width: "50%", marginTop: "20px"
+                                            }}
+                                            size="small"
+                                        />
+
+
                                     </form>
                                     <div id="info-customer-vehicle" className={listCustomerVehicleClass}>
                                         <div className="license-plate" onClick={formAddCustomerVehicle}><span className="button-add-customers">+ Thêm khách hàng</span></div>
@@ -1112,13 +1178,12 @@ function AddInvoice(props) {
                         <div className="material">
                             <div className="title-material">
                                 <div className="name-title">
-                                    <span>Thông tin phụ kiện</span>
                                 </div>
                             </div>
                             <div className="content-material">
                                 <div className="top-content">
                                     <div className="search-material">
-                                        <form>
+                                        {/* <form>
                                             <div className="search-invoice">
                                                 <Search className="icon-search" />
                                                 <input
@@ -1128,7 +1193,19 @@ function AddInvoice(props) {
                                                     placeholder="Tìm kiếm tên sản phẩm, mã ..."
                                                 />
                                             </div>
-                                        </form>
+                                        </form> */}
+                                        <TextField
+                                            id="filled-search"
+                                            label="Thông tin phụ kện"
+                                            type="search"
+                                            variant="outlined"
+                                            onChange={handleSearchTermChange}
+                                            onClick={showListMaterial}
+                                            style={{
+                                                marginLeft: "30px", width: "50%", marginTop: "20px"
+                                            }}
+                                            size="small"
+                                        />
                                         <div id="info-material" className={listMaterial}>
                                             {materitals.map((materital) => (
                                                 <div key={materital.id}>
@@ -1173,7 +1250,9 @@ function AddInvoice(props) {
                                                                         increaseVariant(materital.id)
                                                                     }
                                                                     className="ui-button--link-mod-danger m-auto-bt"
+                                                                    style={{ marginTop: "auto", marginRight: "10px" }}
                                                                 >
+
                                                                     <IconReduce />
                                                                 </span>
                                                                 <span className="ml-10 mr-10">
@@ -1218,6 +1297,7 @@ function AddInvoice(props) {
                                                                         reduceVarant(materital.id)
                                                                     }
                                                                     className="ui-button--link-mod-danger m-auto-bt"
+                                                                    style={{ marginTop: "auto", marginLeft: "10px" }}
                                                                 >
                                                                     <IconIncrease />
                                                                 </span>
@@ -1252,7 +1332,7 @@ function AddInvoice(props) {
                             <div className="content-material">
                                 <div className="top-content">
                                     <div className="search-material">
-                                        <form>
+                                        {/* <form>
                                             <div className="search-invoice">
                                                 <Search className="icon-search" />
                                                 <input
@@ -1262,7 +1342,19 @@ function AddInvoice(props) {
                                                     placeholder="Tìm kiếm tên dịch vụ, mã ..."
                                                 />
                                             </div>
-                                        </form>
+                                        </form> */}
+                                        <TextField
+                                            id="filled-search"
+                                            label="Thông tin dịch vụ"
+                                            type="search"
+                                            variant="outlined"
+                                            onChange={handleSearchTermChange}
+                                            onClick={showListService}
+                                            style={{
+                                                marginLeft: "30px", width: "50%", marginTop: "20px"
+                                            }}
+                                            size="small"
+                                        />
                                         <div id="info-material" className={listService}>
                                             {services.map((service) => (
                                                 <div key={service.id}>
@@ -1332,45 +1424,29 @@ function AddInvoice(props) {
                             <div className="title-employee"><span>Khu vực sửa chữa</span></div>
                             <div className="content-employees">
                                 <div className="search-employee" >
-                                    <form>
+                                    {/* <form>
                                         <div className="search-invoice">
                                             <input
                                                 type="text"
                                                 onChange={handleSearchTermChange}
-                                                onClick={showListEmployee}
+                                                onClick={showListArea}
                                                 placeholder="Tìm kiếm theo tên nhân viên"
                                             />
                                         </div>
-                                    </form>
-                                    {/* <div >
-                                        <TextField
-                                            id="filled-search"
-                                            label="Nhập tên khu vực"
-                                            type="search"
-                                            variant="filled"
-                                            style={{
-                                                textField: {
-                                                    width: '90%',
-                                                    marginLeft: 'auto',
-                                                    marginRight: 'auto',
-                                                    paddingBottom: 0,
-                                                    marginTop: 0,
-                                                    fontWeight: 500
-                                                },
-                                                input: {
-                                                    color: 'white'
-                                                }
-                                            }}
-                                            InputProps={{
-                                                style: {
-                                                    color: "red",
-                                                    background: "white"
-                                                }
-                                            }}
-
-                                        />
-                                    </div> */}
-                                    <div id="info-employees" className={listEmployeeClass}>
+                                    </form> */}
+                                    <TextField
+                                        id="filled-search"
+                                        label="Thông tin khu vực"
+                                        type="search"
+                                        variant="outlined"
+                                        onChange={handleSearchTermChange}
+                                        onClick={showListArea}
+                                        style={{
+                                            marginLeft: "30px", width: "70%", marginTop: "20px"
+                                        }}
+                                        size="small"
+                                    />
+                                    <div id="info-employees" className={listAreaClass}>
                                         {area.map((areas) => (
                                             <div key={areas.id} >
                                                 <div className="name" onClick={() => chooseArea(areas)}><span>{areas.name}</span></div>
@@ -1393,50 +1469,14 @@ function AddInvoice(props) {
                                     </div>
                                 </div>
                             </div>
-                            {/* <div>
-                                <input
-                                    className="next-input next-field--connected"
-                                    placeholder="Tìm kiếm thực đơn"
-                                    autoComplete="off"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={open}
-                                    className="btn btn--icon next-field--connected next-field--connected--no-flex ol-n"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10 16l-4-4h8l-4 4zm0-12L6 8h8l-4-4z"></path></svg>
-                                </button>
 
-                                <Popover
-                                    open={open1}
-                                    onClose={close}
-                                    anchorReference="anchorPosition"
-                                    anchorPosition={{ top: 199, left: 400 }}
-                                    anchorOrigin={{
-                                        vertical: 'center',
-                                        horizontal: 'center',
-                                    }}
-                                    transformOrigin={{
-                                        vertical: 'center',
-                                        horizontal: 'center',
-                                    }}
-                                >
-                                    <PopoverBody>
-                                        {area.map((areas) => (
-                                            <div key={areas.id} >
-                                                <div className="name" onClick={() => chooseEmployee(areas)}><span>{areas.name}</span></div>
-                                            </div>
-                                        ))}
-                                    </PopoverBody>
-                                </Popover>
-                            </div> */}
 
                         </div>
                         <div className="top-right-invoice">
                             <div className="title-employee"><span>Thông tin nhân viên sửa chữa</span></div>
                             <div className="content-employees">
                                 <div className="search-employee" >
-                                    <form>
+                                    {/* <form>
                                         <div className="search-invoice">
                                             <Search className="icon-search" />
                                             <input
@@ -1446,7 +1486,19 @@ function AddInvoice(props) {
                                                 placeholder="Tìm kiếm theo tên nhân viên"
                                             />
                                         </div>
-                                    </form>
+                                    </form> */}
+                                    <TextField
+                                        id="filled-search"
+                                        label="Thông tin nhân viên sửa chữa"
+                                        type="search"
+                                        variant="outlined"
+                                        onChange={handleSearchTermChange}
+                                        onClick={showListEmployee}
+                                        style={{
+                                            marginLeft: "30px", width: "70%", marginTop: "20px"
+                                        }}
+                                        size="small"
+                                    />
                                     <div id="info-employees" className={listEmployeeClass}>
                                         {employees.map((employee) => (
                                             <div key={employee.id} >

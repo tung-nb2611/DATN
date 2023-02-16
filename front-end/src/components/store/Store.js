@@ -409,7 +409,7 @@ export default function (props) {
   const DialogDoSomething = () => {
     const { dismissModal, closeAllModal } = useModal();
     return (
-      <Dialog >
+      <Dialog style={{ height: "10px" }} >
         <DialogTitle >
           Xóa cửa hàng
         </DialogTitle>

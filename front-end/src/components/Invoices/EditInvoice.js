@@ -1,9 +1,8 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect, useRef } from "react";
-import "../../assets/css/invoices/EditInvoice.css";
 import InvoicesService from "../../services/InvoicesService";
 import InvoiceSearch from "components/FiltersForm/InvoiceSearch";
-import { Search } from '@material-ui/icons';
+import { Add, Search } from '@material-ui/icons';
 import { showPrice } from "../../helper/function";
 import '../../assets/css/search/InvoiceSearch.css'
 import CustomerService from "services/CustomerService";
@@ -13,6 +12,13 @@ import MaterialService from "services/materialService";
 import ServicesService from "services/ServicesService";
 import EmployeeService from "services/EmployeeService";
 import '../../assets/css/invoices/InvoiceServiceSearch.css'
+import { Button, TextField } from "@material-ui/core";
+import IconIncrease from "common/iconIncrease";
+import { NumberFormatBase } from "react-number-format";
+import AreaService from "services/AreaService";
+import "../../assets/css/invoices/CreateInvoices.css";
+import VehicleService from "services/VehicleService";
+import IconReduce from "common/iconReduce";
 
 
 function EditInvoice(props) {
@@ -77,6 +83,12 @@ function EditInvoice(props) {
     const [filterSum, setFilterSum] = useState({
         sum: 0,
     });
+    const [filtersCustomer, setFiltersCustomer] = useState({
+        idVehicle: 1,
+        keyword: "",
+    });
+    const [areaName, setAreaName] = useState([]);
+    const [error, setError] = useState(null);
     const [noteInvoice, setNoteInvoice] = useState('');
     const [payMethod, setPayMethod] = useState();
     const [customer, setCustomer] = useState({
@@ -93,11 +105,24 @@ function EditInvoice(props) {
         licensePlate: ''
     });
     const [disabled, setDisabled] = useState(true)
-
+    const [area, setArea] = useState([]);
     const [name, setName] = useState();
     const [licensePlate, setLicensePlate] = useState();
     const [phone, setPhone] = useState();
-
+    const [listAreaClass, setListAreaClass] = useState('');
+    const [filters1, setFilters1] = useState({
+        store_id: 1,
+        status: 1,
+    });
+    const [checkQuantity, setCheckQuantity] = useState({
+        id: 1,
+        quantity: 0,
+    });
+    const [areaChose, setAreaChose] = useState({
+        id: 0,
+        code: '',
+        name: '',
+    });
     //Employee
     const showListEmployee = () => {
         if (listEmployeeClass == '') {
@@ -109,12 +134,55 @@ function EditInvoice(props) {
     const deleteEmployee = () => {
         setShowInfoEmployee('')
     }
+    const showListService = () => {
+        if (listService == '') {
+            setListService('info-material');
+
+        } else {
+            setListService('');
+
+        }
+    }
 
     const chooseEmployee = (employee) => {
         setEmployee(employee);
         setListEmployeeClass('')
         setShowInfoEmployee('info-name')
     }
+    useEffect(() => {
+        async function fetchEmployeeList() {
+            try {
+                AreaService.listArea(filters1).then((res) => {
+                    console.log("checklkk", res);
+                    const areas = res.data.areas;
+                    setArea(
+                        areas.map((area) => {
+                            return {
+                                select: false,
+                                id: area.id,
+                                code: area.code,
+                                name: area.name,
+                                status: area.status,
+                                invoice: area.invoice
+                            }
+                        }))
+                    setAreaName(areaName);
+                }).catch(function (error) {
+                    if (error.response.data.status == 403) {
+                        alert("Không có quyền truy cập!")
+                    }
+                })
+            } catch (error) {
+                if (error.status == 401) {
+                    alert("Không quyền truy cập")
+                }
+                console.log("Failed to fetch employee list: ", error.message);
+                setError(error);
+
+            }
+        }
+        fetchEmployeeList();
+    }, [filters1]);
 
     //Lấy thông tin hóa đơn
     useEffect(() => {
@@ -147,6 +215,10 @@ function EditInvoice(props) {
                     if (res.data.userDTO.id == 0) {
                         setDisabled(false)
                     }
+                    if (res.data.areaDTO !== null) {
+                        setAreaChose(res.data.areaDTO
+                        )
+                    }
                     setEmployee(res.data.userDTO);
                     setVehicle(vehicle);
                     setMaterialChoose(materials)
@@ -165,6 +237,7 @@ function EditInvoice(props) {
                         currentSumService = currentSumService + service.price;
                     })
                     setSumServices(currentSumService)
+                    setShowInfoEmployee('info-name')
                 });
 
             } catch (error) {
@@ -173,6 +246,53 @@ function EditInvoice(props) {
         }
         fetchInvoice();
     }, []);
+    //Lấy list Biển số xe
+    useEffect(() => {
+        async function fetchVehicleList() {
+            try {
+                VehicleService.getListVehicle(filters).then((res) => {
+                    let vehicleDTOS = res.data;
+                    console.log("VEHICLE :" + res.data);
+                    setVehicles(
+                        vehicleDTOS.map((vehicle) => {
+                            return {
+                                id: vehicle.id,
+                                code: vehicle.code,
+                                licensePlate: vehicle.licensePlate,
+                            }
+                        }))
+
+                }).catch(function (error) {
+                    console.log(error.response)
+                    if (error.response.data.errors) {
+                        setMessageError(error.response.data.errors[0].defaultMessage)
+                        setFail(true);
+                        // use this to make the notification autoclose
+                        setTimeout(
+                            function () {
+                                setFail(false)
+                            },
+                            3000
+                        );
+                    } else {
+                        setMessageError(error.response.data.message)
+                        setFail(true);
+                        // use this to make the notification autoclose
+                        setTimeout(
+                            function () {
+                                setFail(false)
+                            },
+                            3000
+                        );
+                    }
+                });
+
+            } catch (error) {
+                console.log("Failed to fetch Customer list: ", error.message);
+            }
+        }
+        fetchVehicleList();
+    }, [filters]);
 
     //Lấy list khách hàng
     useEffect(() => {
@@ -310,6 +430,16 @@ function EditInvoice(props) {
             setModalCustomerClass('')
         }
     }
+    const chooseVehicle = (vehicle) => {
+        setVehicle(vehicle);
+        setFiltersCustomer({
+            ...filters,
+            idVehicle: vehicle.id
+        })
+        setCustomerClass('search-customer-vehicle');
+        setListCustomerClass('')
+        setShowInfoCustomer('info-license-plate')
+    }
     const outFormAddCustomer = () => {
         if (modalCustomerClass == '') {
             setModalCustomerClass('modal-customer');
@@ -319,7 +449,7 @@ function EditInvoice(props) {
     }
 
     const back = () => {
-        props.history.push('/admin/invoices');
+        props.history.push('/admin/areas');
     }
 
     const chooseCustomer = (customer) => {
@@ -335,6 +465,98 @@ function EditInvoice(props) {
         }
 
     }
+    const formAddCustomerVehicle = () => {
+        if (modalCustomerClass == '') {
+            setModalCustomerClass('modal-customer');
+            setListCustomerVehicleClass('')
+        } else {
+            setModalCustomerClass('')
+        }
+    }
+    const chooseArea = (area) => {
+        setAreaChose(area);
+        setListAreaClass('')
+        setShowInfoEmployee('info-name')
+    }
+    function increaseVariant(id) {
+        setMaterialChoose(
+            materialChoose.map(materialCheck => {
+                if (materialCheck.quantityBuy > 0) {
+                    if (materialCheck.id === id) {
+                        materialCheck.quantityBuy = materialCheck.quantityBuy - 1;
+                    }
+                    setFilterSum({
+                        sum: 0
+                    });
+
+                    setCheckQuantity({
+                        ...checkQuantity,
+                        id: materialCheck.id,
+                        quantity: materialCheck.quantityBuy
+                    })
+
+                    return materialCheck;
+                }
+                else {
+                    if (materialCheck.id === id) {
+                        materialCheck.quantityBuy = 1;
+                    }
+                }
+            })
+        )
+
+    };
+    function reduceVarant(id) {
+        setMaterialChoose(
+            materialChoose.map(materialCheck => {
+                if (materialCheck.quantityBuy > 0) {
+                    if (materialCheck.id === id) {
+                        materialCheck.quantityBuy = materialCheck.quantityBuy + 1;
+                    }
+                    setFilterSum({
+                        sum: 0
+                    });
+                    if (materialCheck.quantityBuy > 0) {
+                        setCheckQuantity({
+                            ...checkQuantity,
+                            id: materialCheck.id,
+                            quantity: materialCheck.quantityBuy
+                        })
+                    }
+                    return materialCheck;
+                }
+            })
+        )
+    };
+    function handleSearchTermChangeCustomerVehicle(e) {
+        const value = e.target.value;
+        //Set --100 --clear, set --300 -> submit
+        //Set --300 --> submit
+        if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+        }
+        typingTimeoutRef.current = setTimeout(() => {
+            setFiltersCustomer({
+                ...filters,
+                keyword: value,
+            })
+
+        }, 300);
+    }
+    const deleteCustomer = () => {
+        setShowInfoCustomer('')
+        setCustomerClass('');
+    }
+    const deleteCustomerVehicle = () => {
+        setShowInfoCustomerVehicle('')
+    }
+    const showListArea = () => {
+        if (listEmployeeClass == '') {
+            setListAreaClass('info-employees');
+        } else {
+            setListAreaClass('')
+        }
+    }
 
     function checkMaterial(material, materials) {
         var a = 1;
@@ -346,6 +568,37 @@ function EditInvoice(props) {
         }
         return 0;
     }
+    //Hàm thêm phương tiện và thông tin khách hàng
+    const addCustomerVehicle = (e) => {
+        e.preventDefault();
+
+        let vehicleCustomerDTORequest = { name, phone, licensePlate };
+        console.log("vehicleCustomerDTORequest => " + vehicleCustomerDTORequest.name + vehicleCustomerDTORequest.phone + vehicleCustomerDTORequest.licensePlate)
+
+        CustomerService.postCustomerAndVehicle(vehicleCustomerDTORequest)
+            .then(() => {
+                setFilters({
+                    ...filters,
+                })
+                setTl(true)
+                setTimeout(
+                    function () {
+                        setTl(false)
+                    },
+                    3000
+                );
+                setListCustomerClass('');
+                setModalCustomerClass('');
+            })
+            .catch(function (error) {
+                if (error.response.data.errors) {
+                    alert(error.response.data.errors[0].defaultMessage);
+                } else {
+                    alert(error.response.data.message);
+                }
+            });
+    };
+
 
     const chooseMaterial = (material) => {
         setListMaterial('');
@@ -411,10 +664,7 @@ function EditInvoice(props) {
         }
         return 0;
     }
-    // eslint-disable-next-line no-unused-vars
-    const showListService = () => {
-        setListService('info-service');
-    }
+
 
     const chooseService = (service) => {
         setListMaterial('');
@@ -458,7 +708,7 @@ function EditInvoice(props) {
         setSumServices(currentSum);
     }
 
-    //Hàm thêm đơn hàng mới
+    //Hàm sửa đơn hàng
     const editInvoice = (e) => {
         e.preventDefault();
         let materialDTOS = [];
@@ -470,6 +720,7 @@ function EditInvoice(props) {
             }
             materialDTOS.push(material1)
         })
+
         let serviceDTOS = [];
         serviceChoose.map((service) => {
             let service1 = {
@@ -480,6 +731,7 @@ function EditInvoice(props) {
         })
         let invoice = {
             customerId: customer.id,
+            areaId: areaChose.id,
             vehicleId: vehicle.id,
             fixerId: employee.id,
             note: noteInvoice,
@@ -511,6 +763,7 @@ function EditInvoice(props) {
 
 
     };
+    console.log("arearChose", areaChose)
     const changePayMethod = (e) => {
         setPayMethod(e.target.value);
     }
@@ -617,6 +870,19 @@ function EditInvoice(props) {
                 }
             });
     }
+    const deleteInvoice = (e) => {
+        InvoicesService.deleteInvoice(id)
+            .then(() => {
+                props.history.push("/admin/areas");
+            })
+            .catch(function (error) {
+                if (error.response.data.errors) {
+                    console.log(error.response.data.errors[0].defaultMessage);
+                } else {
+                    console.log(error.response.data.message);
+                }
+            });
+    }
     const changeStatusFinish = (e) => {
         e.preventDefault();
         InvoicesService.finish(id)
@@ -681,323 +947,680 @@ function EditInvoice(props) {
         }, 300);
 
     }
+    function handleSearchTermChangeCustomerVehicle(e) {
+        const value = e.target.value;
+        //Set --100 --clear, set --300 -> submit
+        //Set --300 --> submit
+        if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+        }
+        typingTimeoutRef.current = setTimeout(() => {
+            setFiltersCustomer({
+                ...filters,
+                keyword: value,
+            })
 
+        }, 300);
+    }
 
+    console.log("ádasd", customer)
     return (
-        <div className="body-edit-invoice">
-            <div className="title-add-invoice">
-                <div className="left-title-add-invoice">
-                    <div className="back"><button className="cancel-button" onClick={back}><span>&lsaquo; </span>Quay lại</button></div>
-                    <div className="name-page" ><span>Phiếu sửa chữa</span> <span style={{ fontSize: "13px", color: "#008aff" }}>({status})</span></div>
-                </div>
-                <Snackbars
-                    place="tc"
-                    color="info"
-                    message={messageSuccess}
-                    open={tl}
-                    closeNotification={() => setTl(false)}
-                    close
-                />
-                <Snackbars
-                    place="tc"
-                    color="danger"
-                    message={messageError}
-                    open={fail}
-                    closeNotification={() => setFail(false)}
-                    close
-                />
-                <div className="right-title-add-invoice">
-                    <button id="btn-finish" className={btnFinish} onClick={finishInvoice}>Hoàn thành</button>
-                    <button id="btn-comfirm" className={btnConfirm} onClick={receiptInvoice}>Xác nhận</button>
-                    <button className="btn-add" onClick={editInvoice}>Sửa</button>
-                </div>
-            </div>
-            <div id="warning-modal" className={warningModalClass}>
-                <div id="warning" className={warningClass}>
-                    <div className="title-warning">
-                        <span>Xác nhận phiếu sửa chữa?</span>
+        <div className="body-add-invoice">
+            <div className="body-edit-invoice">
+                <div className="title-add-invoice">
+                    <div className="left-title-add-invoice">
+                        <div className="back"><button className="cancel-button" onClick={back}><span>&lsaquo; </span>Quay lại</button></div>
+                        <div className="name-page" ><span>Phiếu sửa chữa</span> </div>
                     </div>
-                    <div className="content-warning">
-                        <div className="text-warning"><span>Bạn muốn xác nhận phiếu sửa chữa ?</span></div>
-                        <div className="button-warning">
-                            <button className="delete-permission" onClick={changeStatusConfirm}><span>Xác nhận</span></button>
-                            <div className="back" onClick={closeWarning}><span>Thoát</span></div>
+                    <Snackbars
+                        place="tc"
+                        color="info"
+                        message={messageSuccess}
+                        open={tl}
+                        closeNotification={() => setTl(false)}
+                        close
+                    />
+                    <Snackbars
+                        place="tc"
+                        color="danger"
+                        message={messageError}
+                        open={fail}
+                        closeNotification={() => setFail(false)}
+                        close
+                    />
+                    <div className="right-title-add-invoice">
+                        {/* <button id="btn-finish" className={btnFinish} onClick={finishInvoice}>Hoàn thành</button>
+                        <button id="btn-comfirm" className={btnConfirm} onClick={receiptInvoice}>Xác nhận</button> */}
+                        <Button onClick={deleteInvoice} variant="outlinedSizeLarge" size="medium" style={{ background: "#EC5739", width: "136px", height: "35px", color: "white", textAlign: "center" }}> Hủy phiếu</Button>
+                        <button className="btn-add" onClick={editInvoice}>Sửa</button>
+                    </div>
+                </div>
+
+                <div id="warning-modal" className={warningModalClass}>
+                    <div id="warning" className={warningClass}>
+                        <div className="title-warning">
+                            <span>Xác nhận phiếu sửa chữa?</span>
+                        </div>
+                        <div className="content-warning">
+                            <div className="text-warning"><span>Bạn muốn xác nhận phiếu sửa chữa ?</span></div>
+                            <div className="button-warning">
+                                <button className="delete-permission" onClick={changeStatusConfirm}><span>Xác nhận</span></button>
+                                <div className="back" onClick={closeWarning}><span>Thoát</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="warning-modal-finish" className={warningModalFinishClass}>
+                    <div id="warning-finish" className={warningFinishClass}>
+                        <div className="title-warning">
+                            <span>Hoàn thành phiếu sửa chữa</span>
+                        </div>
+                        <div className="content-warning">
+                            <div className="text-warning"><span>Bạn đã hoàn thành phiếu sửa chữa này?.</span></div>
+                            <div className="button-warning">
+                                <button className="delete-permission" onClick={changeStatusFinish}><span>Hoàn thành</span></button>
+                                <div className="back" onClick={closeWarningFinish}><span>Thoát</span></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div id="warning-modal-finish" className={warningModalFinishClass}>
-                <div id="warning-finish" className={warningFinishClass}>
-                    <div className="title-warning">
-                        <span>Hoàn thành phiếu sửa chữa</span>
-                    </div>
-                    <div className="content-warning">
-                        <div className="text-warning"><span>Bạn đã hoàn thành phiếu sửa chữa này?.</span></div>
-                        <div className="button-warning">
-                            <button className="delete-permission" onClick={changeStatusFinish}><span>Hoàn thành</span></button>
-                            <div className="back" onClick={closeWarningFinish}><span>Thoát</span></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
             <div className="content-add-invoice">
-                <div className="top-left-invoice">
-                    <div className="title-customer"><span>Thông tin khách hàng</span></div>
-                    <div className="content-customer">
-                        <div className="search-customer" >
-                            <form>
-                                <div className="search-invoice">
-                                    <Search className="icon-search" />
-                                    <input
-                                        type="text"
+                <div className="main-invoice">
+
+                    <div className="left-invoice">
+                        <div className="top-left-invoice">
+                            <div className="content-customer">
+                                <div className="search-customer" >
+
+                                    {/* <TextField
+                                        id="filled-search"
+                                        label="Thông tin xe"
+                                        type="search"
+                                        variant="outlined"
                                         onChange={handleSearchTermChange}
                                         onClick={showListCustomer}
-                                        placeholder="Tìm kiếm theo biển số xe"
-                                        disabled
-                                    />
-                                </div>
-                            </form>
-                            <div id="info-customers" className={listCustomerClass}>
-                                <div className="license-plate" onClick={formAddCustomer}><span className="button-add-customers">+ Thêm Khách Hàng</span></div>
-                                {vehicles.map((vehicle) => (
-                                    <div key={vehicle.id} >
-                                        <div className="license-plate" onClick={() => chooseCustomer(vehicle)}><span>{vehicle.licensePlate}</span></div>
-                                    </div>
-                                ))}
-                            </div>
-                            <div id="info-license-plate" className={showInfoCustomer} style={{ display: "block" }}>
-                                <div className="info" >
-                                    <div className="table" >
-                                        <table>
-                                            <tr>
-                                                <th>Biển số</th>
-                                                <td>:</td>
-                                                <td>{vehicle.licensePlate}</td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                    <div className="delete-license"><span></span></div>
-                                </div>
-                            </div>
+                                        style={{
+                                            marginLeft: "30px", width: "50%", marginTop: "20px"
+                                        }}
+                                    /> */}
 
-                        </div>
-                        <div id="search-customer-vehicle" className={customerClass} style={{ display: "block" }} >
-                            <form>
-                                <div className="search-invoice">
-                                    <Search className="icon-search" />
-                                    <input
-                                        type="text"
-                                        disabled
-                                        onClick={showListCustomerVehicle}
-                                        placeholder="Tìm kiếm theo tên"
-                                    />
+                                    <div id="info-customers" className={listCustomerClass}>
+                                        <div className="license-plate" onClick={formAddCustomer}>
+
+                                            <Add color="#0e90ff" onClick={formAddCustomer}> </Add> Thêm phương tiện
+                                        </div>
+
+                                        {vehicles.map((vehicle) => (
+                                            <div key={vehicle.id} >
+                                                <div className="license-plate" onClick={() => chooseVehicle(vehicle)}><span>{vehicle.licensePlate}</span></div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div id="info-license-plate" className="info-license-plate">
+                                        <div className="info" >
+                                            <div className="table" >
+                                                <table>
+                                                    <tr>
+                                                        <th>Biển số</th>
+                                                        <td>:</td>
+                                                        <td>{vehicle.licensePlate}</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div id="modal-vehicle" className={modalCustomerClass}>
+                                        <div id="add-vehicle">
+                                            <div className="title-add-customer">
+                                                <div className="name-title"><span>Thêm mới phương tiện</span></div>
+                                                <div className="close-form-add-customer"><span onClick={outFormAddCustomer}>&Chi;</span></div>
+                                            </div>
+                                            <div className="content-add-customer">
+                                                <form>
+                                                    <div className="form-group-top">
+                                                        <div className="form-group">
+                                                            <label>Họ Tên<span style={{ color: "red" }}>*</span></label><br />
+                                                            <input type="text" className="input-customer" name="name" onChange={changeName} />
+                                                        </div>
+                                                        <div className="form-group">
+                                                            <label>Số điện thoại<span style={{ color: "red" }}>*</span></label><br />
+                                                            <input type="text" className="input-customer" name="phone" onChange={changePhone} />
+                                                        </div>
+                                                    </div>
+                                                    <div className="form-group-bot">
+                                                        <label>Biển số xe<span style={{ color: "red" }}>*</span></label><br />
+                                                        <input type="text" className="input-customer" name="licensePlate" onChange={changeLicensePlate} />
+                                                    </div>
+                                                </form>
+
+                                                <div className="button-add-customer">
+                                                    <button className="btn-add" onClick={addCustomerVehicle}>Thêm</button>
+                                                    <div className="btn-out" onClick={outFormAddCustomer}><span>Thoát</span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </form>
-                            <div id="info-customer-vehicle" className={listCustomerVehicleClass}>
-                                <div className="license-plate"><span className="button-add-customers">+ Thêm khách hàng</span></div>
-                                {customers.map((customer) => (
-                                    <div key={customer.id} >
-                                        <div className="license-plate" onClick={() => chooseCustomer(customer)}>
+                                <div id="info-customer" className="info-customer">
+                                    <div className="info" >
+                                        <div className="table" >
                                             <table>
                                                 <tr>
-                                                    <td><span>{customer.name}</span> </td>
-                                                    <td><span>{customer.phone}</span></td>
+                                                    <th>Tên</th>
+                                                    <td>:</td>
+                                                    <td>{customer.name}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Số điện thoại</th>
+                                                    <td>:</td>
+                                                    <td>{customer.phone}</td>
                                                 </tr>
                                             </table>
                                         </div>
+
                                     </div>
-                                ))}
+                                </div>
+                                <div id="search-customer-vehicle"  >
+                                    <form>
+
+                                        <TextField
+                                            id="filled-search"
+                                            label="Thông tin khách hàng"
+                                            type="search"
+                                            variant="outlined"
+                                            onChange={handleSearchTermChangeCustomerVehicle}
+                                            onClick={showListCustomerVehicle}
+                                            style={{
+                                                marginLeft: "30px", width: "50%", marginTop: "20px"
+                                            }}
+                                        />
+
+
+                                    </form>
+                                    <div id="info-customer-vehicle" className={listCustomerVehicleClass}>
+                                        <div className="license-plate" onClick={formAddCustomerVehicle}><span className="button-add-customers">+ Thêm khách hàng</span></div>
+                                        {customers.map((customer) => (
+                                            <div key={customer.id} >
+                                                <div className="license-plate" onClick={() => chooseCustomer(customer)}>
+                                                    <table>
+                                                        <tr>
+                                                            <td><span>{customer.name}</span> </td>
+                                                            <td><span>{customer.phone}</span></td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div id="info-customer" className="info-customer">
+                                        <div className="info" >
+                                            <div className="table" >
+                                                <table>
+                                                    <tr>
+                                                        <th>Tên</th>
+                                                        <td>:</td>
+                                                        <td>{customer.name}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Số điện thoại</th>
+                                                        <td>:</td>
+                                                        <td>{customer.phone}</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                            <div className="delete-license"><span onClick={deleteCustomerVehicle}>x</span></div>
+                                        </div>
+                                    </div>
+                                    <div id="modal-customer" className={modalCustomerClass}>
+                                        <div id="add-customer">
+                                            <div className="title-add-customer">
+                                                <div className="name-title"><span>Thêm mới khách hàng</span></div>
+                                                <div className="close-form-add-customer"><span onClick={outFormAddCustomer}>&Chi;</span></div>
+                                            </div>
+                                            <div className="content-add-customer">
+                                                <form>
+                                                    <div className="form-group-top">
+                                                        <div className="form-group">
+                                                            <label>Họ Tên<span style={{ color: "red" }}>*</span></label><br />
+                                                            <input type="text" className="input-customer" name="name" onChange={changeName} />
+                                                        </div>
+                                                        <div className="form-group">
+                                                            <label>Số điện thoại<span style={{ color: "red" }}>*</span></label><br />
+                                                            <input type="text" className="input-customer" name="phone" onChange={changePhone} />
+                                                        </div>
+                                                    </div>
+                                                    <div className="form-group-bot">
+                                                        <label>Biển số xe</label><br />
+                                                        <input type="text" disabled className="input-customer" name="licensePlate" value={vehicle.licensePlate} />
+                                                    </div>
+                                                </form>
+                                                <div className="button-add-customer">
+                                                    <button className="btn-add" onClick={addCustomer}>Thêm</button>
+                                                    <div className="btn-out" onClick={outFormAddCustomer}><span>Thoát</span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div id="info-customer" className={showInfoCustomerVehicle} style={{ display: "block" }}>
-                                <div className="info" >
-                                    <div className="table" >
+                        </div>
+                        <div className="material">
+                            <div className="title-material">
+                                <div className="name-title">
+                                    <span>Thông tin phụ kiện</span>
+                                </div>
+                            </div>
+                            <div className="content-material">
+                                <div className="top-content">
+                                    <div className="search-material">
+                                        {/* <form>
+                                            <div className="search-invoice">
+                                                <Search className="icon-search" />
+                                                <input
+                                                    type="text"
+                                                    onClick={showListMaterial}
+                                                    onChange={handleSearchTermChange}
+                                                    placeholder="Tìm kiếm tên sản phẩm, mã ..."
+                                                />
+                                            </div>
+                                        </form> */}
+                                        <TextField
+                                            id="filled-search"
+                                            label="Thông tin phụ kiện"
+                                            type="search"
+                                            variant="outlined"
+                                            onChange={handleSearchTermChange}
+                                            onClick={showListMaterial}
+                                            style={{
+                                                marginLeft: "30px", width: "50%", marginTop: "20px"
+                                            }}
+                                            size="small"
+                                        />
+                                        <div id="info-material" className={listMaterial}>
+                                            {materitals.map((materital) => (
+                                                <div key={materital.id}>
+                                                    <div className="info-detail" onClick={() => chooseMaterial(materital)}>
+                                                        <table>
+                                                            <tr>
+                                                                <td className="td-1">{materital.name}</td>
+                                                                <td className="td-2">{showPrice(materital.outputPrice).toString()}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td className="td-1">{materital.code}</td>
+                                                                <td className="td-2">Có thể bán: {materital.quantity}</td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="main-content">
+                                    <div className="table">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <td className="th-1"><span>Mã</span></td>
+                                                    <td className="th-2"><span>phụ kiện</span></td>
+                                                    <td className="th-3"><span>Số lượng</span></td>
+                                                    <td className="th-4"><span>Giá</span></td>
+                                                    <td className="th-5"></td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {materialChoose.map((materital) => (
+                                                    <tr key={materital.id}>
+                                                        <td className="td-1"><span>{materital.code}</span></td>
+                                                        <td className="td-2"><span>{materital.name}</span></td>
+                                                        <td className="td-3">
+                                                            <div style={{ display: "inline-flex", marginLeft: "10px" }}>
+                                                                <span
+                                                                    onClick={() =>
+                                                                        increaseVariant(materital.id)
+                                                                    }
+                                                                    className="ui-button--link-mod-danger m-auto-bt"
+                                                                    style={{ marginTop: "auto", marginRight: "10px" }}
+                                                                >
+                                                                    <IconReduce />
+                                                                </span>
+                                                                <span className="ml-10 mr-10">
+                                                                    <NumberFormatBase
+                                                                        style={{
+                                                                            width: "60px",
+                                                                            height: "32px",
+                                                                            textAlign: "center",
+                                                                        }}
+                                                                        thousandSeparator=","
+                                                                        decimalSeparator="."
+                                                                        allowNegative={false}
+
+                                                                        value={materital.quantityBuy}
+                                                                        onChange={e => {
+                                                                            setMaterialChoose(
+                                                                                materialChoose.map(materialCheck => {
+                                                                                    if (materialCheck.id === materital.id) {
+                                                                                        materialCheck.quantityBuy = e.target.value;
+                                                                                    }
+                                                                                    setFilterSum({
+                                                                                        sum: 0
+                                                                                    });
+                                                                                    if (e.target.value > 0) {
+                                                                                        setCheckQuantity({
+                                                                                            ...checkQuantity,
+                                                                                            id: materialCheck.id,
+                                                                                            quantity: e.target.value
+                                                                                        })
+                                                                                    }
+                                                                                    return materialCheck;
+                                                                                })
+                                                                            )
+
+                                                                        }}
+                                                                        inputMode="decimal"
+                                                                        pattern="[0-9.]*"
+                                                                    />
+                                                                </span>
+                                                                <span
+                                                                    onClick={() =>
+                                                                        reduceVarant(materital.id)
+                                                                    }
+                                                                    className="ui-button--link-mod-danger m-auto-bt"
+                                                                    style={{ marginTop: "auto", marginLeft: "10px" }}
+                                                                >
+                                                                    <IconIncrease />
+                                                                </span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="td-4"><span>{showPrice(materital.outputPrice).toString()}</span></td>
+                                                        <td className="td-5 delete-material"><span onClick={() => deleteMaterialChoosed(materital)}>x</span></td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div className="bottom-content">
+                                    <div className="total">
                                         <table>
                                             <tr>
-                                                <th>Tên</th>
-                                                <td>:</td>
-                                                <td>{customer.name}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Số điện thoại</th>
-                                                <td>:</td>
-                                                <td>{customer.phone}</td>
+                                                <th>Tổng tạm tính: </th>
+                                                <td>{showPrice(sumMaterial).toString()}</td>
                                             </tr>
                                         </table>
                                     </div>
-                                    <div className="delete-license"><span></span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="material">
+                            <div className="title-material">
+                                <div className="name-title">
+                                    <span>Thông tin dịch vụ</span>
+                                </div>
+                            </div>
+                            <div className="content-material">
+                                <div className="top-content">
+                                    <div className="search-material">
+                                        {/* <form>
+                                            <div className="search-invoice">
+                                                <Search className="icon-search" />
+                                                <input
+                                                    type="text"
+                                                    onClick={showListService}
+                                                    onChange={handleSearchTermChange}
+                                                    placeholder="Tìm kiếm tên dịch vụ, mã ..."
+                                                />
+                                            </div>
+                                        </form> */}
+                                        <TextField
+                                            id="filled-search"
+                                            label="Thông tin dịch vụ"
+                                            type="search"
+                                            variant="outlined"
+                                            onChange={handleSearchTermChange}
+                                            onClick={showListService}
+                                            style={{
+                                                marginLeft: "30px", width: "50%", marginTop: "20px"
+                                            }}
+                                            size="small"
+                                        />
+                                        <div id="info-material" className={listService}>
+                                            {services.map((service) => (
+                                                <div key={service.id}>
+                                                    <div className="info-detail" onClick={() => chooseService(service)}>
+                                                        <table>
+                                                            <tr>
+                                                                <td className="td-1">{service.name}</td>
+                                                                <td className="td-2">{showPrice(service.price).toString()}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td className="td-1">{service.code}</td>
+                                                                <td className="td-2">Đang hoạt động</td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="main-content">
+                                    <div className="table">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <td className="th-1"><span>Mã</span></td>
+                                                    <td className="th-2"><span>phụ kiện</span></td>
+                                                    <td className="th-3"><span>Số lượng</span></td>
+                                                    <td className="th-4"><span>Giá</span></td>
+                                                    <td className="th-5"></td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {serviceChoose.map((service) => (
+                                                    <tr key={service.id}>
+                                                        <td className="td-1"><span>{service.code}</span></td>
+                                                        <td className="td-2"><span>{service.name}</span></td>
+                                                        <td className="td-3">
+
+                                                            <span style={{ textAlign: "center" }}>
+                                                                <input value="1" />
+                                                            </span>
+                                                        </td>
+                                                        <td className="td-4"><span>{showPrice(service.price).toString()}</span></td>
+                                                        <td className="td-5 delete-service"><span onClick={() => deleteServiceChoosed(service)}>x</span></td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div className="bottom-content">
+                                    <div className="total">
+                                        <table>
+                                            <tr>
+                                                <th>Tổng tạm tính: </th>
+                                                <td>{showPrice(sumServices).toString()}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="right-invoice">
+                        <div className="top-right-invoice">
+                            <div className="title-employee"><span>Khu vực sửa chữa</span></div>
+                            <div className="content-employees">
+                                <div className="search-employee" >
+                                    {/* <form>
+                                        <div className="search-invoice">
+                                            <input
+                                                type="text"
+                                                onChange={handleSearchTermChange}
+                                                onClick={showListArea}
+                                                placeholder="Tìm kiếm theo tên nhân viên"
+                                            />
+                                        </div>
+                                    </form> */}
+                                    <TextField
+                                        id="filled-search"
+                                        label="Thông tin khu vực"
+                                        type="search"
+                                        variant="outlined"
+                                        onChange={handleSearchTermChange}
+                                        onClick={showListArea}
+                                        style={{
+                                            marginLeft: "30px", width: "70%", marginTop: "20px"
+                                        }}
+                                        size="small"
+                                    />
+                                    <div id="info-employees" className={listAreaClass}>
+                                        {area.map((areas) => (
+                                            <div key={areas.id} >
+                                                <div className="name" onClick={() => chooseArea(areas)}><span>{areas.name}</span></div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div id="info-name" className={showInfoEmployee}>
+                                        <div className="info" >
+                                            <div className="table" >
+                                                <table>
+                                                    <tr>
+                                                        <th>Tên khu vực</th>
+                                                        <td>:</td>
+                                                        <td>{areaChose.name}</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                            <div className="delete-name"><span onClick={deleteEmployee}>x</span></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
+
                         </div>
-                    </div>
-                </div>
-                <div className="top-right-invoice">
-                    <div className="title-employee"><span>Thông tin nhân viên sửa chữa</span></div>
-                    <div className="content-employees">
-                        <div className="search-employee" >
-                            <form>
-                                <div className="search-invoice">
-                                    <Search className="icon-search" />
-                                    <input
-                                        type="text"
-                                        onChange={handleSearchTermChange}
-                                        onClick={showListEmployee}
-                                        placeholder="Tìm kiếm theo tên nhân viên"
-                                        disabled={disabled}
-                                    />
-                                </div>
-                            </form>
-                            <div id="info-employees" className={listEmployeeClass} >
-                                {employees.map((employee) => (
-                                    <div key={employee.id} >
-                                        <div className="name" onClick={() => chooseEmployee(employee)}><span>{employee.name}</span></div>
-                                    </div>
-                                ))}
-                            </div>
-                            <div id="info-name" className={showInfoEmployee} style={{ display: "block" }}>
-                                <div className="info" >
-                                    <div className="table" >
-                                        <table>
-                                            <tr>
-                                                <th>Tên</th>
-                                                <td>:</td>
-                                                <td>{employee.name}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Số điện thoại</th>
-                                                <td>:</td>
-                                                <td>{employee.phone}</td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                    <div className="delete-name"><span onClick={deleteEmployee}></span></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="main-invoice">
-                    <div className="left-invoice">
-                        <div className="title-material">
-                            <div className="name-title">
-                                <span>Thông tin phụ kiện và dịch vụ</span>
-                            </div>
-                        </div>
-                        <div className="content-material">
-                            <div className="top-content">
-                                <div className="search-material">
-                                    <form>
+                        <div className="top-right-invoice">
+                            <div className="title-employee"><span>Thông tin nhân viên sửa chữa</span></div>
+                            <div className="content-employees">
+                                <div className="search-employee" >
+                                    {/* <form>
                                         <div className="search-invoice">
                                             <Search className="icon-search" />
                                             <input
                                                 type="text"
                                                 onChange={handleSearchTermChange}
-                                                onClick={showListMaterial}
-                                                placeholder="Tìm kiếm tên sản phẩm, mã ..."
+                                                onClick={showListEmployee}
+                                                placeholder="Tìm kiếm theo tên nhân viên"
                                             />
-                                            <div className="choose-materials"><span>Chọn</span></div>
                                         </div>
-                                    </form>
-                                    <div id="info-material" className={listMaterial}>
-                                        {materitals.map((materital) => (
-                                            <div key={materital.id}>
-                                                <div className="info-detail" onClick={() => chooseMaterial(materital)}>
-                                                    <table>
-                                                        <tr>
-                                                            <td className="td-1">{materital.name}</td>
-                                                            <td className="td-2">{showPrice(materital.outputPrice).toString()}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td className="td-1">{materital.code}</td>
-                                                            <td className="td-2">Có thể bán: {materital.quantity}</td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        ))}
-                                        {services.map((service) => (
-                                            <div key={service.id}>
-                                                <div className="info-detail" onClick={() => chooseService(service)}>
-                                                    <table>
-                                                        <tr>
-                                                            <td className="td-1">{service.name}</td>
-                                                            <td className="td-2">{showPrice(service.price).toString()}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td className="td-1">{service.code}</td>
-                                                            <td className="td-2">Đang hoạt động</td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
+                                    </form> */}
+                                    <TextField
+                                        id="filled-search"
+                                        label="Thông tin nhân viên"
+                                        type="search"
+                                        variant="outlined"
+                                        onChange={handleSearchTermChange}
+                                        onClick={showListArea}
+                                        style={{
+                                            marginLeft: "30px", width: "70%", marginTop: "20px"
+                                        }}
+                                        size="small"
+                                    />
+                                    <div id="info-employees" className={listEmployeeClass}>
+                                        {employees.map((employee) => (
+                                            <div key={employee.id} >
+                                                <div className="name" onClick={() => chooseEmployee(employee)}><span>{employee.name}</span></div>
                                             </div>
                                         ))}
                                     </div>
+                                    <div id="info-name" className={showInfoEmployee}>
+                                        <div className="info" >
+                                            <div className="table" >
+                                                <table>
+                                                    <tr>
+                                                        <th>Tên</th>
+                                                        <td>:</td>
+                                                        <td>{employee.name}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Số điện thoại</th>
+                                                        <td>:</td>
+                                                        <td>{employee.phone}</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                            <div className="delete-name"><span onClick={deleteEmployee}>x</span></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="main-content">
-                                <div className="table">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <td className="th-1"><span>Mã phụ kiện, dịch vụ</span></td>
-                                                <td className="th-2"><span>Tên phụ kiện</span></td>
-                                                <td className="th-3"><span>Số lượng</span></td>
-                                                <td className="th-4"><span>Thành tiền</span></td>
-                                                <td className="th-5"></td>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {materialChoose.map((material) => (
-                                                <tr key={material.id}>
-                                                    <td className="td-1"><span>{material.code}</span></td>
-                                                    <td className="td-2"><span>{material.name}</span></td>
-                                                    <td className="td-3"><span><input value={material.quantityBuy} onChange={e => {
-                                                        setMaterialChoose(
-                                                            materialChoose.map(materialCheck => {
-                                                                if (materialCheck.id === material.id) {
-                                                                    materialCheck.quantityBuy = e.target.value;
-
-                                                                }
-                                                                setFilterSum({
-                                                                    sum: 0
-                                                                });
-                                                                return materialCheck;
-                                                            })
-                                                        )
-                                                    }} /></span></td>
-                                                    <td className="td-4"><span>{showPrice(material.outputPrice).toString()}</span></td>
-                                                    <td className="td-5 delete-material"><span onClick={() => deleteMaterialChoosed(material)}>x</span></td>
-                                                </tr>
-                                            ))}
-                                            {serviceChoose.map((service) => (
-                                                <tr key={service.id}>
-                                                    <td className="td-1"><span>{service.code}</span></td>
-                                                    <td className="td-2"><span>{service.name}</span></td>
-                                                    <td className="td-3"><span><input value="1" /></span></td>
-                                                    <td className="td-4"><span>{showPrice(service.price).toString()}</span></td>
-                                                    <td className="td-5 delete-service"><span onClick={() => deleteServiceChoosed(service)}>x</span></td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-
-                                    </table>
-                                </div>
+                        </div>
+                        <div className="invoice">
+                            <div className="title-right-invoice">
+                                <span>Hóa Đơn tạm tính</span>
                             </div>
-                            <div className="bottom-content">
-                                <div className="total">
+                            <div className="content-pay-invoice">
+
+                                <div className="pay-method">
+                                    <div className="content-pay-method">
+                                        <table>
+                                            <thead>
+                                                <tr style={{ fontWeight: "bold", fontSize: "15px" }}>
+                                                    <td className="td"><span>Phụ kiện</span></td>
+                                                    <td ><span style={{ marginLeft: "52px" }}>Số lượng</span></td>
+                                                    <td className="tf"><span style={{ marginLeft: "85px" }}>Giá</span></td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {materialChoose.map((materital) => (
+                                                    <tr key={materital.id}>
+                                                        <td className="td-2"><span style={{ width: "100px" }}>{materital.name}</span></td>
+                                                        <td className="td-3">
+                                                            <span style={{ marginLeft: "75px" }}>{materital.quantityBuy}
+                                                            </span>
+                                                        </td>
+                                                        <td className="td-4"><span style={{ marginLeft: "55px" }}>{showPrice(materital.outputPrice * materital.quantityBuy).toString()}</span></td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                        <table>
+                                            <thead>
+                                                <tr style={{ fontWeight: "bold", fontSize: "15px" }}>
+                                                    <td className="td"><span>Dịch vụ</span></td>
+                                                    <td className="tf"><span style={{ marginLeft: "220px" }}>Giá</span></td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {serviceChoose.map((service) => (
+                                                    <tr key={service.id}>
+                                                        <td className="td-2"><span style={{ width: "100px" }}>{service.name}</span></td>
+                                                        <td className="td-4"><span style={{ marginLeft: "207px" }}>{showPrice(service.price).toString()}</span></td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div className="total-pay">
                                     <table>
-                                        <tr>
-                                            <th>Tổng tạm tính: </th>
-                                            <td>{showPrice(sumMaterial + sumServices).toString()}</td>
+                                        <tr style={{ fontWeight: "bold", fontSize: "15px", marginTop: "200px" }}>
+                                            <th>Tổng tiền thanh toán tạm tính</th>
+                                            <td>:</td>
+                                            <td >{showPrice(sumMaterial + sumServices).toString()}</td>
                                         </tr>
                                     </table>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
-                <div className="bottom-invoice">
+                {/* <div className="bottom-invoice">
                     <div className="left-invoice">
                         <div className="note-invoice">
                             <label>Ghi chú</label><br />
@@ -1015,20 +1638,37 @@ function EditInvoice(props) {
                                     <span>Xác nhận thanh toán</span>
                                 </div>
                                 <div className="content-pay-method">
-                                    <form>
-                                        <div className="pay-method-group">
-                                            <input type="radio" name="payMethod" onChange={changePayMethod} value="1" checked />
-                                            <label>Thanh toán tiền mặt</label>
-                                        </div>
-                                        <div className="pay-method-group">
-                                            <input type="radio" name="payMethod" value="2" onChange={changePayMethod} />
-                                            <label>Thanh toán chuyển khoản</label>
-                                        </div>
-                                    </form>
+
                                 </div>
                             </div>
                             <div className="total-pay">
                                 <table>
+                                    <thead>
+                                        <tr>
+                                            <td className="th-2"><span>phụ kiện</span></td>
+                                            <td className="th-3"><span>Số lượng</span></td>
+                                            <td className="th-4"><span>Giá</span></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {materialChoose.map((materital) => (
+                                            <tr key={materital.id}>
+                                                <td className="td-2"><span>{materital.name}</span></td>
+                                                <td className="td-3">
+                                                    <span>{materital.quantityBuy}
+                                                    </span>
+                                                </td>
+                                                <td className="td-4"><span>{showPrice(materital.outputPrice).toString()}</span></td>
+                                            </tr>
+                                        ))}
+                                        {serviceChoose.map((service) => (
+                                            <tr key={service.id}>
+                                                <td className="td-2"><span>{service.name}</span></td>
+                                                <td className="td-3"><span><input value="1" /></span></td>
+                                                <td className="td-4"><span>{showPrice(service.price).toString()}</span></td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
                                     <tr>
                                         <th style={{ color: "#008aff" }}>Tổng tiền phụ kiện ({materialChoose.length} sản phẩm)</th>
                                         <td>:</td>
@@ -1040,7 +1680,7 @@ function EditInvoice(props) {
                                         <td>{showPrice(sumServices).toString()}</td>
                                     </tr>
                                     <tr className="total">
-                                        <th>Tổng tiền thanh toán</th>
+                                        <th>Tổng tiền thanh toán tạm tính</th>
                                         <td>:</td>
                                         <td className="total-td">{showPrice(sumMaterial + sumServices).toString()}</td>
                                     </tr>
@@ -1048,7 +1688,7 @@ function EditInvoice(props) {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
             </div>
 
         </div>

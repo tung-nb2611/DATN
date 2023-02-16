@@ -420,12 +420,12 @@
 
 .search-customer>.search-customer-vehicle>#info-customer-vehicle>div>.license-plate {
     width: 490px;
-    line-height: 30px;
+    line-height: 35px;
     cursor: pointer;
 }
 
 .search-customer>.search-customer-vehicle>#info-customer-vehicle>.license-plate {
-    color: #008aff;
+    color: #A3A8AF;
     cursor: pointer;
 }
 
@@ -436,11 +436,11 @@
 
 .search-customer>.search-customer-vehicle>#info-customer-vehicle>.license-plate:hover {
     color: white;
-    background: #008aff;
+    background: #A3A8AF;
 }
 
 .search-customer>.search-customer-vehicle>#info-customer-vehicle>div>.license-plate:hover {
-    background: #008aff;
+    background: #A3A8AF;
     color: white;
 }
 

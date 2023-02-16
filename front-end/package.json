@@ -10,6 +10,7 @@
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@material-ui/core": "4.10.0",
     "@material-ui/icons": "4.9.1",
+    "@material-ui/styles": "^4.11.5",
     "@mui/utils": "^5.11.7",
     "@reach/visually-hidden": "^0.18.0",
     "@sapo-presentation/sapo-ui-components": "^1.6.17-unstable-alpha.3",
@@ -34,6 +35,7 @@
     "react-select": "^4.3.1",
     "react-swipeable-views": "0.13.9",
     "react-tooltip": "^5.4.0",
+    "react-window": "^1.8.8",
     "reactstrap": "^9.1.5",
     "redux": "^4.2.0",
     "styled-components": "^5.3.6"

@@ -18,22 +18,26 @@ const getMaterialId = (materialId) => {
 
 const getAllMaterial = (filters) => {
   const paramsString = queryString.stringify(filters);
-  return axios.get(MATERIALS_API_URL + `/list?${paramsString}`,filters);
+  return axios.get(MATERIALS_API_URL + `/list?${paramsString}`, filters);
 };
 
 const updateMaterial = (id, material) => {
   return axios.put(MATERIALS_API_URL + "/" + `${id}`, material);
 };
-const postMaterialDTO = (material) =>{
-  return axios.post(MATERIALS_API_URL+ "/receipt", material);
+const postMaterialDTO = (material) => {
+  return axios.post(MATERIALS_API_URL + "/receipt", material);
 }
 const getListMaterial = (filters) => {
   const paramsString = queryString.stringify(filters);
-  return axios.get(MATERIALS_API_URL_1 +`?${paramsString}`,filters);
+  return axios.get(MATERIALS_API_URL_1 + `?${paramsString}`, filters);
 };
 
 const deleteMaterial = (id) => {
   return axios.put(MATERIALS_API_URL + "/delete/" + `${id}`);
+};
+const deleteListMaterial = (filter1) => {
+  const paramsString = queryString.stringify(filter1)
+  return axios.put(MATERIALS_API_URL + `?${paramsString}`, filter1);
 };
 
 
@@ -45,5 +49,6 @@ export default {
   getMaterialId,
   updateMaterial,
   postMaterialDTO,
-  deleteMaterial
+  deleteMaterial,
+  deleteListMaterial
 };

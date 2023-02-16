@@ -95,6 +95,7 @@ const switchRoutes = (
     <Route exact path="/admin/areas" component={Area} />
     <Route exact path="/admin/areas/add-area" component={CreateArea} />
     <Route exact path="/admin/areas/update-area/:id" component={UpdateArea} />
+
     {/* store */}
     <Route exact path="/admin/store" component={Store} />
     <Route exact path="/admin/store/update-store/:id" component={UpdateStore} />
@@ -107,6 +108,7 @@ const switchRoutes = (
     <Route exact path="/admin/receipts/view-receipt/:id" component={ViewReceipt} />
     <Route exact path="/admin/invoices/add-invoice" component={AddInvoice} />
     <Route exact path="/admin/invoices/payment" component={Payment} />
+
     {/* roles */}
     <Route exact path="/admin/roles" component={Roles} />
     <Route exact path="/admin/roles/add-role" component={CreateRole} />

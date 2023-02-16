@@ -1,10 +1,10 @@
 /* eslint-disable react/prop-types */
-import React, { useState, useEffect,useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../../assets/css/invoices/CreateInvoiceMaterial.css";
 import ReceiptsService from "services/ReceiptsService";
 import { Search } from '@material-ui/icons';
 import '../../assets/css/search/ReceiptSearch.css'
-import {showPrice} from "../../helper/function";
+import { showPrice } from "../../helper/function";
 import Snackbars from 'components/Snackbar/Snackbar.js';
 import '../../assets/css/invoices/InvoiceMaterialSearch.css'
 import MaterialService from "services/materialService";
@@ -13,14 +13,14 @@ import '../../assets/css/invoices/InvoiceServiceSearch.css'
 
 export default function CreateReceipt(props) {
     React.useEffect(() => {
-    // Specify how to clean up after this effect:
-    return function cleanup() {
-        // to stop the warning of calling setTl of unmounted component
-        var id = window.setTimeout(null, 0);
-        while (id--) {
-        window.clearTimeout(id);
-        }
-    };
+        // Specify how to clean up after this effect:
+        return function cleanup() {
+            // to stop the warning of calling setTl of unmounted component
+            var id = window.setTimeout(null, 0);
+            while (id--) {
+                window.clearTimeout(id);
+            }
+        };
     });
 
     const [message, setMessage] = useState('');
@@ -35,16 +35,18 @@ export default function CreateReceipt(props) {
     const [note, setNote] = useState('');
     const [payMethod, setPayMethod] = useState();
     const [nameMaterial, setNameMaterial] = useState();
-    const [inputPrice, setInputPrice]= useState();
-    const [outputPrice, setOutputPrice]= useState();
-    const [description, setDescription]= useState();
+    const [inputPrice, setInputPrice] = useState();
+    const [outputPrice, setOutputPrice] = useState();
+    const [description, setDescription] = useState();
     const [supplier, setSupplier] = useState();
     const [filterSum, setFilterSum] = useState({
         sum: 0,
     });
     const [filters, setFilters] = useState({
         keyword: "",
-      });
+        status: 1,
+        store_id: 1
+    });
 
 
     //Lấy list Phụ kiện
@@ -101,7 +103,7 @@ export default function CreateReceipt(props) {
         async function fetchMaterialList() {
             try {
                 let currentSumMaterial = 0;
-                materialChoose.map((data) => { 
+                materialChoose.map((data) => {
                     currentSumMaterial += data.quantityInput * data.inputPrice;
                 })
                 setSumMaterial(currentSumMaterial);
@@ -174,7 +176,7 @@ export default function CreateReceipt(props) {
             }
             materialDTO.push(material1)
         })
-        let receiptDTO = { materialDTOS :  materialDTO, note : note}
+        let receiptDTO = { materialDTOS: materialDTO, note: note }
         console.log("receipt => " + JSON.stringify(receiptDTO));
         ReceiptsService.postReceipt(receiptDTO)
             .then(() => {
@@ -186,22 +188,22 @@ export default function CreateReceipt(props) {
                     setTl(true);
                     // use this to make the notification autoclose
                     setTimeout(
-                      function () {
-                        setTl(false)
-                      },
-                      3000
+                        function () {
+                            setTl(false)
+                        },
+                        3000
                     );
-                  } else {
+                } else {
                     setMessage(error.response.data.message)
                     setTl(true);
                     // use this to make the notification autoclose
                     setTimeout(
-                      function () {
-                        setTl(false)
-                      },
-                      3000
+                        function () {
+                            setTl(false)
+                        },
+                        3000
                     );
-                  }
+                }
             });
     };
     const changePayMethod = (e) => {
@@ -249,33 +251,33 @@ export default function CreateReceipt(props) {
             outputPrice: outputPrice,
             supplier: supplier
         }
-        console.log("material: " +material)
+        console.log("material: " + material)
         MaterialService.postMaterialDTO(material).then(() => {
             window.location.reload()
         })
-        .catch(function (error) {
-            if (error.response.data.errors) {
-            setMessage(error.response.data.errors[0].defaultMessage)
-            setTl(true);
-            // use this to make the notification autoclose
-            setTimeout(
-                function () {
-                setTl(false)
-                },
-                3000
-            );
-            } else {
-            setMessage(error.response.data.message)
-            setTl(true);
-            // use this to make the notification autoclose
-            setTimeout(
-                function () {
-                setTl(false)
-                },
-                3000
-            );
-            }
-        });
+            .catch(function (error) {
+                if (error.response.data.errors) {
+                    setMessage(error.response.data.errors[0].defaultMessage)
+                    setTl(true);
+                    // use this to make the notification autoclose
+                    setTimeout(
+                        function () {
+                            setTl(false)
+                        },
+                        3000
+                    );
+                } else {
+                    setMessage(error.response.data.message)
+                    setTl(true);
+                    // use this to make the notification autoclose
+                    setTimeout(
+                        function () {
+                            setTl(false)
+                        },
+                        3000
+                    );
+                }
+            });
     }
     function handleSearchTermChange(e) {
         const value = e.target.value;
@@ -288,10 +290,10 @@ export default function CreateReceipt(props) {
             setFilters({
                 ...filters,
                 keyword: value,
-              })
-              
+            })
+
         }, 300);
-        
+
     }
     return (
         <div className="body-add-receipt">
@@ -363,32 +365,32 @@ export default function CreateReceipt(props) {
                                                 <form>
                                                     <div className="form-group-top">
                                                         <div className="form-group">
-                                                            <label>Tên phụ tùng</label><span className="attribute" style={{color: "red"}}>*</span><br />
-                                                            <input type="text" className="input-material" name="nameMaterial" onChange={changeNameMaterial}/>
+                                                            <label>Tên phụ tùng</label><span className="attribute" style={{ color: "red" }}>*</span><br />
+                                                            <input type="text" className="input-material" name="nameMaterial" onChange={changeNameMaterial} />
                                                         </div>
                                                         <div className="form-group">
-                                                            <label>Giá nhập</label><span className="attribute" style={{color: "red"}}>*</span><br />
-                                                            <input type="text" className="input-material" name="inputPrice" onChange={changeInputPrice}/>
+                                                            <label>Giá nhập</label><span className="attribute" style={{ color: "red" }}>*</span><br />
+                                                            <input type="text" className="input-material" name="inputPrice" onChange={changeInputPrice} />
                                                         </div>
                                                     </div>
                                                     <div className="form-group-top">
                                                         <div className="form-group">
                                                             <label>Nhà cung cấp</label><br />
-                                                            <input type="text" className="input-material" name="supplier" onChange={changeSupplier}/>
+                                                            <input type="text" className="input-material" name="supplier" onChange={changeSupplier} />
                                                         </div>
                                                         <div className="form-group">
                                                             <label>Giá bán</label><br />
-                                                            <input type="text" className="input-material" name="outputPrice" onChange={changeOutputPrice}/>
+                                                            <input type="text" className="input-material" name="outputPrice" onChange={changeOutputPrice} />
                                                         </div>
                                                     </div>
                                                     <div className="form-group-bot">
                                                         <label>Mô tả chi tiết</label><br />
-                                                        <textarea type="text" className="input-material" name="description" onChange={changeDescription}/>
+                                                        <textarea type="text" className="input-material" name="description" onChange={changeDescription} />
                                                     </div>
                                                 </form>
 
                                                 <div className="button-add-material">
-                                                    <button className="btn-add"onClick={addMaterial} >Thêm</button>
+                                                    <button className="btn-add" onClick={addMaterial} >Thêm</button>
                                                     <div className="btn-out" onClick={outFormAddMaterial}><span>Thoát</span></div>
                                                 </div>
                                             </div>
@@ -414,7 +416,7 @@ export default function CreateReceipt(props) {
                                                     <td className="td-1"><span>{materital.code}</span></td>
                                                     <td className="td-2"><span>{materital.name}</span></td>
                                                     <td className="td-3"><span>
-                                                        <input value={materital.quantityInput}  onChange={e => {
+                                                        <input value={materital.quantityInput} onChange={e => {
                                                             setMaterialChoose(
                                                                 materialChoose.map(materialCheck => {
                                                                     if (materialCheck.id === materital.id) {
@@ -422,12 +424,12 @@ export default function CreateReceipt(props) {
 
                                                                     }
                                                                     setFilterSum({
-                                                                        sum:0
+                                                                        sum: 0
                                                                     });
                                                                     return materialCheck;
                                                                 })
                                                             )
-                                                        }}/>
+                                                        }} />
                                                     </span></td>
                                                     <td className="td-4"><span>{showPrice(materital.inputPrice).toString()}</span></td>
                                                     <td className="td-5 delete-material"><span onClick={() => deleteMaterialChoosed(materital)}>x</span></td>
@@ -452,9 +454,9 @@ export default function CreateReceipt(props) {
                 </div>
                 <div className="bottom-receipt">
                     <div className="left-receipt">
-                    <div className="note-receipt">
-                            <label style={{color: "black"}}>Ghi chú</label><br />
-                            <textarea placeholder="Thông tin thêm về đơn hàng" name="noteInvoice"  value={note}/>
+                        <div className="note-receipt">
+                            <label style={{ color: "black" }}>Ghi chú</label><br />
+                            <textarea placeholder="Thông tin thêm về đơn hàng" name="noteInvoice" value={note} />
                         </div>
                     </div>
                     <div className="right-receipt">

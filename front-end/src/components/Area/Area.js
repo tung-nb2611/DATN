@@ -6,10 +6,10 @@ import "../../assets/css/employees/employee.css";
 import FiltersForm from "../FiltersForm/search.js";
 import LimitPagination from 'components/Pagination/limitPagination.js';
 import EmployeesService from "services/employees";
-
+import { FixedSizeList } from 'react-window';
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
-import { ArrowDropDown, Delete, DeleteForever, EditAttributesTwoTone } from "@material-ui/icons";
+import { Add, ArrowDropDown, Delete, DeleteForever, EditAttributesTwoTone } from "@material-ui/icons";
 // material-ui icons
 import Snackbars from 'components/Snackbar/Snackbar.js';
 import Edit from "@material-ui/icons/Edit";
@@ -18,7 +18,9 @@ import RoleFilters from "components/FiltersForm/RoleFilters";
 import StoreService from "services/StoreService";
 import { Link } from "react-router-dom";
 import AreaService from "services/AreaService";
-import { Button, Card, CardActions, CardContent, CardHeader, Paper, Typography } from "@material-ui/core";
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Modal, Paper, Table, TableBody, TableCell, TableHead, Typography } from "@material-ui/core";
+import { Alert, Dialog, DialogActions, DialogContent, DialogTitle, TableRow, useModal } from "@sapo-presentation/sapo-ui-components";
+import InvoicesService from "../../services/InvoicesService";
 const styles = {
   cardCategoryWhite: {
     "&,& a,& a:hover,& a:focus": {
@@ -68,19 +70,52 @@ export default function (props) {
   const [messageError, setMessageError] = useState('');
   const [tl, setTl] = React.useState(false);
   const [fail, setFail] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   const [id, setId] = useState();
   const [area, setArea] = useState([]);
   const [employeeId, setEmployeeId] = useState();
   const [salaryDay, setSalaryDay] = useState();
-
+  const [invoices, setInvoices] = useState([]);
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [buttonOtherClass, setButtonOtherClass] = useState('');
   const [modalTimeSheetClass, setModalTimeSheetClass] = useState('');
   const [modalSalaryDayClass, setModalSalaryDayClass] = useState('');
+  const [serviceChoose, setServiceChoose] = useState([]);
   const [warningClass, setWarningClass] = useState('');
   const [warningModalClass, setWarningModalClass] = useState('');
+  const [materialChoose, setMaterialChoose] = useState([]);
+  const [selectedIndex, setSelectedIndex] = useState(1);
   const [month, setMonth] = useState('');
+  const [services, setServices] = useState([]);
+  const [sumServices, setSumServices] = useState(0);
+  const [materitals, setMaterials] = useState([]);
+  const [status, setStatus] = useState('');
+  const [idInvoice, setIdInvoice] = useState(0);
+  const [areaChose, setAreaChose] = useState({});
+  const [customer, setCustomer] = useState({
+    id: 0,
+    code: '',
+    name: '',
+    phone: '',
+    licensePlate: ''
+  });
+  const [payMethod, setPayMethod] = useState();
+  const [employee, setEmployee] = useState({
+    id: 0,
+    code: '',
+    name: '',
+    phone: ''
+  });
+  const [vehicle, setVehicle] = useState({
+    id: 0,
+    code: '',
+    licensePlate: ''
+  });
+  const [sumMaterial, setSumMaterial] = useState(0);
+  const { openModal } = useModal();
   const showButtonOther = () => {
     if (buttonOtherClass == '') {
       setButtonOtherClass('content-button');
@@ -88,7 +123,50 @@ export default function (props) {
       setButtonOtherClass('');
     }
   }
+  const editInvoice = (id) => {
+    props.history.push(`/admin/invoices/edit-invoice/${id}`)
+  }
+  const DialogDoSomething = (id) => {
+    const { closeAllModal } = useModal();
+    return (
+      <Dialog style={{ height: "30px" }} >
+        <DialogTitle >
+          Chỉnh sửa hóa đơn
+        </DialogTitle>
+        <DialogContent>Bạn có chắc muốn chỉnh sửa hóa đơn này không?</DialogContent>
+        <DialogActions>
+          <Button destruction onClick={closeAllModal} variant="outlined">
+            Thoát
+          </Button>
+          <Button onClick={editInvoice(id)} destruction>
+            Nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  };
+  function renderRow(props) {
+    const { index, style } = props;
 
+    return (
+      <div className={index % 2 ? "ListItemOdd" : "ListItemEven"} style={style}>
+        <List component="nav" aria- label="secondary mailbox folder" >
+          {invoices.map((x) => (
+            <ListItem
+              key={x.id}
+              index
+              button
+              selected={selectedIndex === 2}
+              onClick={() => { editInvoice(x.id) }}
+            >
+              <ListItemText primary={x.code} />
+            </ListItem>
+          ))}
+        </List >
+      </div>
+
+    );
+  }
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -97,6 +175,13 @@ export default function (props) {
   const [filters, setFilters] = useState({
     store_id: 1,
     status: [1, 2]
+  });
+  const [filters1, setFilters1] = useState({
+    page: 1,
+    limit: 10,
+    keyword: "",
+    status: [1, 2],
+    sort: 0,
   });
 
   function handlePageChange(newPage) {
@@ -141,7 +226,9 @@ export default function (props) {
   const addEmployee = () => {
     props.history.push("/admin/employees/add-employee");
   };
-
+  const addInvoice = () => {
+    props.history.push("/admin/invoices/add-invoice");
+  }
   useEffect(() => {
     async function fetchEmployeeList() {
       try {
@@ -175,7 +262,40 @@ export default function (props) {
     }
     fetchEmployeeList();
   }, [filters]);
-
+  useEffect(() => {
+    async function fetchInvoicesList() {
+      try {
+        InvoicesService.getInvoices(filters1).then((res) => {
+          let invoices = res.data.invoiceListResponseDTOS;
+          let pagination = res.data.pagination;
+          console.log(res.data);
+          setInvoices(
+            invoices.map((invoice) => {
+              return {
+                select: false,
+                id: invoice.id,
+                code: invoice.code,
+                licensePlate: invoice.licensePlate,
+                fixerName: invoice.fixerName,
+                status: invoice.status,
+              }
+            }))
+          setPagination(pagination);
+          console.log(pagination);
+          setIsLoaded(true);
+        }).catch(function (error) {
+          console.log("ERROR: " + error.response.data.status)
+          if (error.response.data.status == 403) {
+            alert("Không có quyền truy cập!")
+          }
+        })
+      } catch (error) {
+        console.log("Failed to fetch Invoicce list: ", error.message);
+        setError(error);
+      }
+    }
+    fetchInvoicesList();
+  }, [filters1]);
   const handleCreateTimeSheets = (e) => {
     e.preventDefault();
     const ids = [];
@@ -311,7 +431,6 @@ export default function (props) {
   const listRoles = () => {
     props.history.push('/admin/roles')
   }
-  const classes = useStyles();
 
   const hiddenFormRole = () => {
     setModalTimeSheetClass('')
@@ -388,6 +507,99 @@ export default function (props) {
         }
       });
   }
+  const okModal = (id) => {
+    detailInvocie(id)
+
+
+  }
+  const detailInvocie = (id) => {
+    try {
+      console.log("oke", id)
+      InvoicesService.getInvoiceById(id).then((res) => {
+        let customer = {
+          id: res.data.customerVehicleDTO.customerDTO.id,
+          code: res.data.customerVehicleDTO.customerDTO.code,
+          name: res.data.customerVehicleDTO.customerDTO.name,
+          phone: res.data.customerVehicleDTO.customerDTO.phone,
+        };
+        let vehicle = {
+          id: res.data.customerVehicleDTO.vehicleDTO.id,
+          code: res.data.customerVehicleDTO.vehicleDTO.code,
+          licensePlate: res.data.customerVehicleDTO.vehicleDTO.licensePlate,
+        }
+        let materials = res.data.materialOrderResponseDTOS;
+        let services = res.data.serviceOrderResponseDTOS;
+        console.log("1111", res.data);
+        setStatus(res.data.status)
+        setCustomer(customer);
+        setAreaChose(res.data.areaDTO)
+        setEmployee(res.data.userDTO);
+        setVehicle(vehicle);
+        setMaterialChoose(materials)
+        setServiceChoose(services)
+        setIdInvoice(res.data.id)
+        let currentSumMaterial = 0;
+        materials.map((material) => {
+          currentSumMaterial = currentSumMaterial + material.quantityBuy * material.outputPrice;
+        })
+        setSumMaterial(currentSumMaterial)
+
+
+        let currentSumService = 0;
+        services.map((service) => {
+          currentSumService = currentSumService + service.price;
+        })
+        setSumServices(currentSumService)
+        setOpen(true);
+      });
+
+    } catch (error) {
+      console.log("Failed to fetch Invoicce: ", error.message);
+    }
+  }
+  const payment = (e) => {
+    e.preventDefault();
+    if (customer.id == 0) {
+      alert("Không được để trống khách hàng")
+    }
+
+    let materialDTOS = [];
+    let serviceDTOS = [];
+    let invoice = {
+      areaId: idInvoice,
+      fixerId: employee.id,
+      vehicleId: vehicle.id,
+      customerId: customer.id,
+      total: sumMaterial + sumServices,
+      payMethod: payMethod,
+      materialDTOS: materialDTOS,
+      serviceDTOS: serviceDTOS,
+    }
+    InvoicesService.changeStatusInvoiceToCompletePayment(idInvoice, invoice)
+      .then(() => {
+        window.location.reload();
+        props.history.push("/admin/areas");
+      })
+      .catch(function (error) {
+        if (error.response.data.errors) {
+          console.log(error.response.data.errors[0].defaultMessage);
+        } else {
+          console.log(error.response.data.message);
+        }
+      });
+  };
+
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '1px solid rgb(167 165 165)',
+    boxShadow: 24,
+    p: 4,
+  };
   const addArea = () => {
     props.history.push("/admin/areas/add-area");
   };
@@ -518,65 +730,52 @@ export default function (props) {
         {/* </div > * /}
     < div > */}
 
-        <div style={{ display: "-webkit-inline-box" }}>
+        <Grid container spacing={2} >
+          <Grid item xs={4} >
 
-          {area.map((area) =>
-          (
-            <div style={{ marginRight: "20px", marginLeft: "20px", padding: "20px", marginTop: "40px" }}
+            <Box
+              sx={{ width: '100%', height: "100%", maxHeight: "490px", bgcolor: 'background.paper', marginTop: "50px" }}
             >
-              <Card
-                style={{ maxWidth: "200px" }}>
-                <Paper elevation={3} />
-                <CardHeader
-                  title={area.name}>
-                </CardHeader>
-                <CardContent>
-                  <Typography variant="body2" color="text.secondary">
-                    mã khu vực: <span>{area.code}</span>
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {area.status && area.status === 1
-                      ? <Typography variant="body2" color="text.secondary">
-                        trạng thái: <span>Đang trống</span>
+              <Button variant="outlined" startIcon={<Add />} onClick={addInvoice}>Thêm hóa đơn</Button>
+              <FixedSizeList
+                height={490}
+                width="100%"
+                itemSize={46}
+                itemCount={1}
+                color="red"
+                style={{ borderRadius: "10px" }}
+
+              >
+                {renderRow}
+              </FixedSizeList>
+            </Box>
+          </Grid>
+          <Grid item xs={8}>
+            <div style={{ display: "-webkit-inline-box" }}>
+
+              {area.map((area) =>
+              (
+                <div style={{ padding: "10px", marginTop: "40px" }}
+                >
+                  <Card
+                    style={{ maxWidth: "200px" }}>
+                    <Paper elevation={3} />
+                    <CardHeader
+                      title={area.name}>
+                    </CardHeader>
+                    <CardContent style={{ padding: "8px" }}>
+                      <Typography variant="body2" color="text.secondary">
+                        mã khu vực: <span>{area.code}</span>
                       </Typography>
-                      :
-                      <div><Typography variant="body2" color="text.secondary">
-                        trạng thái: <span style={{ color: "red" }}>Đang sửa xe</span>
-                      </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Tên khách: <span>{area.invoice.name}</span>
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Biển số xe: <span>{area.invoice.licensePlate}</span>
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Mã hóa đơn: <span>{area.invoice.code}</span>
-                        </Typography>
-                      </div>
-                    }
-                  </Typography>
-
-                  {/* {(() => {
-                      debugger
-                      if (area.status === 1) {
-                        return (
-                          <>
-                            <Typography variant="body2" color="text.secondary">
-                              trạng thái: <span>Đang trống</span>
-                            </Typography>
-
-                          </>
-
-                        )
-
-                      }
-                      else {
-                        return (
-                          <>
-                            <Typography variant="body2" color="text.secondary">
-                              trạng thái: <span>Đang sửa xe</span>
-
-                            </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {area.status && area.status === 1
+                          ? <Typography variant="body2" color="text.secondary">
+                            trạng thái: <span>Đang trống</span>
+                          </Typography>
+                          :
+                          <div><Typography variant="body2" color="text.secondary">
+                            trạng thái: <span style={{ color: "red" }}>Đang sửa xe</span>
+                          </Typography>
                             <Typography variant="body2" color="text.secondary">
                               Tên khách: <span>{area.invoice.name}</span>
                             </Typography>
@@ -586,39 +785,106 @@ export default function (props) {
                             <Typography variant="body2" color="text.secondary">
                               Mã hóa đơn: <span>{area.invoice.code}</span>
                             </Typography>
-                            <CardActions>
-                              <Button size="small" color="primary">
-                                Share
-                              </Button>
-                            </CardActions>
+                            <Typography variant="body2" color="text.secondary">
+                              Nhân viên sửa: <span>{area.invoice.fixerName}</span>
+                            </Typography>
+                          </div>
+                        }
+                      </Typography>
+                    </CardContent>
+                    {area.status && area.status === 1
+                      ?
+                      <CardActions>
+                        <Button size="small" color="primary" onClick={() => invoice(area.id)}>
+                          Danh sách phiếu
+                        </Button>
+                      </CardActions>
+                      :
+                      <div><CardActions>
+                        <Button size="small" color="primary" onClick={() => okModal(area.invoice.id)} >
+                          Thanh toán
+                        </Button>
+                        <Button size="small" color="primary" onClick={() => editInvoice(area.invoice.id)}>
+                          Sửa hóa đơn
+                        </Button>
+                      </CardActions>
+                      </div>
+                    }
+                  </Card>
+                  <Modal
+                    open={open}
+                    onClose={handleClose}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                  >
+                    {open == true ? (
+                      <Box sx={style}>
+                        <Typography id="modal-modal-title" variant="h1" component="h2">
+                          Hóa đơn {idInvoice}
+                        </Typography>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                          Tên khách hàng:{customer.name}
+                        </Typography>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                          số điện thoại:{customer.phone}
+                        </Typography>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                          Biển số xe:{vehicle.licensePlate}
+                        </Typography>
+                        <Box style={{ display: "flex" }} >
+                          <Typography id="modal-modal-description" variant="h6" sx={{ mt: 2 }}>
+                            Sản phẩm
+                          </Typography>
+                          <Typography id="modal-modal-description" variant="h6" sx={{ mt: 2 }} style={{ marginLeft: "110px" }}>
+                            số lượng
+                          </Typography>
+                        </Box>
 
-                          </>
-                        )
-                      }
-
-                    })} */}
-                </CardContent>
-                {area.status && area.status === 1
-                  ?
-                  <CardActions>
-                    <Button size="small" color="primary" onClick={() => invoice(area.id)}>
-                      Danh sách phiếu
-                    </Button>
-                  </CardActions>
-                  :
-                  <div><CardActions>
-                    <Button size="small" color="primary">
-                      Thanh toán
-                    </Button>
-                    <Button size="small" color="primary">
-                      Sửa hóa đơn
-                    </Button>
-                  </CardActions>
-                  </div>
-                }
-              </Card>
-            </div>))}
-        </div>
+                        <Box style={{ display: "flex" }} >
+                          {materialChoose.map((x) => (
+                            <div style={{ display: "flex" }}>
+                              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                                {x.name}
+                              </Typography>
+                              <Typography id="modal-modal-description" sx={{ mt: 2 }} style={{ marginLeft: "110px" }} >
+                                {x.quantityBuy}
+                              </Typography>
+                            </div>
+                          ))}
+                        </Box>
+                        <Box style={{ display: "flex" }} >
+                          {serviceChoose.map((x) => (
+                            <div style={{ display: "flex" }}  >
+                              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                                {x.name}
+                              </Typography>
+                              <Typography id="modal-modal-description" sx={{ mt: 2 }} style={{ marginLeft: "110px" }}>
+                                1
+                              </Typography>
+                            </div>
+                          ))}
+                        </Box>
+                        <Box style={{ display: "flex" }}>
+                          <Typography id="modal-modal-description" variant="h6" sx={{ mt: 2 }}>
+                            Tổng tiền
+                          </Typography>
+                          <Typography id="modal-modal-description" variant="h6" sx={{ mt: 2 }} style={{ marginLeft: "110px" }}>
+                            {sumMaterial + sumServices}đ
+                          </Typography>
+                        </Box>
+                        <Button onClick={payment}>Thanh toán</Button>
+                        <Button autoFocus>
+                          Hủy
+                        </Button>
+                      </Box>
+                    )
+                      :
+                      ("")}
+                  </Modal>
+                </div>))}
+            </div>
+          </Grid>
+        </Grid>
       </div >
 
     );
