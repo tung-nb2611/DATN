@@ -393,9 +393,15 @@ export default function Material(props) {
   const addMaterial = () => {
     props.history.push("/admin/materials/add-material");
   };
-  const Receipt = () => {
+  const receipt = () => {
     props.history.push("/admin/receipts");
+
   };
+  const exportMaterial = () => {
+    props.history.push("/admin/export");
+
+  };
+
   return (
     <Container >
       <Button style={{
@@ -415,7 +421,16 @@ export default function Material(props) {
         marginTop: "15px",
         float: "right",
         marginRight: "10px",
-      }} variant="outlined" onClick={Receipt}>Phiếu </Button>
+      }} variant="outlined" onClick={receipt}>Phiếu Nhập  </Button>
+      <Button style={{
+        background: "#218FFE",
+        color: "white",
+        height: "40px",
+        marginBottom: "10px",
+        marginTop: "15px",
+        float: "right",
+        marginRight: "10px",
+      }} variant="outlined" onClick={exportMaterial}>Phiếu xuất  </Button>
       <Box sx={{ width: '100%' }}>
         <Paper sx={{ width: '100%', mb: 2, minHeight: "100px" }}>
           {selected.length > 0 ?

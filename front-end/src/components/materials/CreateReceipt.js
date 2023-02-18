@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../../assets/css/invoices/CreateInvoiceMaterial.css";
 import ReceiptsService from "services/ReceiptsService";
-import { Search } from '@material-ui/icons';
+import { ArrowBackIosOutlined, AutorenewOutlined, Clear, Search } from '@material-ui/icons';
 import '../../assets/css/search/ReceiptSearch.css'
 import { showPrice } from "../../helper/function";
 import Snackbars from 'components/Snackbar/Snackbar.js';
@@ -10,6 +10,11 @@ import '../../assets/css/invoices/InvoiceMaterialSearch.css'
 import MaterialService from "services/materialService";
 // import ServicesService from "services/ServicesService";
 import '../../assets/css/invoices/InvoiceServiceSearch.css'
+import { Button, Collapse, FormControl, FormControlLabel, FormLabel, IconButton, InputAdornment, InputLabel, MenuItem, OutlinedInput, Paper, Radio, RadioGroup, Select, Table, TableBody, TableContainer, TableHead, TableRow, TextareaAutosize, TextField, Typography } from "@material-ui/core";
+import { Box } from "@sapo-presentation/sapo-ui-components";
+import MuiTableHead from "@material-ui/core/TableHead";
+import TableCell from "@material-ui/core/TableCell";
+import { makeStyles, withStyles } from "@material-ui/core/styles";
 
 export default function CreateReceipt(props) {
     React.useEffect(() => {
@@ -33,6 +38,7 @@ export default function CreateReceipt(props) {
     const typingTimeoutRef = useRef(null);
     const [modalMaterialClass, setModalMaterialClass] = useState('');
     const [note, setNote] = useState('');
+    const [type, setType] = useState('');
     const [payMethod, setPayMethod] = useState();
     const [nameMaterial, setNameMaterial] = useState();
     const [inputPrice, setInputPrice] = useState();
@@ -47,7 +53,7 @@ export default function CreateReceipt(props) {
         status: 1,
         store_id: 1
     });
-
+    const [pay, setPay] = React.useState('');
 
     //Lấy list Phụ kiện
     useEffect(() => {
@@ -77,7 +83,7 @@ export default function CreateReceipt(props) {
     }, [filters]);
 
     const back = () => {
-        props.history.push('/admin/materials');
+        props.history.push('/admin/receipts');
     }
 
     const showListMaterial = () => {
@@ -173,14 +179,15 @@ export default function CreateReceipt(props) {
             let material1 = {
                 id: material.id,
                 quantity: material.quantityInput,
+
             }
             materialDTO.push(material1)
         })
-        let receiptDTO = { materialDTOS: materialDTO, note: note }
+        let receiptDTO = { materialDTOS: materialDTO, note: note, type: "order", storeId: "1" }
         console.log("receipt => " + JSON.stringify(receiptDTO));
         ReceiptsService.postReceipt(receiptDTO)
             .then(() => {
-                props.history.push("/admin/materials");
+                props.history.push("/admin/receipts");
             })
             .catch(function (error) {
                 if (error.response.data.errors) {
@@ -225,7 +232,9 @@ export default function CreateReceipt(props) {
         setSupplier(e.target.value);
     }
 
-
+    const handleChangeValue = (event) => {
+        setType(event.target.value);
+    };
 
     const outFormAddMaterial = () => {
         if (modalMaterialClass == '') {
@@ -295,211 +304,190 @@ export default function CreateReceipt(props) {
         }, 300);
 
     }
+    const TableHead = withStyles(() => ({
+        root: {
+            backgroundColor: "#F9FAFC"
+        }
+    }))(MuiTableHead);
+    const TableHeaderCell = withStyles(() => ({
+        root: {
+            fontSize: "14px",
+            fontWeight: "bold"
+        }
+    }))(TableCell);
+    function Row(props) {
+        const { row } = props;
+        const [open, setOpen] = useState(false);
+        return (
+            <React.Fragment>
+
+                <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+                    <TableCell component="th" scope="row">
+                        {row.name}
+                    </TableCell>
+                    <TableCell align="right">{showPrice(row.inputPrice).toString()} vnđ</TableCell>
+                    <TableCell align="right">
+                        <OutlinedInput
+                            id="outlined-adornment-weight"
+                            style={{
+                                width: "100px",
+                                height: "40px"
+                            }}
+                            value={row.quantityInput}
+                            onChange={e => {
+                                setMaterialChoose(
+                                    materialChoose.map(materialCheck => {
+                                        if (materialCheck.id === row.id) {
+                                            materialCheck.quantityInput = e.target.value;
+                                        }
+                                        setFilterSum({
+                                            sum: 0
+                                        });
+                                        return materialCheck;
+                                    })
+                                )
+                            }}
+                        />
+
+                    </TableCell>
+                    <TableCell align="right">{row.inputPrice * row.quantityInput} vnđ</TableCell>
+                    <TableCell ><Clear onClick={() => deleteMaterialChoosed(row)} fontSize="small" /></TableCell>
+                </TableRow>
+            </React.Fragment>
+        );
+    }
     return (
         <div className="body-add-receipt">
-            <Snackbars
-                place="tc"
-                color="warning"
-                message={message}
-                open={tl}
-                closeNotification={() => setTl(false)}
-                close
-            />
-            <div className="title-add-receipt">
-                <div className="left-title-add-receipt">
-                    <div className="back"><button className="cancel-button" onClick={back}><span>&lsaquo; </span>Quay lại</button></div>
-                    <div className="name-page" ><span>Tạo phiếu nhập phụ tùng</span></div>
-                </div>
-                <div className="right-title-add-receipt">
-                    <button className="btn-add" onClick={addReceipt}>Nhập</button>
-                </div>
-            </div>
-            <div className="content-add-receipt">
-                <div className="main-receipt">
-                    <div className="left-receipt">
-                        <div className="title-material">
-                            <div className="name-title">
-                                <span>Thông tin phụ tùng</span>
-                            </div>
-                        </div>
-                        <div className="content-material">
-                            <div className="top-content">
-                                <div className="search-material">
-                                    <form>
-                                        <div className="search-receipt">
-                                            <Search className="icon-search" />
-                                            <input
-                                                type="text"
-                                                onClick={showListMaterial}
-                                                onChange={handleSearchTermChange}
-                                                placeholder="Tìm kiếm tên sản phẩm, mã ..."
-                                            />
-                                        </div>
-                                    </form>
-                                    <div id="info-material" className={listMaterial}>
-                                        <div className="material" onClick={formAddMaterial}><span className="button-add-materials">+ Thêm mới phụ kiện</span></div>
-                                        {materitals.map((materital) => (
-                                            <div key={materital.id}>
-                                                <div className="info-detail" onClick={() => chooseMaterial(materital)}>
-                                                    <table>
-                                                        <tr>
-                                                            <td className="td-1">{materital.name}</td>
-                                                            <td className="td-2">{showPrice(materital.inputPrice).toString()}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td className="td-1">{materital.code}</td>
-                                                            <td className="td-2">Số lượng trong kho: {materital.quantity}</td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div id="modal-material" className={modalMaterialClass}>
-                                        <div id="add-material">
-                                            <div className="title-add-material">
-                                                <div className="name-title"><span>Thêm mới phụ tùng</span></div>
-                                                <div className="close-form-add-material"><span onClick={outFormAddMaterial}>&Chi;</span></div>
-                                            </div>
-                                            <div className="content-add-material">
-                                                <form>
-                                                    <div className="form-group-top">
-                                                        <div className="form-group">
-                                                            <label>Tên phụ tùng</label><span className="attribute" style={{ color: "red" }}>*</span><br />
-                                                            <input type="text" className="input-material" name="nameMaterial" onChange={changeNameMaterial} />
-                                                        </div>
-                                                        <div className="form-group">
-                                                            <label>Giá nhập</label><span className="attribute" style={{ color: "red" }}>*</span><br />
-                                                            <input type="text" className="input-material" name="inputPrice" onChange={changeInputPrice} />
-                                                        </div>
-                                                    </div>
-                                                    <div className="form-group-top">
-                                                        <div className="form-group">
-                                                            <label>Nhà cung cấp</label><br />
-                                                            <input type="text" className="input-material" name="supplier" onChange={changeSupplier} />
-                                                        </div>
-                                                        <div className="form-group">
-                                                            <label>Giá bán</label><br />
-                                                            <input type="text" className="input-material" name="outputPrice" onChange={changeOutputPrice} />
-                                                        </div>
-                                                    </div>
-                                                    <div className="form-group-bot">
-                                                        <label>Mô tả chi tiết</label><br />
-                                                        <textarea type="text" className="input-material" name="description" onChange={changeDescription} />
-                                                    </div>
-                                                </form>
+            <Box style={{ marginBottom: "25px", backgroundColor: "#F6F6FA" }}>
 
-                                                <div className="button-add-material">
-                                                    <button className="btn-add" onClick={addMaterial} >Thêm</button>
-                                                    <div className="btn-out" onClick={outFormAddMaterial}><span>Thoát</span></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="main-content">
-                                <div className="table">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <td className="th-1"><span>Mã</span></td>
-                                                <td className="th-2"><span>Tên</span></td>
-                                                <td className="th-3"><span>Số lượng</span></td>
-                                                <td className="th-4"><span>Giá thành</span></td>
-                                                <td className="th-5"></td>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {materialChoose.map((materital) => (
-                                                <tr key={materital.id}>
-                                                    <td className="td-1"><span>{materital.code}</span></td>
-                                                    <td className="td-2"><span>{materital.name}</span></td>
-                                                    <td className="td-3"><span>
-                                                        <input value={materital.quantityInput} onChange={e => {
-                                                            setMaterialChoose(
-                                                                materialChoose.map(materialCheck => {
-                                                                    if (materialCheck.id === materital.id) {
-                                                                        materialCheck.quantityInput = e.target.value;
+                <Typography onClick={back}> <ArrowBackIosOutlined style={{ height: "10px" }} /> Quay lại</Typography>
+                <Typography style={{ marginTop: "10px", marginLeft: "15px" }} variant="h4">Phiếu nhập phụ tùng</Typography>
+                <Button style={{
+                    background: "#218FFE",
+                    color: "white",
+                    height: "40px",
+                    marginBottom: "10px",
+                    marginTop: "-35px",
+                    float: "right",
+                    marginRight: "10px",
+                }} variant="outlined" onClick={addReceipt}>Tạo phiếu </Button>
+            </Box>
+            <Box style={{ display: "flex" }}>
+                <Box width="80%" bgcolor="white" minHeight="300px">
+                    <Typography style={{ fontSize: "16px", fontWeight: "bold", marginLeft: "10px" }}>
+                        Thông tin phụ tùng
+                    </Typography>
+                    <div className="top-content">
+                        <div className="search-material">
+                            <TextField
+                                label="Tên phụ tùng"
+                                id="outlined-required" variant="outlined"
+                                style={{
+                                    width: "95%",
+                                    padding: "10px"
+                                }}
+                                size="small"
+                                onClick={showListMaterial}
+                                onChange={handleSearchTermChange}
 
-                                                                    }
-                                                                    setFilterSum({
-                                                                        sum: 0
-                                                                    });
-                                                                    return materialCheck;
-                                                                })
-                                                            )
-                                                        }} />
-                                                    </span></td>
-                                                    <td className="td-4"><span>{showPrice(materital.inputPrice).toString()}</span></td>
-                                                    <td className="td-5 delete-material"><span onClick={() => deleteMaterialChoosed(materital)}>x</span></td>
+                            />
+                            <div id="info-material" className={listMaterial}>
+                                {materitals.map((materital) => (
+                                    <div key={materital.id}>
+                                        <div className="info-detail" onClick={() => chooseMaterial(materital)}>
+                                            <table>
+                                                <tr>
+                                                    <td className="td-1">{materital.name}</td>
+                                                    <td className="td-2">{showPrice(materital.inputPrice).toString()}</td>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div className="bottom-content">
-                                <div className="total">
-                                    <table>
-                                        <tr>
-                                            <th>Tổng tạm tính: </th>
-                                            <td>{showPrice(sumMaterial).toString()}</td>
-                                        </tr>
-                                    </table>
-                                </div>
+                                                <tr>
+                                                    <td className="td-1">{materital.code}</td>
+                                                    <td className="td-2">Số lượng trong kho: {materital.quantity}</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
-                </div>
-                <div className="bottom-receipt">
-                    <div className="left-receipt">
-                        <div className="note-receipt">
-                            <label style={{ color: "black" }}>Ghi chú</label><br />
-                            <textarea placeholder="Thông tin thêm về đơn hàng" name="noteInvoice" value={note} />
-                        </div>
-                    </div>
-                    <div className="right-receipt">
-                        <div className="title-right-receipt">
-                            <span>Thanh Toán</span>
-                        </div>
-                        <div className="content-pay-receipt">
+                    <TableContainer component={Paper} >
+                        <Table aria-label="collapsible table" >
+                            <TableHead variant="h6">
+                                <TableRow>
 
-                            <div className="pay-method">
-                                <div className="title-pay-method">
-                                    <span>Xác nhận thanh toán</span>
-                                </div>
-                                <div className="content-pay-method">
-                                    <form>
-                                        <div className="pay-method-group">
-                                            <input type="radio" name="payMethod" onChange={changePayMethod} value="1" />
-                                            <label>Thanh toán tiền mặt</label>
-                                        </div>
-                                        <div className="pay-method-group">
-                                            <input type="radio" name="payMethod" value="2" onChange={changePayMethod} />
-                                            <label>Thanh toán chuyển khoản</label>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                            <div className="total-pay">
-                                <table>
-                                    <tr>
-                                        <th style={{ color: "#008aff" }}>Tổng tiền phụ kiện ({materialChoose.length} sản phẩm)</th>
-                                        <td>:</td>
-                                        <td>{showPrice(sumMaterial).toString()}</td>
-                                    </tr>
-                                    <tr className="total">
-                                        <th>Tổng tiền thanh toán</th>
-                                        <td>:</td>
-                                        <td className="total-td">{showPrice(sumMaterial).toString()}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                                    <TableHeaderCell variant="h6">Tên phụ tùng</TableHeaderCell>
+                                    <TableHeaderCell align="right">Đơn giá</TableHeaderCell>
+                                    <TableHeaderCell align="right">Số lượng </TableHeaderCell>
+                                    <TableHeaderCell align="right">Thành Tiền</TableHeaderCell>
+                                    <TableHeaderCell ></TableHeaderCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {materialChoose.map((row) => (
+                                    <Row key={row.name} row={row} />
+                                ))}
+                            </TableBody>
+                        </Table>
+                        <Box style={{ display: "flex", float: "right", marginTop: "60px", marginRight: "50px" }}>
+                            <Typography variant="h6" style={{ marginRight: "50px" }}>Tổng tiền:</Typography>
+                            <Typography variant="h6">{showPrice(sumMaterial).toString()}vnd</Typography>
+                        </Box>
+                    </TableContainer>
+                </Box>
+                <Box style={{ marginLeft: "40px", marginTop: "18px" }}>
+                    <FormControl>
+                        <FormLabel id="demo-controlled-radio-buttons-group">Loại phiếu</FormLabel>
+                        <RadioGroup
+                            aria-labelledby="demo-controlled-radio-buttons-group"
+                            name="controlled-radio-buttons-group"
+                            value={type}
+                            onChange={handleChangeValue}
+                        >
+                            <FormControlLabel value="2" control={<Radio />} label="phiếu xuất hàng" />
+                            <FormControlLabel value="1" control={<Radio />} label="phiếu nhập phụ tùng" />
+                        </RadioGroup>
+                    </FormControl>
+                </Box>
+            </Box>
+            <Box style={{ marginTop: "20px", minHeight: "200px", display: "flex" }}>
+                <Box style={{ width: "50%", marginLeft: "10px" }}>
+                    <Typography style={{ fontSize: "16px", fontWeight: "bold", marginTop: "10px" }}>
+                        Phương thức thanh toán
+                    </Typography>
+                    <FormControl style={{ width: "70%", marginTop: "10px" }}>
+                        <InputLabel
+                            style={{
+                                fontSize: "15px",
+                                color: "black"
+                            }} >Chọn phương thức thanh toán</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={payMethod}
+                            label="Age"
+                            onChange={changePayMethod}
+                        >
+                            <MenuItem value={10}>Tiền mặt</MenuItem>
+                            <MenuItem value={20}>visa</MenuItem>
+                            <MenuItem value={30}>chuyển khoản</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Box>
+                <Box>
+                    <Typography style={{ fontSize: "16px", fontWeight: "bold", marginTop: "10px" }}>
+                        Ghi chú
+                    </Typography>
+                    <TextareaAutosize
+                        aria-label="minimum height"
+                        minRows={8}
+
+                        style={{
+                            width: 500, height: "80px",
+                            marginLeft: "60px", marginTop: "30px"
+                        }}></TextareaAutosize>
+                </Box>
+            </Box>
         </div>
     );
 }

@@ -67,6 +67,7 @@ import Area from "components/Area/Area";
 import CreateArea from "components/Area/CreateArea";
 import UpdateArea from "components/Area/UpdateArea";
 import AddInvoice from "components/Invoices/AddInvocie";
+import ExportMaterial from "components/materials/ExportMaterial";
 
 let ps;
 
@@ -104,6 +105,7 @@ const switchRoutes = (
 
     {/* add receipt */}
     <Route exact path="/admin/receipts" component={Receipt} />
+    <Route exact path="/admin/export" component={ExportMaterial} />
     <Route exact path="/admin/receipts/add-receipt" component={CreateReceipt} />
     <Route exact path="/admin/receipts/view-receipt/:id" component={ViewReceipt} />
     <Route exact path="/admin/invoices/add-invoice" component={AddInvoice} />
