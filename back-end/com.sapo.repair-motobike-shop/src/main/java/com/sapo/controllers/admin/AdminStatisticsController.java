@@ -22,8 +22,8 @@ public class    AdminStatisticsController {
 
     // Api thống kê số đơn hàng và tổng số tiền từng khách hàng
     @GetMapping("/customers")
-    public ResponseEntity<List<StatisticsCustomerDTO>> selectCustomerAndInvoiceInfo(@RequestParam String dateStart, @RequestParam String dateEnd) throws ParseException {
-        List<StatisticsCustomerDTO> statisticsCustomerDTOS = statisticsService.selectCustomerAndInvoiceInfo(dateStart, dateEnd);
+    public ResponseEntity<List<StatisticsCustomerDTO>> selectCustomerAndInvoiceInfo(@RequestParam int storeId,@RequestParam List<Integer> areaId,@RequestParam String dateStart, @RequestParam String dateEnd) throws ParseException {
+        List<StatisticsCustomerDTO> statisticsCustomerDTOS = statisticsService.selectCustomerAndInvoiceInfo(storeId,areaId,dateStart, dateEnd);
         return ResponseEntity.ok(statisticsCustomerDTOS);
     }
 

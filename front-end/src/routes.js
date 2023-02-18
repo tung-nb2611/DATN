@@ -65,13 +65,13 @@ const dashboardRoutes = [
   //   component: Invoices,
   //   layout: "/admin",
   // },
-  // {
-  //   path: "/statistics",
-  //   name: "Thống kê",
-  //   icon: Equalizer,
-  //   component: Statistics,
-  //   layout: "/admin"
-  // },
+  {
+    path: "/statistics",
+    name: "Thống kê",
+    icon: Equalizer,
+    component: Statistics,
+    layout: "/admin"
+  },
 ];
 
 export default dashboardRoutes;

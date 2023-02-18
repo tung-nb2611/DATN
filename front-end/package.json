@@ -13,7 +13,7 @@
     "@material-ui/styles": "^4.11.5",
     "@mui/utils": "^5.11.7",
     "@reach/visually-hidden": "^0.18.0",
-    "@sapo-presentation/sapo-ui-components": "^1.6.17-unstable-alpha.3",
+    "@sapo-presentation/sapo-ui-components": "^1.6.17",
     "axios": "^0.21.4",
     "chartist": "0.10.1",
     "classnames": "2.2.6",

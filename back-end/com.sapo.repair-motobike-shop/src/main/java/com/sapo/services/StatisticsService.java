@@ -9,7 +9,7 @@ import java.util.List;
 @Service
 public interface StatisticsService {
 
-    List<StatisticsCustomerDTO> selectCustomerAndInvoiceInfo(String dateStart, String dateEnd) throws ParseException;
+    List<StatisticsCustomerDTO> selectCustomerAndInvoiceInfo(int store_id,List<Integer>areaId,String dateStart, String dateEnd) throws ParseException;
 
     List<StatisticMaterialDTO> selectMaterialAndInvoiceInfo(String dateStart, String dateEnd) throws ParseException;
 
