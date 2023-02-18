@@ -183,7 +183,7 @@ export default function CreateReceipt(props) {
             }
             materialDTO.push(material1)
         })
-        let receiptDTO = { materialDTOS: materialDTO, note: note, type: "order", storeId: "1" }
+        let receiptDTO = { materialDTOS: materialDTO, note: note, type:type, storeId: "1" }
         console.log("receipt => " + JSON.stringify(receiptDTO));
         ReceiptsService.postReceipt(receiptDTO)
             .then(() => {

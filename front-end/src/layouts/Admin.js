@@ -94,7 +94,7 @@ const switchRoutes = (
     <Route exact path="/admin/materials/update-material/:id" component={UpdateMaterial} />
     {/* area */}
     <Route exact path="/admin/areas" component={Area} />
-    <Route exact path="/admin/areas/add-area" component={CreateArea} />
+    {/* <Route exact path="/admin/areas/add-area" component={CreateArea} /> */}
     <Route exact path="/admin/areas/update-area/:id" component={UpdateArea} />
 
     {/* store */}

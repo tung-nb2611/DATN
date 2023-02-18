@@ -233,7 +233,7 @@ ReactDOM.render(
           </UIComponentProvider> : <Redirect to="/login" />
       }} />
       <Route path="/login" component={Login} />
-      <Redirect from="/" to="/admin/store" />
+      <Redirect from="/" to="/admin/areas" />
     </Switch>
   </Router>,
   document.getElementById("root")

@@ -25,8 +25,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     //Hàm thống số hóa đơn và tổng tiền các hóa đơn của khách hàng
     @Override
-    public List<StatisticsCustomerDTO> selectCustomerAndInvoiceInfo(String dateStart, String dateEnd) throws ParseException {
-        List<StatisticsCustomerDTO> statisticsCustomerDTOS = statisticsDAO.selectCustomerAndInvoicesInfo();
+    public List<StatisticsCustomerDTO> selectCustomerAndInvoiceInfo(int store_id,List<Integer>areaId,String dateStart, String dateEnd ) throws ParseException {
+        List<StatisticsCustomerDTO> statisticsCustomerDTOS = statisticsDAO.selectCustomerAndInvoicesInfo( store_id,areaId);
 
         long dateStart1 = Common.getMilliSeconds(dateStart);
         long dateEnd1 = Common.getMilliSeconds(dateEnd);
@@ -50,8 +50,9 @@ public class StatisticsServiceImpl implements StatisticsService {
             BigDecimal totalPurchased = new BigDecimal(String.valueOf(obj[5]));
             int numberPurchases = Integer.parseInt(String.valueOf(obj[6]));
             long createAt = Long.parseLong(String.valueOf(obj[7]));
+            String areaName = String.valueOf(obj[8]);
 
-            StatisticsCustomerDTO statisticsCustomerDTO = new StatisticsCustomerDTO(id, code, name, phone, licensePlate, totalPurchased, numberPurchases, createAt);
+            StatisticsCustomerDTO statisticsCustomerDTO = new StatisticsCustomerDTO(id, code, name, phone, licensePlate, totalPurchased, numberPurchases, createAt,areaName);
             if(statisticsCustomerDTO.getCreateAt() >= dateStart && statisticsCustomerDTO.getCreateAt() <= dateEnd){
                 statisticsCustomerList.add(statisticsCustomerDTO);
             }
@@ -60,7 +61,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public List<StatisticMaterialDTO> selectMaterialAndInvoiceInfo(String dateStart, String dateEnd) throws ParseException {
+    public List<StatisticMaterialDTO> selectMaterialAndInvoiceInfo( String dateStart, String dateEnd) throws ParseException {
         List<StatisticMaterialDTO> statisticMaterialDTOS = statisticsDAO.selectMaterialAndInvoiceInfo();
         List<StatisticMaterialDTO> statisticMaterialList = new ArrayList<>();
         long dateStart1 = Common.getMilliSeconds(dateStart);
