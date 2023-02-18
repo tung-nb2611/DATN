@@ -8,14 +8,16 @@ public class ViewReceiptDTOResponse {
     private String createDate;
     private String note;
     private String total;
+    private int type;
     private List<ReceiptMaterialResponseDTO> receiptMaterialResponseDTOs;
 
-    public ViewReceiptDTOResponse(int id, String code, String createDate, String note, String total, List<ReceiptMaterialResponseDTO> receiptMaterialResponseDTOs) {
+    public ViewReceiptDTOResponse(int id, String code, String createDate, String note, String total,int type, List<ReceiptMaterialResponseDTO> receiptMaterialResponseDTOs) {
         this.id = id;
         this.code = code;
         this.createDate = createDate;
         this.note = note;
         this.total = total;
+        this.type=type;
         this.receiptMaterialResponseDTOs = receiptMaterialResponseDTOs;
     }
 
@@ -45,6 +47,14 @@ public class ViewReceiptDTOResponse {
 
     public void setCreateDate(String createDate) {
         this.createDate = createDate;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public String getNote() {

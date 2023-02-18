@@ -1,19 +1,27 @@
 package com.sapo.dto.receipts;
 
 
+import java.util.List;
+
 public class ReceiptDTOResponse {
     private int id;
     private String code;
     private String createDate;
     private String status;
     private String total;
-    
-    public ReceiptDTOResponse(int id, String code, String createDate, String status, String total) {
+    private int type;
+    private List<ReceiptMaterialResponseDTO> receiptMaterialResponseDTOs;
+
+
+
+    public ReceiptDTOResponse(int id, String code, String createDate, String status, String total,int type, List<ReceiptMaterialResponseDTO> receiptMaterialResponseDTOs) {
         this.id = id;
         this.code = code;
         this.createDate = createDate;
         this.status = status;
         this.total = total;
+        this.type=type;
+        this.receiptMaterialResponseDTOs=receiptMaterialResponseDTOs;
     }
     
     public ReceiptDTOResponse(int id, String code, String createDate, String status) {
@@ -24,6 +32,14 @@ public class ReceiptDTOResponse {
     }
     
     public ReceiptDTOResponse() {
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public int getId() {
@@ -64,5 +80,12 @@ public class ReceiptDTOResponse {
     
     public void setTotal(String total) {
         this.total = total;
+    }
+    public List<ReceiptMaterialResponseDTO> getReceiptMaterialResponseDTOs() {
+        return receiptMaterialResponseDTOs;
+    }
+
+    public void setReceiptMaterialResponseDTOs(List<ReceiptMaterialResponseDTO> receiptMaterialResponseDTOs) {
+        this.receiptMaterialResponseDTOs = receiptMaterialResponseDTOs;
     }
 }

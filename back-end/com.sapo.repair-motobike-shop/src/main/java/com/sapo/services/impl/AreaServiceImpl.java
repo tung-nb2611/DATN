@@ -130,9 +130,9 @@ public class AreaServiceImpl implements AreaService {
     }
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void changeStatusArea(int id){
+    public void changeStatusArea(int id, int status){
         Areas areas = areaDao.findAreaById(id);
-        areas.setStatus(2);
+        areas.setStatus(status);
         saveAreaRepository(areas);
     }
 

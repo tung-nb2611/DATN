@@ -22,8 +22,8 @@ public class ReceiptDAO {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReceiptServiceImpl.class.toString());
 
     //hàm tìm Receipt bằng keyword
-    public List<Receipt> findReceiptByKeyword(String keyword){
-        String sql = "SELECT * FROM tbl_receipts where 1=1 ";
+    public List<Receipt> findReceiptByKeyword(String keyword, String type){
+        String sql = "SELECT * FROM tbl_receipts where type =" + type ;
         if(keyword != null && keyword.length() != 0){
             sql = sql + "LCASE(CONCAT(tbl_receipts.code)) LIKE LCASE('%" + keyword + "%') ";
         }

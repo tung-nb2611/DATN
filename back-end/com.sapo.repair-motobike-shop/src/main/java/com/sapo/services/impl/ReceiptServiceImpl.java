@@ -4,10 +4,10 @@ import com.sapo.common.Common;
 import com.sapo.common.ConstantVariableCommon;
 import com.sapo.dao.jpa.MaterialDAO;
 import com.sapo.dao.jpa.ReceiptDAO;
-import com.sapo.dto.invoices.InvoiceAddRequestDTO;
-import com.sapo.dto.invoices.InvoiceMaterialOrderRequestDTO;
 import com.sapo.dto.receipts.*;
-import com.sapo.entities.*;
+import com.sapo.entities.Material;
+import com.sapo.entities.Receipt;
+import com.sapo.entities.ReceiptMaterial;
 import com.sapo.exception.InputException;
 import com.sapo.repositories.MaterialRepository;
 import com.sapo.repositories.ReceiptMaterialRepository;
@@ -47,8 +47,8 @@ public class ReceiptServiceImpl implements ReceiptService {
     }
     //Hàm search receipt
     @Override
-    public ReceiptPaginationDTO searchReceipt(int page, int limit, String keyword){
-        List<Receipt> receipts = receiptDAO.findReceiptByKeyword(keyword);
+    public ReceiptPaginationDTO searchReceipt(int page, int limit, String keyword, String type){
+        List<Receipt> receipts = receiptDAO.findReceiptByKeyword(keyword, type);
         ReceiptPaginationDTO receiptDTOsPagination = findAllReceiptDTO(page, limit, receipts);
         return receiptDTOsPagination;
     }
@@ -63,7 +63,9 @@ public class ReceiptServiceImpl implements ReceiptService {
             receipt.setCreatedAt();
             receipt.setNote(receiptDTO.getNote());
             receipt.setStatus(ConstantVariableCommon.STATUS_RECEIPT_1);
-            addReceiptMaterial(receiptDTO.getMaterialDTOS(), receipt);
+            receipt.setType(receiptDTO.getType());
+            receipt.setStore_id(receiptDTO.getStoreId());
+            addReceiptMaterial(receiptDTO.getMaterialDTOS(), receipt,receiptDTO.getType());
             saveReceiptRepository(receipt);
         }else {
             throw new InputException("Không có phụ tùng để tạo phiếu");
@@ -71,7 +73,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     }
 
     //hàm thêm material trong receipt
-    private void addReceiptMaterial(List<MaterialInputRequestDTO> materialDTOS, Receipt receipt) {
+    private void addReceiptMaterial(List<MaterialInputRequestDTO> materialDTOS, Receipt receipt,int type) {
         List<ReceiptMaterial> receiptMaterials = new ArrayList<>();
         for (int i = 0; i < materialDTOS.size(); i++) {
             ReceiptMaterial receiptMaterial = new ReceiptMaterial();
@@ -82,16 +84,25 @@ public class ReceiptServiceImpl implements ReceiptService {
             receiptMaterial.setCreatedAt();
             receiptMaterials.add(receiptMaterial);
             //Sửa quantity trong material
-            editMaterial(materialDTOS.get(i));
+
+                editMaterial(materialDTOS.get(i),type);
+
+
         }
         saveReceiptMaterial(receiptMaterials);
     }
     //Hàm sửa số lượng trong material
-    void editMaterial (MaterialInputRequestDTO materialDTO){
+    void editMaterial (MaterialInputRequestDTO materialDTO,int type){
         Material material = materialDAO.findMaterialById(materialDTO.getId());
-        material.setQuantity(material.getQuantity() + materialDTO.getQuantity());
-        saveMaterialRepository(material);
+        if(type == 1 ) {
+            material.setQuantity(material.getQuantity() + materialDTO.getQuantity());
+            saveMaterialRepository(material);
+        }else {
+            material.setQuantity(material.getQuantity() - materialDTO.getQuantity());
+            saveMaterialRepository(material);
+        }
     }
+
     
 
     //Hàm chuyển trạng thái
@@ -119,7 +130,7 @@ public class ReceiptServiceImpl implements ReceiptService {
         List<ReceiptDTOResponse> receiptDTOS = new ArrayList<>();
         receipts.forEach(receipt -> {
             ViewReceiptDTOResponse viewReceiptDTOResponse = findReceiptDetailById(receipt.getId());
-            ReceiptDTOResponse receiptDTO = new ReceiptDTOResponse(receipt.getId(), receipt.getCode(),Common.getDateByMilliSeconds(receipt.getCreatedAt()), ConstantVariableCommon.statusReceiptIntToString(receipt.getStatus()), viewReceiptDTOResponse.getTotal());
+            ReceiptDTOResponse receiptDTO = new ReceiptDTOResponse(receipt.getId(), receipt.getCode(),Common.getDateByMilliSeconds(receipt.getCreatedAt()), ConstantVariableCommon.statusReceiptIntToString(receipt.getStatus()), viewReceiptDTOResponse.getTotal(),viewReceiptDTOResponse.getType(),viewReceiptDTOResponse.getReceiptMaterialResponseDTOs());
             receiptDTOS.add(receiptDTO);
         });
         return receiptDTOS;
@@ -203,6 +214,7 @@ public class ReceiptServiceImpl implements ReceiptService {
         }
         receiptDTO.setReceiptMaterialResponseDTOs(receiptDTOs);
         receiptDTO.setTotal(Common.getStringPriceVNBigDecimal(total));
+        receiptDTO.setType(receipt.getType());
 
         return receiptDTO;
     }

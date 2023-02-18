@@ -11,7 +11,7 @@ import { makeStyles, withStyles } from "@material-ui/core/styles";
 import Snackbars from 'components/Snackbar/Snackbar.js';
 import ReceiptsService from "../../services/ReceiptsService";
 import { KeyboardArrowDown, KeyboardArrowUp, NavigateBefore } from "@material-ui/icons";
-import { Collapse, IconButton, Paper, Table, TableBody, TableContainer, TableHead, TableRow, Typography } from "@material-ui/core";
+import { Button, Collapse, IconButton, Paper, Table, TableBody, TableContainer, TableHead, TableRow, Typography } from "@material-ui/core";
 import { Box } from "@sapo-presentation/sapo-ui-components";
 import MuiTableHead from "@material-ui/core/TableHead";
 import TableCell from "@material-ui/core/TableCell";
@@ -75,6 +75,7 @@ export default function Receipt(props) {
     page: 1,
     limit: 10,
     keyword: "",
+    type: 1,
   });
   function handlePageChange(newPage) {
     // console.log("new page: ", newPage);
@@ -188,6 +189,9 @@ export default function Receipt(props) {
   const back = () => {
     props.history.push('/admin/materials');
   }
+  const addOrder = () => {
+    props.history.push('/admin/receipts/add-receipt');
+  }
   function createData(name, calories, fat, carbs, protein, price) {
     return {
       name,
@@ -210,7 +214,7 @@ export default function Receipt(props) {
       ],
     };
   }
-  console.log("454545", receipts)
+
   function Row(props) {
     const { row } = props;
     const [open, setOpen] = useState(false);
@@ -218,6 +222,7 @@ export default function Receipt(props) {
 
     return (
       <React.Fragment>
+
         <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
           <TableCell>
             <IconButton
@@ -291,7 +296,16 @@ export default function Receipt(props) {
             <div className="name-list"><span>Danh sách hóa đơn nhập hàng</span></div>
           </div>
         </div>
-        <Box style={{ marginTop: "40px" }}>
+        <Button style={{
+          background: "#218FFE",
+          color: "white",
+          height: "40px",
+          marginBottom: "10px",
+          marginTop: "opx",
+          float: "right",
+          marginRight: "10px",
+        }} variant="outlined" onClick={addOrder}>Tạo phiếu nhập </Button>
+        <Box style={{ marginTop: "70px" }}>
           <TableContainer component={Paper}>
             <Table aria-label="collapsible table" >
               <TableHead variant="h6">

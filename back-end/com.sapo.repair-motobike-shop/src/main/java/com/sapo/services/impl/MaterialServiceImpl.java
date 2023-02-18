@@ -159,6 +159,22 @@ public class MaterialServiceImpl implements MaterialService {
 
     //Hàm xóa material
     @Override
+    public List<MaterialDTOResponse> deleteListMaterial(List<Integer> ids){
+        List<MaterialDTOResponse> materialDTOS = new ArrayList<>();
+        ids.forEach(id -> {
+        Material material = materialDAO.findMaterialById(id);
+        material.setStatus(ConstantVariableCommon.STATUS_MATERIAL_3);
+        material.setDeletedAt();
+        saveMaterialRepository(material);
+        MaterialDTOResponse materialDTOResponse = new MaterialDTOResponse(material.getId(), material.getCode(),material.getName(), material.getDescription(),material.getQuantity(),material.getSupplier(), Common.getStringPriceVNBigDecimal(material.getInputPrice()), Common.getStringPriceVNBigDecimal(material.getOutputPrice()), ConstantVariableCommon.statusMaterialIntToString(material.getStatus()));
+            materialDTOS.add(materialDTOResponse);
+
+        });
+        return materialDTOS;
+    }
+
+    //Hàm xóa material
+    @Override
     public MaterialDTOResponse deleteMaterial(int id){
         Material material = materialDAO.findMaterialById(id);
         material.setStatus(ConstantVariableCommon.STATUS_MATERIAL_3);

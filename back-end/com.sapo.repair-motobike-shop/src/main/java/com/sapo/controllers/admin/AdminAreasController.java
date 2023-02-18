@@ -35,6 +35,7 @@ public class AdminAreasController {
         AreaResponeById areaResponeById   = areaService.findAreaDTOById(id);
         return ResponseEntity.ok(areaResponeById);
     }
+
     // tao khu vực  mới
     @PostMapping
     public ResponseEntity<AreaDtoRequest> addArea(@Valid @RequestBody AreaDtoRequest areaDtoRequest) throws IOException {

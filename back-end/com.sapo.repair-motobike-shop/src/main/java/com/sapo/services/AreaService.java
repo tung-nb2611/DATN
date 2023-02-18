@@ -20,7 +20,7 @@ public interface AreaService {
     void updateArea(int id, AreaDtoRequest areaDtoRequest) throws IOException;
 
     @Transactional(rollbackOn = Exception.class)
-    void changeStatusArea(int id) throws IOException;
+    void changeStatusArea(int id,int status) throws IOException;
     //Hàm tìm khu vuc bằng id
     Areas findAreaById(int id);
     AreaResponeById findAreaDTOById(int id);

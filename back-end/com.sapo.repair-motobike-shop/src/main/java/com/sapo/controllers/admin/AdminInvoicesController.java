@@ -1,8 +1,10 @@
 package com.sapo.controllers.admin;
 
 import com.sapo.common.ConstantVariableCommon;
-import com.sapo.dto.invoices.*;
-import com.sapo.dto.users.UserDTOResponse;
+import com.sapo.dto.invoices.InvoiceAddRequestDTO;
+import com.sapo.dto.invoices.InvoiceEditResponseDTO;
+import com.sapo.dto.invoices.InvoiceMaterialPaginationResponseDTO;
+import com.sapo.services.AreaService;
 import com.sapo.services.InvoiceService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,9 +18,11 @@ import java.util.List;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminInvoicesController {
   private final InvoiceService invoiceService;
+  private final AreaService areaService;
   
-  public AdminInvoicesController(InvoiceService invoiceService) {
+  public AdminInvoicesController(InvoiceService invoiceService , AreaService areaService) {
     this.invoiceService = invoiceService;
+    this.areaService =areaService;
   }
   
   //API lấy list hóa đơn chờ thanh toán và đã thanh toán
@@ -33,8 +37,7 @@ public class AdminInvoicesController {
   @PutMapping("/{id}")
   public ResponseEntity<Void> changeStatusInvoiceToCompletePayment (@PathVariable("id") int id, @RequestBody InvoiceAddRequestDTO invoiceAddRequestDTO){
    invoiceService.changeStatusInvoice(id, ConstantVariableCommon.STATUS_INVOICE_5 , invoiceAddRequestDTO);
-
-    return ResponseEntity.ok().build();
+ return ResponseEntity.ok().build();
   }
 
   //API hủy hóa đơn 1,2,7

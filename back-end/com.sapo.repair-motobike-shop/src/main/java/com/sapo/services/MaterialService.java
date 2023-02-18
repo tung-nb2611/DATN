@@ -1,7 +1,6 @@
 package com.sapo.services;
 
 import com.sapo.dto.materials.*;
-import com.sapo.dto.receipts.ReceiptPaginationDTO;
 import com.sapo.entities.Material;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,6 +38,8 @@ public interface MaterialService {
 
     // hàm delete Material
     MaterialDTOResponse deleteMaterial(int id);
+    // hàm delete list Material
+    List<MaterialDTOResponse>deleteListMaterial(List <Integer> ids);
 
     //hàm tạo mới phụ kiện ở phiếu nhập
     void saveMaterialInReceipt (MaterialNewDTO materialNewDTO);

@@ -1,12 +1,13 @@
 package com.sapo.services;
 
-import com.sapo.dto.receipts.*;
+import com.sapo.dto.receipts.ReceiptDTORequest;
+import com.sapo.dto.receipts.ReceiptDTOResponse;
+import com.sapo.dto.receipts.ReceiptPaginationDTO;
+import com.sapo.dto.receipts.ViewReceiptDTOResponse;
 import com.sapo.entities.Receipt;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.io.IOException;
-import java.util.List;
 
 @Service
 public interface ReceiptService {
@@ -29,7 +30,7 @@ public interface ReceiptService {
     ReceiptDTOResponse changeStatusReceipt(int id);
 
     //Hàm search receipt
-    ReceiptPaginationDTO searchReceipt(int page, int limit, String keyword);
+    ReceiptPaginationDTO searchReceipt(int page, int limit, String keyword, String type);
 
     // hàm delete receipt
     void deleteReceipt(int id);

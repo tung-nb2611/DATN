@@ -10,9 +10,22 @@ public class Receipt extends BaseEntity {
 
     @Column(name = "note", length = 500, nullable = true)
     private String note;
+    @Column(name = "type", nullable = true)
+    private int type;
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
 
     @Column(name = "status", nullable = true)
     private int status;
+
+
+
     @Column(name = "store_id", nullable = true)
     private int store_id;
 

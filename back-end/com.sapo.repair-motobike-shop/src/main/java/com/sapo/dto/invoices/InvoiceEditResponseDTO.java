@@ -1,6 +1,6 @@
 package com.sapo.dto.invoices;
 
-import com.sapo.dto.Area.AreasResponse;
+import com.sapo.dto.Area.AreaResponeById;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -16,9 +16,9 @@ public class InvoiceEditResponseDTO {
     private InvoiceUserResponseDTO userDTO;
     private String status;
     private  int code;
-    private AreasResponse areaDTO;
+    private AreaResponeById areaDTO;
 
-    public InvoiceEditResponseDTO(AreasResponse areaDTO,int code,int id, String note, int payMethod, BigDecimal total, List<MaterialOrderResponseDTO> materialOrderResponseDTOS, List<ServiceOrderResponseDTO> serviceOrderResponseDTOS, InvoiceCustomerVehicleDTO customerVehicleDTO, InvoiceUserResponseDTO userDTO, String status) {
+    public InvoiceEditResponseDTO(AreaResponeById areaDTO,int code,int id, String note, int payMethod, BigDecimal total, List<MaterialOrderResponseDTO> materialOrderResponseDTOS, List<ServiceOrderResponseDTO> serviceOrderResponseDTOS, InvoiceCustomerVehicleDTO customerVehicleDTO, InvoiceUserResponseDTO userDTO, String status) {
         this.areaDTO=areaDTO;
         this.code=code;
         this.id = id;
@@ -40,11 +40,11 @@ public class InvoiceEditResponseDTO {
         this.code = code;
     }
 
-    public AreasResponse getAreaDTO() {
+    public AreaResponeById getAreaDTO() {
         return areaDTO;
     }
 
-    public void setAreaDTO(AreasResponse areaDTO) {
+    public void setAreaDTO(AreaResponeById areaDTO) {
         this.areaDTO = areaDTO;
     }
 

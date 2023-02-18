@@ -75,6 +75,12 @@ public class AdminMaterialsController {
         MaterialDTOResponse materialDTOResponse = materialService.deleteMaterial(id);
         return ResponseEntity.ok(materialDTOResponse);
     }
+    // Xóa  list material
+    @PutMapping("/delete/{ids}")
+    public ResponseEntity<List<MaterialDTOResponse>> deleteListMaterial(@PathVariable("ids") List<Integer> ids){
+        List<MaterialDTOResponse> materialDTOResponse = materialService.deleteListMaterial(ids);
+        return ResponseEntity.ok(materialDTOResponse);
+    }
 
     @PostMapping("/uploadFile/{id}")
     public ResponseEntity<MultipartFile> uploadFile(@PathVariable("id") int id , @RequestParam("file") MultipartFile file) throws IOException {

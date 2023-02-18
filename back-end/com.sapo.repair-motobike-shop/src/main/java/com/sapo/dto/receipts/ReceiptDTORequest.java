@@ -1,17 +1,38 @@
 package com.sapo.dto.receipts;
 
 
-import com.sapo.dto.invoices.InvoiceMaterialOrderRequestDTO;
-
 import java.util.List;
 
 public class ReceiptDTORequest {
     private String note;
-    private List<MaterialInputRequestDTO> materialDTOS;
 
+    public int getStoreId() {
+        return storeId;
+    }
+
+    public void setStoreId(int storeId) {
+        this.storeId = storeId;
+    }
+
+    private  int storeId;
+
+
+
+    private List<MaterialInputRequestDTO> materialDTOS;
+    private  int type;
     public String getNote() {
         return note;
     }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+
 
     public void setNote(String note) {
         this.note = note;

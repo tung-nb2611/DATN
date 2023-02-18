@@ -25,11 +25,11 @@ public class Invoice extends BaseEntity {
     private Integer fixerId;
 
 
-    public int getArea_id() {
+    public Integer getArea_id() {
         return area_id;
     }
 
-    public void setArea_id(int area_id) {
+    public void setArea_id(Integer area_id) {
         this.area_id = area_id;
     }
 
