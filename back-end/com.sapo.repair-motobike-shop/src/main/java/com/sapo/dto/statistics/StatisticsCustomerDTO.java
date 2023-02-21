@@ -13,9 +13,8 @@ public class StatisticsCustomerDTO {
     private BigDecimal totalPurchased;
     private int numberPurchases;
     private long createAt;
-    private String areaName;
 
-    public StatisticsCustomerDTO(int id, String code, String name, String phone, String licensePlate, BigDecimal totalPurchased, int numberPurchases, long createAt,String areaName) {
+    public StatisticsCustomerDTO(int id, String code, String name, String phone, String licensePlate, BigDecimal totalPurchased, int numberPurchases, long createAt) {
         this.id = id;
         this.code = code;
         this.name = name;
@@ -24,7 +23,6 @@ public class StatisticsCustomerDTO {
         this.totalPurchased = totalPurchased;
         this.numberPurchases = numberPurchases;
         this.createAt = createAt;
-        this.areaName = areaName;
     }
 
     public int getId() {
@@ -33,14 +31,6 @@ public class StatisticsCustomerDTO {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getAreaName() {
-        return areaName;
-    }
-
-    public void setAreaName(String areaName) {
-        this.areaName = areaName;
     }
 
     public String getCode() {

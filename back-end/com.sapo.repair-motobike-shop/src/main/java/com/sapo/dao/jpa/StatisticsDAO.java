@@ -3,6 +3,7 @@ package com.sapo.dao.jpa;
 import com.sapo.dto.statistics.*;
 import com.sapo.entities.Invoice;
 import com.sapo.services.impl.UserServiceImpl;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -11,7 +12,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository(value = "StatisticsDAO")
@@ -21,41 +21,44 @@ public class StatisticsDAO {
     private EntityManager entityManager;
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class.toString());
 
+    //Hàm thống số hóa đơn và tổng tiền
+    public InvoiceTotalDTO selecInvoicesTotal(int store_id,int area_id,long dateStart, long dateEnd) {
+        String sql = "select\n" +
+                "       sum(tbl_invoices.total) as totalPrice,\n" +
+                "       count(tbl_invoices.id) as countInvoice\n" +
+                "from tbl_invoices\n" +
+                "where tbl_invoices.store_id ="+store_id +"\n"+"AND tbl_invoices.area_id="+ area_id +""+" AND tbl_invoices.created_at between \n" + dateStart+
+                "\n"+"And\n"+ dateEnd;
+        System.out.println(sql);
+        Query query = entityManager.createNativeQuery(sql,InvoiceTotalDTO.class);
+        System.out.println(sql);
+        val xio = ((Object) query.getSingleResult());
+        InvoiceTotalDTO invoiceTotalDTO = (InvoiceTotalDTO) query.getSingleResult();
+        return invoiceTotalDTO;
+    }
+
+
     //Hàm thống số hóa đơn và tổng tiền các hóa đơn của khách hàng
-    public List<StatisticsCustomerDTO> selectCustomerAndInvoicesInfo( int store_id, List<Integer>areaId) {
-        List<StatisticsCustomerDTO> statisticsCustomerDTO = new ArrayList<>();
-        if (areaId.size() > 0) {
-            for (int i = 0; i < areaId.size(); i++) {
-                String sql = "select\n" +
-                        "       tbl_vehicle_customer.customer_id,\n" +
-                        "       tbl_customers.code,\n" +
-                        "       tbl_customers.name,\n" +
-                        "       tbl_customers.phone,\n" +
-                        "       tbl_vehicles.license_plate,\n" +
-                        "       tbl_invoices.total as total_purchased,\n" +
-                        "       count(customer_id) as number_purchases,\n" +
-                        "       tbl_invoices.created_at,\n" +
-                        "       tbl_areas.name as area_Name \n" +
-                        "from tbl_areas, tbl_invoices, tbl_customers, tbl_vehicles, tbl_vehicle_customer\n" +
-                        "where  tbl_areas.store_id= " + store_id +
-                        " and tbl_invoices.area_id =" + areaId.get(i) +"\n"+
-                        " and tbl_invoices.area_id =tbl_areas.id\n" +
-                        " and tbl_invoices.vehicle_customer_id = tbl_vehicle_customer.id\n" +
-                        "and tbl_vehicle_customer.customer_id = tbl_customers.id\n" +
-                        "and tbl_vehicle_customer.vehicle_id = tbl_vehicles.id\n" +
-                        "group by tbl_vehicle_customer.customer_id";
+    public List<StatisticsCustomerDTO> selectCustomerAndInvoicesInfo() {
+        String sql = "select\n" +
+                "       tbl_vehicle_customer.customer_id,\n" +
+                "       tbl_customers.code,\n" +
+                "       tbl_customers.name,\n" +
+                "       tbl_customers.phone,\n" +
+                "       tbl_vehicles.license_plate,\n" +
+                "       tbl_invoices.total as total_purchased,\n" +
+                "       count(customer_id) as number_purchases,\n" +
+                "       tbl_invoices.created_at\n" +
+                "from tbl_invoices, tbl_customers, tbl_vehicles, tbl_vehicle_customer\n" +
+                "where tbl_invoices.vehicle_customer_id = tbl_vehicle_customer.id\n" +
+                "and tbl_vehicle_customer.customer_id = tbl_customers.id\n" +
+                "and tbl_vehicle_customer.vehicle_id = tbl_vehicles.id\n" +
+                "group by tbl_vehicle_customer.customer_id";
 
+        Query query = entityManager.createNativeQuery(sql);
+        List<StatisticsCustomerDTO> statisticsCustomerDTOS = (List<StatisticsCustomerDTO>) query.getResultList();
 
-                System.out.println(sql);
-
-                Query query = entityManager.createNativeQuery(sql);
-
-                List<StatisticsCustomerDTO> statisticsCustomerDTOS = (List<StatisticsCustomerDTO>) query.getResultList();
-
-                statisticsCustomerDTO.addAll(statisticsCustomerDTOS);
-            }
-        }
-    return statisticsCustomerDTO;
+        return statisticsCustomerDTOS;
     }
 
     //Hàm thống kê số hóa đơn và tổng tiền các hóa đơn của phụ tùng
@@ -66,7 +69,7 @@ public class StatisticsDAO {
                 "       tbl_materials.output_price,\n" +
                 "       (tbl_material_order.quantity * tbl_materials.output_price) as totalPurchased, " +
                 "       tbl_invoices.created_at\n" +
-                "from tbl_areas, tbl_invoices, tbl_material_order, tbl_materials\n" +
+                "from tbl_invoices, tbl_material_order, tbl_materials\n" +
                 "where tbl_invoices.id = tbl_material_order.invoice_id\n" +
                 "  and tbl_material_order.material_id = tbl_materials.id\n" +
                 " group by tbl_materials.id " +

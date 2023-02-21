@@ -1,8 +1,10 @@
 package com.sapo.services.impl;
 
 import com.sapo.common.Common;
+import com.sapo.dao.jpa.AreaDao;
 import com.sapo.dao.jpa.StatisticsDAO;
 import com.sapo.dto.statistics.*;
+import com.sapo.entities.Areas;
 import com.sapo.entities.Invoice;
 import com.sapo.services.StatisticsService;
 import org.springframework.stereotype.Service;
@@ -16,17 +18,32 @@ import java.util.List;
 @Service
 public class StatisticsServiceImpl implements StatisticsService {
     private final StatisticsDAO statisticsDAO;
-//    private final StatisticsDAO statisticsDAOjdbc;
+    private final AreaDao areaDao;
 
-    public StatisticsServiceImpl(StatisticsDAO statisticsDAO) {
+    public StatisticsServiceImpl(StatisticsDAO statisticsDAO, AreaDao areaDao) {
         this.statisticsDAO = statisticsDAO;
-//        this.statisticsDAOjdbc = statisticsDAOjdbc;
+        this.areaDao = areaDao;
+
+    }
+    @Override
+    public List<InvoiceReportDTO> selectInvoiceReport(int store_id,List<Integer> area_id,String dateStart, String dateEnd) throws ParseException {
+        long dateStart1 = Common.getMilliSeconds(dateStart);
+        long dateEnd1 = Common.getMilliSeconds(dateEnd);
+        List<InvoiceReportDTO> invoiceReportDTOS = new ArrayList<>();
+        if(area_id.size() >0) {
+            for (int i =0;i<area_id.size();i++) {
+                InvoiceTotalDTO invoiceTotalDTO = statisticsDAO.selecInvoicesTotal(store_id,area_id.get(i), dateStart1, dateEnd1);
+                Areas areas =areaDao.findAreaById(area_id.get(i));
+                InvoiceReportDTO invoiceReportDTO = new InvoiceReportDTO(areas.getName(),invoiceTotalDTO);
+                invoiceReportDTOS.add(invoiceReportDTO);
+            } }
+        return invoiceReportDTOS;
     }
 
     //Hàm thống số hóa đơn và tổng tiền các hóa đơn của khách hàng
     @Override
-    public List<StatisticsCustomerDTO> selectCustomerAndInvoiceInfo(int store_id,List<Integer>areaId,String dateStart, String dateEnd ) throws ParseException {
-        List<StatisticsCustomerDTO> statisticsCustomerDTOS = statisticsDAO.selectCustomerAndInvoicesInfo( store_id,areaId);
+    public List<StatisticsCustomerDTO> selectCustomerAndInvoiceInfo(String dateStart, String dateEnd) throws ParseException {
+        List<StatisticsCustomerDTO> statisticsCustomerDTOS = statisticsDAO.selectCustomerAndInvoicesInfo();
 
         long dateStart1 = Common.getMilliSeconds(dateStart);
         long dateEnd1 = Common.getMilliSeconds(dateEnd);
@@ -50,9 +67,8 @@ public class StatisticsServiceImpl implements StatisticsService {
             BigDecimal totalPurchased = new BigDecimal(String.valueOf(obj[5]));
             int numberPurchases = Integer.parseInt(String.valueOf(obj[6]));
             long createAt = Long.parseLong(String.valueOf(obj[7]));
-            String areaName = String.valueOf(obj[8]);
 
-            StatisticsCustomerDTO statisticsCustomerDTO = new StatisticsCustomerDTO(id, code, name, phone, licensePlate, totalPurchased, numberPurchases, createAt,areaName);
+            StatisticsCustomerDTO statisticsCustomerDTO = new StatisticsCustomerDTO(id, code, name, phone, licensePlate, totalPurchased, numberPurchases, createAt);
             if(statisticsCustomerDTO.getCreateAt() >= dateStart && statisticsCustomerDTO.getCreateAt() <= dateEnd){
                 statisticsCustomerList.add(statisticsCustomerDTO);
             }
@@ -61,7 +77,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public List<StatisticMaterialDTO> selectMaterialAndInvoiceInfo( String dateStart, String dateEnd) throws ParseException {
+    public List<StatisticMaterialDTO> selectMaterialAndInvoiceInfo(String dateStart, String dateEnd) throws ParseException {
         List<StatisticMaterialDTO> statisticMaterialDTOS = statisticsDAO.selectMaterialAndInvoiceInfo();
         List<StatisticMaterialDTO> statisticMaterialList = new ArrayList<>();
         long dateStart1 = Common.getMilliSeconds(dateStart);
