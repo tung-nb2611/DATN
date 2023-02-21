@@ -6,6 +6,9 @@ import com.sapo.services.impl.UserServiceImpl;
 import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -17,6 +20,8 @@ import java.util.List;
 @Repository(value = "StatisticsDAO")
 @Transactional(rollbackOn = Exception.class)
 public class StatisticsDAO {
+    @Autowired
+    protected JdbcTemplate jdbc;
     @PersistenceContext
     private EntityManager entityManager;
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class.toString());
@@ -36,8 +41,14 @@ public class StatisticsDAO {
         InvoiceTotalDTO invoiceTotalDTO = (InvoiceTotalDTO) query.getSingleResult();
         return invoiceTotalDTO;
     }
+    public <V> V queryForObject(String query, Object[] args, Class<V> clazz) {
+        List<V> result = this.jdbc.query(query, args, new BeanPropertyRowMapper(clazz));
+        return result.isEmpty() ? null : result.get(0);
+    }
 
-
+    public Integer getById(int store_id) {
+        return jdbc.queryForObject("SELECT  count(tbl_invoices.id) as countInvoice FROM  tbl_invoices WHERE tbl_invoices.store_id =?", new Object[]{store_id}, Integer.class);
+    }
     //Hàm thống số hóa đơn và tổng tiền các hóa đơn của khách hàng
     public List<StatisticsCustomerDTO> selectCustomerAndInvoicesInfo() {
         String sql = "select\n" +

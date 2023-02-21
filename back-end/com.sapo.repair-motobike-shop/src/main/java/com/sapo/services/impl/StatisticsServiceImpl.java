@@ -32,7 +32,8 @@ public class StatisticsServiceImpl implements StatisticsService {
         List<InvoiceReportDTO> invoiceReportDTOS = new ArrayList<>();
         if(area_id.size() >0) {
             for (int i =0;i<area_id.size();i++) {
-                InvoiceTotalDTO invoiceTotalDTO = statisticsDAO.selecInvoicesTotal(store_id,area_id.get(i), dateStart1, dateEnd1);
+                Integer tui = statisticsDAO.getById(store_id);
+                InvoiceTotalDTO invoiceTotalDTO = statisticsDAO.selecInvoicesTotal(store_id,area_id.get(i),dateStart1,dateEnd1);
                 Areas areas =areaDao.findAreaById(area_id.get(i));
                 InvoiceReportDTO invoiceReportDTO = new InvoiceReportDTO(areas.getName(),invoiceTotalDTO);
                 invoiceReportDTOS.add(invoiceReportDTO);
