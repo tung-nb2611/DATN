@@ -29,7 +29,7 @@ export default function Login(props) {
                 setJwt(token);
                 console.log(token)
                 sessionStorage.setItem('jwt', token);
-                props.history.push('/admin/store')
+                props.history.push('/admin/areas')
                 window.location.reload();
             })
             .catch(function (error) {
