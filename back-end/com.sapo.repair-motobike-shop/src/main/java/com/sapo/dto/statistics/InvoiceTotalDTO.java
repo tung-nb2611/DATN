@@ -3,18 +3,18 @@ package com.sapo.dto.statistics;
 import java.math.BigDecimal;
 
 public class InvoiceTotalDTO {
-   private BigDecimal totalPrice;
+   private int totalPrice;
    private int countInvoice;
 
-   public InvoiceTotalDTO(BigDecimal totalPrice, int countInvoice) {
+   public InvoiceTotalDTO(int totalPrice, int countInvoice) {
       this.totalPrice = totalPrice;
       this.countInvoice = countInvoice;
    }
-   public BigDecimal getTotalPrice() {
+   public int getTotalPrice() {
       return totalPrice;
    }
 
-   public void setTotalPrice(BigDecimal totalPrice) {
+   public void setTotalPrice(int totalPrice) {
       this.totalPrice = totalPrice;
    }
 

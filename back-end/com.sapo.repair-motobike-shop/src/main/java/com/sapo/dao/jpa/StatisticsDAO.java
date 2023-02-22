@@ -27,7 +27,7 @@ public class StatisticsDAO {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class.toString());
 
     //Hàm thống số hóa đơn và tổng tiền
-    public InvoiceTotalDTO selecInvoicesTotal(int store_id,int area_id,long dateStart, long dateEnd) {
+    public List<InvoiceTotalDTO> selecInvoicesTotal(int store_id,int area_id,long dateStart, long dateEnd) {
         String sql = "select\n" +
                 "       sum(tbl_invoices.total) as totalPrice,\n" +
                 "       count(tbl_invoices.id) as countInvoice\n" +
@@ -38,16 +38,18 @@ public class StatisticsDAO {
         Query query = entityManager.createNativeQuery(sql,InvoiceTotalDTO.class);
         System.out.println(sql);
         val xio = ((Object) query.getSingleResult());
-        InvoiceTotalDTO invoiceTotalDTO = (InvoiceTotalDTO) query.getSingleResult();
-        return invoiceTotalDTO;
+        List<InvoiceTotalDTO> statisticsCustomerDTOS = (List<InvoiceTotalDTO>) query.getResultList();
+        return statisticsCustomerDTOS;
     }
     public <V> V queryForObject(String query, Object[] args, Class<V> clazz) {
         List<V> result = this.jdbc.query(query, args, new BeanPropertyRowMapper(clazz));
         return result.isEmpty() ? null : result.get(0);
     }
-
-    public Integer getById(int store_id) {
-        return jdbc.queryForObject("SELECT  count(tbl_invoices.id) as countInvoice FROM  tbl_invoices WHERE tbl_invoices.store_id =?", new Object[]{store_id}, Integer.class);
+    public Integer getSumInbvoice(int store_id,int area_id,long dateStart, long dateEnd) {
+        return jdbc.queryForObject("SELECT  sum(tbl_invoices.total) as totalPrice FROM  tbl_invoices WHERE tbl_invoices.store_id =? and tbl_invoices.area_id = ? and   tbl_invoices.created_at >=? and tbl_invoices.created_at <=?", new Object[]{store_id,area_id,dateStart,dateEnd}, Integer.class);
+    }
+    public Integer getCountInbvoice(int store_id,int area_id,long dateStart, long dateEnd) {
+        return jdbc.queryForObject("SELECT  count(tbl_invoices.id) as countInvoice FROM  tbl_invoices WHERE tbl_invoices.store_id =? and tbl_invoices.area_id = ? and    tbl_invoices.created_at >=? and tbl_invoices.created_at <=?", new Object[]{store_id,area_id,dateStart,dateEnd}, Integer.class);
     }
     //Hàm thống số hóa đơn và tổng tiền các hóa đơn của khách hàng
     public List<StatisticsCustomerDTO> selectCustomerAndInvoicesInfo() {
