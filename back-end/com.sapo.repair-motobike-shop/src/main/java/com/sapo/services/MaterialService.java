@@ -42,5 +42,5 @@ public interface MaterialService {
     List<MaterialDTOResponse>deleteListMaterial(List <Integer> ids);
 
     //hàm tạo mới phụ kiện ở phiếu nhập
-    void saveMaterialInReceipt (MaterialNewDTO materialNewDTO);
+    void saveMaterialInReceipt (MaterialNewDTO material);
 }

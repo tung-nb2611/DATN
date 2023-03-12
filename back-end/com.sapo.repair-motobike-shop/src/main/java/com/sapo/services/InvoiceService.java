@@ -9,10 +9,10 @@ import java.util.List;
 @Service
 public interface InvoiceService {
     //Hàm lấy list hóa đơn trạng thái chờ xử lý và đang xử lý
-    InvoiceListPaginationResponseDTO findAllInvoiceByStatus( int page, int limit, String keyword, List<Integer> status, int sort);
+    InvoiceListPaginationResponseDTO findAllInvoiceByStatus( int store_id, int page, int limit, String keyword, List<Integer> status, int sort);
 
     //hàm lấy list hóa đơn trạng thái chờ thanh toán và thanh toán
-    InvoiceMaterialPaginationResponseDTO findAllInvoiceAndBuyMaterialByStatus( int aera_id,int page, int limit, String keyword, List<Integer> status, int sort);
+    InvoiceMaterialPaginationResponseDTO findAllInvoiceAndBuyMaterialByStatus( int store_id ,int aera_id,int page, int limit, String keyword, List<Integer> status, int sort);
 
 
     //Hàm lấy list hóa đơn trạng thái đang xử lý
@@ -58,7 +58,7 @@ public interface InvoiceService {
     void receiptInvoiceByFixer(int id);
 
     //Hàm hoàn thành của nhân viên sửa chữa
-    void finishInvoiceByFixer(int id);
+    void finishInvoiceByFixer(int id,int status);
 
     //hàm so sánh số lượng còn trong material
     void compareQuantityMaterial(int id, int quantity);

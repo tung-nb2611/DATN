@@ -1,0 +1,8 @@
+.overview {
+  width: calc((100% - 60px) / 4);
+  margin-right: 20px;
+  box-shadow: 0 2px 4px hsl(0deg 0% 66% / 25%);
+  background: #cf1010;
+  padding: 20px;
+  border-radius: 3px;
+}

@@ -1,15 +1,20 @@
 package com.sapo.controllers.admin;
 
 import com.sapo.common.ConstantVariableCommon;
+import com.sapo.config.sercurity.jwt.JwtProvider;
 import com.sapo.dto.invoices.InvoiceAddRequestDTO;
 import com.sapo.dto.invoices.InvoiceEditResponseDTO;
 import com.sapo.dto.invoices.InvoiceMaterialPaginationResponseDTO;
+import com.sapo.entities.User;
 import com.sapo.services.AreaService;
 import com.sapo.services.InvoiceService;
+import com.sapo.services.UserService;
+import lombok.val;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -19,17 +24,28 @@ import java.util.List;
 public class AdminInvoicesController {
   private final InvoiceService invoiceService;
   private final AreaService areaService;
-  
-  public AdminInvoicesController(InvoiceService invoiceService , AreaService areaService) {
+    private final UserService userService;
+    private final JwtProvider jwtProvider;
+  public AdminInvoicesController(InvoiceService invoiceService , AreaService areaService, UserService userService, JwtProvider jwtProvider) {
     this.invoiceService = invoiceService;
     this.areaService =areaService;
+      this.userService = userService;
+      this.jwtProvider = jwtProvider;
   }
-  
+    public Integer getstoreId(HttpServletRequest request){
+        String tokenBearer = request.getHeader("Authorization");
+        String[] splits = tokenBearer.split(" ");
+        String username = jwtProvider.getUserNameFromJwtToken(splits[1]);
+        User user = userService.findUserByUsername(username);
+
+        return user.getStore().getId();
+    }
   //API lấy list hóa đơn chờ thanh toán và đã thanh toán
   @GetMapping("/list")
-  public ResponseEntity<InvoiceMaterialPaginationResponseDTO> listInvoiceInProcess(@RequestParam int aera_id,@RequestParam int page, @RequestParam int limit, @RequestParam String keyword, @RequestParam List<Integer> status){
+  public ResponseEntity<InvoiceMaterialPaginationResponseDTO> listInvoiceInProcess(@RequestParam int aera_id,@RequestParam int page, @RequestParam int limit, @RequestParam String keyword, @RequestParam List<Integer> status,HttpServletRequest request){
+      val store_id = getstoreId(request);
     int sort = 0;
-    InvoiceMaterialPaginationResponseDTO invoiceDTO = invoiceService.findAllInvoiceAndBuyMaterialByStatus(aera_id,page, limit, keyword, status, sort);
+    InvoiceMaterialPaginationResponseDTO invoiceDTO = invoiceService.findAllInvoiceAndBuyMaterialByStatus(store_id,aera_id,page, limit, keyword, status, sort);
     return ResponseEntity.ok(invoiceDTO);
   }
   

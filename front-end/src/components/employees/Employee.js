@@ -4,17 +4,51 @@ import React, { useState, useEffect } from "react";
 import Pagination from "components/Pagination/pagination";
 import "../../assets/css/employees/employee.css";
 import FiltersForm from "../FiltersForm/search.js";
-import LimitPagination from 'components/Pagination/limitPagination.js';
+import LimitPagination from "components/Pagination/limitPagination.js";
 import EmployeesService from "services/employees";
 
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
-import { ArrowDropDown, Delete, DeleteForever, EditAttributesTwoTone } from "@material-ui/icons";
+import {
+  ArrowDropDown,
+  Delete,
+  DeleteForever,
+  EditAttributesTwoTone,
+} from "@material-ui/icons";
 // material-ui icons
-import Snackbars from 'components/Snackbar/Snackbar.js';
+import Snackbars from "components/Snackbar/Snackbar.js";
 import Edit from "@material-ui/icons/Edit";
 import EmployeeFilters from "components/FiltersForm/EmployeeFilters";
 import RoleFilters from "components/FiltersForm/RoleFilters";
+import {
+  Box,
+  Checkbox,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+  TableSortLabel,
+  Toolbar,
+  Typography,
+  Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  Button,
+  Container,
+  TextField,
+} from "@material-ui/core";
+import { Add, Clear } from "@material-ui/icons";
+import { withStyles } from "@material-ui/styles";
+import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 const styles = {
   cardCategoryWhite: {
     "&,& a,& a:hover,& a:focus": {
@@ -45,7 +79,6 @@ const styles = {
   },
 };
 
-
 const useStyles = makeStyles(styles);
 
 export default function (props) {
@@ -60,8 +93,8 @@ export default function (props) {
     };
   });
 
-  const [messageSuccess, setMessageSuccess] = useState('');
-  const [messageError, setMessageError] = useState('');
+  const [messageSuccess, setMessageSuccess] = useState("");
+  const [messageError, setMessageError] = useState("");
   const [tl, setTl] = React.useState(false);
   const [fail, setFail] = React.useState(false);
   const [id, setId] = useState();
@@ -71,20 +104,21 @@ export default function (props) {
 
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [buttonOtherClass, setButtonOtherClass] = useState('');
-  const [modalTimeSheetClass, setModalTimeSheetClass] = useState('');
-  const [modalSalaryDayClass, setModalSalaryDayClass] = useState('');
-  const [warningClass, setWarningClass] = useState('');
-  const [warningModalClass, setWarningModalClass] = useState('');
-  const [month, setMonth] = useState('');
+  const [buttonOtherClass, setButtonOtherClass] = useState("");
+  const [modalTimeSheetClass, setModalTimeSheetClass] = useState("");
+  const [modalSalaryDayClass, setModalSalaryDayClass] = useState("");
+  const [warningClass, setWarningClass] = useState("");
+  const [warningModalClass, setWarningModalClass] = useState("");
+  const [month, setMonth] = useState("");
   const showButtonOther = () => {
-    if (buttonOtherClass == '') {
-      setButtonOtherClass('content-button');
+    if (buttonOtherClass == "") {
+      setButtonOtherClass("content-button");
     } else {
-      setButtonOtherClass('');
+      setButtonOtherClass("");
     }
-  }
-
+  };
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -105,12 +139,12 @@ export default function (props) {
       page: newPage,
     });
   }
-  function handleFiltersChange(newFilters) {
-    console.log("New filters: ", newFilters);
+  function handleFiltersChange(e) {
+    const value = e.target.value;
     setFilters({
       ...filters,
       page: 1,
-      keyword: newFilters.keyword,
+      keyword: value,
     });
   }
   function handleChangeLimit(newLimit) {
@@ -144,35 +178,37 @@ export default function (props) {
   useEffect(() => {
     async function fetchEmployeeList() {
       try {
-        EmployeesService.listEmployees(filters).then((res) => {
-          const employees = res.data.userDTOS;
-          const pagination = res.data.pagination;
+        EmployeesService.listEmployees(filters)
+          .then((res) => {
+            const employees = res.data.userDTOS;
+            const pagination = res.data.pagination;
 
-          setEmployees(
-            employees.map((employee) => {
-              return {
-                select: false,
-                id: employee.id,
-                code: employee.code,
-                name: employee.name,
-                phone: employee.phone,
-                status: employee.status
-              }
-            }))
-          setPagination(pagination);
-          setIsLoaded(true);
-        }).catch(function (error) {
-          if (error.response.data.status == 403) {
-            alert("Không có quyền truy cập!")
-          }
-        })
+            setEmployees(
+              employees.map((employee) => {
+                return {
+                  select: false,
+                  id: employee.id,
+                  code: employee.code,
+                  name: employee.name,
+                  phone: employee.phone,
+                  status: employee.status,
+                };
+              })
+            );
+            setPagination(pagination);
+            setIsLoaded(true);
+          })
+          .catch(function (error) {
+            if (error.response.data.status == 403) {
+              alert("Không có quyền truy cập!");
+            }
+          });
       } catch (error) {
         if (error.status == 401) {
-          alert("Không quyền truy cập")
+          alert("Không quyền truy cập");
         }
         console.log("Failed to fetch employee list: ", error.message);
         setError(error);
-
       }
     }
     fetchEmployeeList();
@@ -181,61 +217,49 @@ export default function (props) {
   const handleCreateTimeSheets = (e) => {
     e.preventDefault();
     const ids = [];
-    employees.forEach(employee => {
+    employees.forEach((employee) => {
       if (employee.select) {
         ids.push(employee.id);
       }
     });
 
     if (ids.length != 0) {
-      let timesheets = { ids, month }
+      let timesheets = { ids, month };
       EmployeesService.createTimeSheets(timesheets)
         .then(() => {
-          setMessageSuccess("Tạo bảng công thành công")
+          setMessageSuccess("Tạo bảng công thành công");
           setTl(true);
           // use this to make the notification autoclose
-          setTimeout(
-            function () {
-              setTl(false)
-            },
-            3000
-          );
+          setTimeout(function () {
+            setTl(false);
+          }, 3000);
         })
         .catch(function (error) {
           if (error.response.data.errors) {
-            setMessageError(error.response.data.errors[0].defaultMessage)
+            setMessageError(error.response.data.errors[0].defaultMessage);
             setFail(true);
             // use this to make the notification autoclose
-            setTimeout(
-              function () {
-                setFail(false)
-              },
-              3000
-            );
+            setTimeout(function () {
+              setFail(false);
+            }, 3000);
           } else {
-            setMessageError(error.response.data.message)
+            setMessageError(error.response.data.message);
             setFail(true);
             // use this to make the notification autoclose
-            setTimeout(
-              function () {
-                setFail(false)
-              },
-              3000
-            );
+            setTimeout(function () {
+              setFail(false);
+            }, 3000);
           }
         });
     } else {
-      setMessageError("Không có lựa chọn nào! Vui lòng chọn lại!")
+      setMessageError("Không có lựa chọn nào! Vui lòng chọn lại!");
       setFail(true);
       // use this to make the notification autoclose
-      setTimeout(
-        function () {
-          setFail(false)
-        },
-        3000
-      );
+      setTimeout(function () {
+        setFail(false);
+      }, 3000);
     }
-  }
+  };
 
   const putSalaryDay = (e) => {
     e.preventDefault();
@@ -243,43 +267,34 @@ export default function (props) {
     EmployeesService.changeSalaryDay(employeeId, filters)
       .then(() => {
         setFilters({
-          ...filters
-        })
-        setMessageSuccess("Điều chỉnh lương thành công!")
+          ...filters,
+        });
+        setMessageSuccess("Điều chỉnh lương thành công!");
         setTl(true);
         // use this to make the notification autoclose
-        setTimeout(
-          function () {
-            setTl(false)
-          },
-          3000
-        );
-        setModalSalaryDayClass('');
+        setTimeout(function () {
+          setTl(false);
+        }, 3000);
+        setModalSalaryDayClass("");
       })
       .catch(function (error) {
         if (error.response.data.errors) {
-          setMessageError(error.response.data.errors[0].defaultMessage)
+          setMessageError(error.response.data.errors[0].defaultMessage);
           setTl(true);
           // use this to make the notification autoclose
-          setTimeout(
-            function () {
-              setFail(false)
-            },
-            3000
-          );
+          setTimeout(function () {
+            setFail(false);
+          }, 3000);
         } else {
-          setMessageError(error.response.data.message)
+          setMessageError(error.response.data.message);
           setFail(true);
           // use this to make the notification autoclose
-          setTimeout(
-            function () {
-              setFail(false)
-            },
-            3000
-          );
+          setTimeout(function () {
+            setFail(false);
+          }, 3000);
         }
       });
-  }
+  };
   const updateCategory = (id) => {
     props.history.push(`/admin/employees/update-employee/${id}`);
   };
@@ -298,103 +313,144 @@ export default function (props) {
       console.log(user);
       setSalaryDay(user.salaryDay);
     });
-    if (modalSalaryDayClass == '') {
-      setModalSalaryDayClass('modal-salaryday')
+    if (modalSalaryDayClass == "") {
+      setModalSalaryDayClass("modal-salaryday");
     }
-  }
-
+  };
 
   const timesheet = () => {
-    props.history.push('/admin/employees/time-sheets')
-  }
+    props.history.push("/admin/employees/time-sheets");
+  };
   const listRoles = () => {
-    props.history.push('/admin/roles')
-  }
+    props.history.push("/admin/roles");
+  };
   const classes = useStyles();
 
   const hiddenFormRole = () => {
-    setModalTimeSheetClass('')
-  }
+    setModalTimeSheetClass("");
+  };
 
   const hiddenFormSalaryDay = () => {
-    setEmployeeId('')
-    setSalaryDay('')
-    setModalSalaryDayClass('')
-  }
+    setEmployeeId("");
+    setSalaryDay("");
+    setModalSalaryDayClass("");
+  };
 
   const showCreateTimesheet = () => {
-    if (modalTimeSheetClass == '') {
-      setModalTimeSheetClass('modal-timesheet')
+    if (modalTimeSheetClass == "") {
+      setModalTimeSheetClass("modal-timesheet");
     }
-  }
+  };
 
   const changeCreateTimeSheet = (e) => {
-    setMonth(e.target.value)
-  }
+    setMonth(e.target.value);
+  };
 
   const backconfirm = () => {
-    setWarningClass('');
-    setWarningModalClass('');
-  }
+    setWarningClass("");
+    setWarningModalClass("");
+  };
 
   const deleteS = (id) => {
-    if (warningModalClass == '') {
-      setWarningModalClass('warning-modal')
-      setId(id)
+    if (warningModalClass == "") {
+      setWarningModalClass("warning-modal");
+      setId(id);
     }
-  }
+  };
 
   //Xóa nhân viên
   const deleteEmployee = (e) => {
     EmployeesService.deleteEmployee(id)
       .then(() => {
         setFilters({
-          ...filters
-        })
-        setWarningModalClass('')
-        setMessageSuccess("Xóa thành công!")
+          ...filters,
+        });
+        setWarningModalClass("");
+        setMessageSuccess("Xóa thành công!");
         setTl(true);
         // use this to make the notification autoclose
-        setTimeout(
-          function () {
-            setTl(false)
-          },
-          3000
-        );
+        setTimeout(function () {
+          setTl(false);
+        }, 3000);
       })
       .catch(function (error) {
         console.log(error.response);
         if (error.response.data.errors) {
-          setMessageError(error.response.data.errors[0].defaultMessage)
+          setMessageError(error.response.data.errors[0].defaultMessage);
           setFail(true);
           // use this to make the notification autoclose
-          setTimeout(
-            function () {
-              setFail(false)
-            },
-            3000
-          );
+          setTimeout(function () {
+            setFail(false);
+          }, 3000);
         } else {
-          setMessageError(error.response.data.message)
+          setMessageError(error.response.data.message);
           setFail(true);
           // use this to make the notification autoclose
-          setTimeout(
-            function () {
-              setFail(false)
-            },
-            3000
-          );
+          setTimeout(function () {
+            setFail(false);
+          }, 3000);
         }
       });
-  }
-
+  };
+  const TableHeaderCell = withStyles(() => ({
+    root: {
+      fontSize: "14px",
+      fontWeight: "bold",
+    },
+  }))(TableCell);
+  const handleChangePage = (event, newPage) => {
+    setFilters({
+      ...filters,
+      page: newPage + 1,
+    });
+    setPage(newPage);
+  };
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+  const colorStatusInvoice = (status) => {
+    if (status.localeCompare("Sẵn sàng sửa xe") == 0) {
+      return (
+        <span
+          style={{
+            color: "rgb(255 255 255)",
+            background: "rgb(102, 184, 255)",
+            borderRadius: "20px",
+            width: "fit-content",
+            margin: "auto",
+            padding: "2px 10px",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {status}
+        </span>
+      );
+    } else if (status.localeCompare("Đang làm việc") == 0) {
+      return (
+        <span
+          style={{
+            color: "rgb(255, 174, 6)",
+            background: "rgb(255, 239, 205)",
+            borderRadius: "20px",
+            width: "fit-content",
+            margin: "auto",
+            padding: "2px 10px",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {status}
+        </span>
+      );
+    }
+  };
   if (error) {
     return <div>Error: {error.message}</div>;
   } else if (!isLoaded) {
     return <div>Loading....</div>;
   } else {
     return (
-      <div className="list-employees">
+      <>
         <Snackbars
           place="tc"
           color="info"
@@ -411,176 +467,148 @@ export default function (props) {
           closeNotification={() => setFail(false)}
           close
         />
-        <div className="title-employees">
-          <div className="name-title"><span>Danh sách nhân viên</span></div>
-          <div className="add-new-invoice"><button className="button-add" onClick={addEmployee}>Thêm Nhân viên</button></div>
-        </div>
-        {/* <div id="modal-timesheet" className={modalTimeSheetClass}>
-          <div className="create-timesheet">
-            <div className="title-add-timesheet"><div className="title-timesheet"><span >Thêm bảng công tháng mới</span></div> <div className="close"><span onClick={hiddenFormRole}>&times;</span></div></div>
-            <select onChange={changeCreateTimeSheet}>
-              <option value="1">Tháng 1</option>
-              <option value="2">Tháng 2</option>
-              <option value="3">Tháng 3</option>
-              <option value="4">Tháng 4</option>
-              <option value="5">Tháng 5</option>
-              <option value="6">Tháng 6</option>
-              <option value="7">Tháng 7</option>
-              <option value="8">Tháng 8</option>
-              <option value="9">Tháng 9</option>
-              <option value="10">Tháng 10</option>
-              <option value="11">Tháng 11</option>
-              <option value="12">Tháng 12</option>
-            </select><br />
-            <button onClick={handleCreateTimeSheets}>Tạo</button>
-          </div>
-        </div> */}
 
-        <div id="warning-modal" className={warningModalClass}>
-          <div id="warning" className={warningClass}>
-            <div className="title-warning">
-              <span>Xóa nhân viên?</span>
-            </div>
-            <div className="content-warning">
-              <div className="text-warning"><span>Bạn có chắc muốn xóa nhân viên này? Thao tác này không thể khôi phục.</span></div>
-              <div className="button-warning">
-                <button className="delete-permission" onClick={deleteEmployee}><span>Xóa</span></button>
-                <div className="back" onClick={backconfirm}><span>Thoát</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* // <div id="warning-modal" className={warningModalClass}>
+        //   <div id="warning" className={warningClass}>
+        //     <div className="title-warning">
+        //       <span>Xóa nhân viên?</span>
+        //     </div>
+        //     <div className="content-warning">
+        //       <div className="text-warning">
+        //         <span>
+        //           Bạn có chắc muốn xóa nhân viên này? Thao tác này không thể
+        //           khôi phục.
+        //         </span>
+        //       </div>
+        //       <div className="button-warning">
+        //         <button className="delete-permission" onClick={deleteEmployee}>
+        //           <span>Xóa</span>
+        //         </button>
+        //         <div className="back" onClick={backconfirm}>
+        //           <span>Thoát</span>
+        //         </div>
+        //       </div>
+        //     </div>
+        //   </div>
+        // </div> */}
 
-        {/* <div id="modal-salaryday" className={modalSalaryDayClass}>
-          <div className="create-salaryday">
-            <div className="title-salaryday"><div className="title-salaryday"><span >Điều chỉnh lương nhân viên</span></div> <div className="close"><span onClick={hiddenFormSalaryDay}>&times;</span></div></div>
-            <div className="content-salaryday">
-              <div className="form-group">
-                <label>Lương hiện tại</label>
-                <br />
-                <input
-                  name="name"
-                  type="text"
-                  className="form-control"
-                  value={salaryDay}
-                  disabled
-                />
-              </div>
-              <div className="form-group">
-                <label>Lương điều chỉnh</label>
-                <br />
-                <input
-                  placeholder="Lương Điều chỉnh"
-                  name="address"
-                  className="form-control"
-                  onChange={changeSalaryDayAdjustment}
-                />
-              </div>
-            </div>
-            <button onClick={putSalaryDay}>Tạo</button>
-          </div>
-        </div> */}
-
-        <div className="content-employees">
-          {/* <div className="filter">
-            <FiltersForm onSubmit={handleFiltersChange} />
-            <div className="action">
-              <div className="select">
-                <EmployeeFilters onSubmit={handleFiltersStatus} />
-              </div>
-              <div className="select">
-                <RoleFilters onSubmit={handleFiltersRole} />
-              </div>
-              <div className="add-invoices">
-                <button className="button-action" onClick={timesheet}>Bảng Công NV</button> */}
-          {/* <button className="button-action" onClick={showCreateTimesheet}>Tạo bảng công</button> */}
-          {/* <div className="button-other" onClick={showButtonOther}>
-                  <div className="title-button">
-                    <span>Khác</span>
-                    <ArrowDropDown style={{ width: "15px" }} />
-                  </div>
-                  <div id="content-button" className={buttonOtherClass}>
-                    <button className="button-action" onClick={listRoles}>Chức vụ</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div> */}
-          <table className="table">
-            <thead>
-              <tr>
-                <th className="th-3">
-                  <span>Mã nhân viên</span>
-                </th>
-                <th className="th-4">
-                  <span>Họ và tên</span>
-                </th>
-                <th className="th-5">
-                  <span>Số điện thoại</span>
-                </th>
-                <th className="th-6">
-                  <span>Trạng thái</span>
-                </th>
-                <th className="th-7">
-                  <span></span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {employees.map((employee) => (
-                <tr key={employee.id}>
-                  <td className="td-3">
-                    <span>{employee.code}</span>
-                  </td>
-                  <td className="td-4">
-                    <span>{employee.name}</span>
-                  </td>
-                  <td className="td-5">
-                    <span>{employee.phone}</span>
-                  </td>
-                  <td className="td-6">
-                    <span>{employee.status}</span>
-                  </td>
-                  <td className="td-7">
-                    <button
-                      className="button-icon"
-                      onClick={() => updateCategory(employee.id)}
-                    >
-                      <Edit style={{ width: "15px" }} /><div className="info-button"><span>Sửa thông tin nv</span></div>
-                    </button>
-                    <button
-                      className="button-icon"
-                      onClick={() => updateSalaryDay(employee)}
-                    >
-                      <EditAttributesTwoTone style={{ width: "15px" }} /><div className="info-button"><span>Điều chỉnh lương nv</span></div>
-                    </button>
-                    <button
-                      className="button-icon"
-                      onClick={() => deleteS(employee.id)}
-                    >
-                      <DeleteForever style={{ width: "15px" }} /><div className="info-button"><span>Xóa nhân viên</span></div>
-                    </button>
-                  </td>
-                  <td></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="pagination-limit">
-            <div className="limit">
-              <span>Hiển thị </span><LimitPagination onSubmit={handleChangeLimit} /> <span style={{ marginTop: "21px" }}> kết quả</span>
-            </div>
-            <div className="pagination">
-              <Pagination
-                pagination={pagination}
-                onPageChange={handlePageChange}
+        <Container>
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <Typography
+              variant="h4"
+              style={{
+                marginBottom: "15px",
+                marginTop: "15px",
+              }}
+            >
+              Thông tin nhân viên
+            </Typography>
+            {/* <Tabs
+                onChange={handleChangeTab}
+                aria-label="lab API tabs example"
+              >
+                <Tabs label="Item One" value="1" />
+                <TabTwoTone label="Item Two" value="2" />
+                <TabTwoTone label="Item Three" value="3" />
+              </Tabs> */}
+          </Box>
+          <Button
+            style={{
+              background: "#218FFE",
+              color: "white",
+              height: "40px",
+              marginBottom: "10px",
+              marginTop: "15px",
+              float: "right",
+              marginRight: "10px",
+            }}
+            onClick={addEmployee}
+            variant="outlined"
+            startIcon={<Add />}
+          >
+            Thêm Nhân viên
+          </Button>
+          <Box sx={{ width: "100%" }}>
+            <Paper sx={{ width: "100%", mb: 2, minHeight: "100px" }}>
+              <TextField
+                id="filled-search"
+                label="Tìm kiếm dịch vụ"
+                type="search"
+                variant="outlined"
+                style={{
+                  marginLeft: "30px",
+                  width: "93%",
+                  marginTop: "20px",
+                }}
+                size="small"
+                onChange={handleFiltersChange}
               />
-            </div>
-          </div>
-        </div>
-      </div>
 
+              <TableContainer>
+                <Table
+                  sx={{ minWidth: 750 }}
+                  aria-labelledby="tableTitle"
+                  size={"medium"}
+                >
+                  <TableHead variant="h6">
+                    <TableRow>
+                      <TableHeaderCell variant="h6">
+                        Mã nhân viên
+                      </TableHeaderCell>
+                      <TableHeaderCell align="center">
+                        Họ và tên{" "}
+                      </TableHeaderCell>
+                      <TableHeaderCell align="center">
+                        Số điện thoại
+                      </TableHeaderCell>
+                      <TableHeaderCell align="center">
+                        Trạng thái
+                      </TableHeaderCell>
+                      <TableHeaderCell></TableHeaderCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {employees.map((row, index) => {
+                      return (
+                        <TableRow>
+                          <TableCell component="th">
+                            {" "}
+                            <Link onClick={() => updateCategory(row.id)}>
+                              {row.code}
+                            </Link>
+                          </TableCell>
+                          <TableCell align="center">{row.name}</TableCell>
+                          <TableCell align="center">{row.phone}</TableCell>
+
+                          <TableCell align="center">
+                            {" "}
+                            {colorStatusInvoice(row.status)}
+                          </TableCell>
+                          <TableCell align="left">
+                            <Clear
+                              size="small"
+                              onClick={() => deleteEmployee(row.id)}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <TablePagination
+                rowsPerPageOptions={[10, 25]}
+                component="div"
+                count={pagination.totalRows}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onChangePage={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </Paper>
+          </Box>
+        </Container>
+      </>
     );
   }
 }

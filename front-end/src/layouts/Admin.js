@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 // creates a beautiful scrollbar
 import PerfectScrollbar from "perfect-scrollbar";
@@ -7,9 +7,9 @@ import "perfect-scrollbar/css/perfect-scrollbar.css";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 // core components
-import Navbar from "components/Navbars/Navbar.js";
+import Navbar from "../components/Navbars/Navbar.js";
 import Footer from "components/Footer/Footer.js";
-import Sidebar from "components/Sidebar/Sidebar.js";
+import Sidebar from "../components/Sidebar/Sidebar.js";
 import FixedPlugin from "components/FixedPlugin/FixedPlugin.js";
 import CreateEmployee from "components/employees/CreateEmployee";
 import Employees from "components/employees/Employee";
@@ -22,7 +22,7 @@ import UpdateEmployee from "components/employees/UpdateEmployee";
 import TimeSheets from "components/TimeSheet/TimeSheets";
 import Roles from "components/Roles/Roles";
 
-import routes from "routes.js";
+import routes from "../routes.js";
 
 import styles from "assets/jss/material-dashboard-react/layouts/adminStyle.js";
 import history from "../history";
@@ -30,8 +30,6 @@ import history from "../history";
 import bgImage from "assets/img/sidebar-2.jpg";
 import logo from "assets/img/reactlogo.png";
 import TimeSheetExcel from "components/TimeSheet/TimeSheetExcel";
-
-
 
 // import CreateMaterial from "../views/Materials/CreateMaterial";
 // import UpdateMaterial from "../views/Materials/UpdateMaterial";
@@ -47,13 +45,13 @@ import PaymentInvoice from "components/Invoices/PaymentInvoice";
 import DeleteInvoice from "components/Invoices/DeleteInvoices";
 import Service from "components/services/Service";
 import PauseService from "components/services/PauseService";
-import ReturnService from "components/services/ReturnService"
+import ReturnService from "components/services/ReturnService";
 
 import ReceiptInvocie from "components/Invoices/ReceiptInvocie";
 
 import Materials from "../components/materials/Material";
 import Login from "components/Login/Login";
-import UpdateMaterial from "components/materials/UpdateMaterial"
+import UpdateMaterial from "components/materials/UpdateMaterial";
 import CreateMaterial from "components/materials/CreateMaterial";
 import Receipt from "components/materials/Receipt";
 import ViewReceipt from "components/materials/ViewReceipt";
@@ -68,6 +66,9 @@ import CreateArea from "components/Area/CreateArea";
 import UpdateArea from "components/Area/UpdateArea";
 import AddInvoice from "components/Invoices/AddInvocie";
 import ExportMaterial from "components/materials/ExportMaterial";
+import EmployeeService from "services/EmployeeService.js";
+import dashboardRoutes1 from "routes1.js";
+import StatisticsAdmin from "views/StaticAdmin/StatisticsAdmin.js";
 
 let ps;
 
@@ -76,25 +77,53 @@ const switchRoutes = (
     {/* employees */}
 
     <Route exact path="/login" component={Login} />
-    <Route exact path="/admin/employees/add-employee" component={CreateEmployee} />
+    <Route
+      exact
+      path="/admin/employees/add-employee"
+      component={CreateEmployee}
+    />
     <Route exact path="/admin/employees" component={Employees} />
-    <Route exact path="/admin/employees/update-employee/:id" component={UpdateEmployee} />
+    <Route
+      exact
+      path="/admin/employees/update-employee/:id"
+      component={UpdateEmployee}
+    />
     <Route exact path="/admin/employees/time-sheets" component={TimeSheets} />
-    <Route exact path="/admin/employees/time-sheets/export-excel" component={TimeSheetExcel} />
+    <Route
+      exact
+      path="/admin/employees/time-sheets/export-excel"
+      component={TimeSheetExcel}
+    />
 
-    <Route exact path="/admin/employees/:id/edit-employee" component={InfoEmployees} />
+    <Route
+      exact
+      path="/admin/employees/:id/edit-employee"
+      component={InfoEmployees}
+    />
 
     {/* customer */}
     <Route exact path="/admin/customers" component={Vehicle} />
-    <Route exact path="/admin/customers/get-all-customers" component={Customer} />
+    <Route
+      exact
+      path="/admin/customers/get-all-customers"
+      component={Customer}
+    />
 
     {/* material */}
     <Route exact path="/admin/materials" component={Materials} />
-    <Route exact path="/admin/materials/add-material" component={CreateMaterial} />
-    <Route exact path="/admin/materials/update-material/:id" component={UpdateMaterial} />
+    <Route
+      exact
+      path="/admin/materials/add-material"
+      component={CreateMaterial}
+    />
+    <Route
+      exact
+      path="/admin/materials/update-material/:id"
+      component={UpdateMaterial}
+    />
     {/* area */}
     <Route exact path="/admin/areas" component={Area} />
-    {/* <Route exact path="/admin/areas/add-area" component={CreateArea} /> */}
+    <Route exact path="/admin/areas/add-area" component={CreateArea} />
     <Route exact path="/admin/areas/update-area/:id" component={UpdateArea} />
 
     {/* store */}
@@ -107,10 +136,14 @@ const switchRoutes = (
     <Route exact path="/admin/receipts" component={Receipt} />
     <Route exact path="/admin/export" component={ExportMaterial} />
     <Route exact path="/admin/receipts/add-receipt" component={CreateReceipt} />
-    <Route exact path="/admin/receipts/view-receipt/:id" component={ViewReceipt} />
+    <Route
+      exact
+      path="/admin/receipts/view-receipt/:id"
+      component={ViewReceipt}
+    />
     <Route exact path="/admin/invoices/add-invoice" component={AddInvoice} />
     <Route exact path="/admin/invoices/payment" component={Payment} />
-
+    <Route exact path="/admin/reports" component={StatisticsAdmin} />
     {/* roles */}
     <Route exact path="/admin/roles" component={Roles} />
     <Route exact path="/admin/roles/add-role" component={CreateRole} />
@@ -119,26 +152,63 @@ const switchRoutes = (
     <Route exact path="/admin/invoices/:id" component={Invoices} />
 
     {/* <Route exact path="/admin/invoices/add-invoice" component={AddInvoice} /> */}
-    <Route exact path="/admin/invoices/add-invoice-material" component={CreateInvocieMaterial} />
-    <Route exact path="/admin/invoices/edit-invoice/:id" component={EditInvoice} />
-    <Route exact path="/admin/invoices/view-invoice/:id" component={ViewInvoice} />
-    <Route exact path="/admin/invoices/list-invoice/no-fixer" component={ListInvoiceNoFixer} />
-    <Route exact path="/admin/invoices/edit-invoice-in-process/:id" component={EditInvoicesInProcess} />
+    <Route
+      exact
+      path="/admin/invoices/add-invoice-material"
+      component={CreateInvocieMaterial}
+    />
+    <Route
+      exact
+      path="/admin/invoices/edit-invoice/:id"
+      component={EditInvoice}
+    />
+    <Route
+      exact
+      path="/admin/invoices/view-invoice/:id"
+      component={ViewInvoice}
+    />
+    <Route
+      exact
+      path="/admin/invoices/list-invoice/no-fixer"
+      component={ListInvoiceNoFixer}
+    />
+    <Route
+      exact
+      path="/admin/invoices/edit-invoice-in-process/:id"
+      component={EditInvoicesInProcess}
+    />
 
-    <Route exact path="/admin/invoices/payment/:id" component={PaymentInvoice} />
-    <Route exact path="/admin/invoices/delete-invoice" component={DeleteInvoice} />
-    <Route exact path="/admin/invoices/fixer-invoice/:id" component={ReceiptInvocie} />
-
+    <Route
+      exact
+      path="/admin/invoices/payment/:id"
+      component={PaymentInvoice}
+    />
+    <Route
+      exact
+      path="/admin/invoices/delete-invoice"
+      component={DeleteInvoice}
+    />
+    <Route
+      exact
+      path="/admin/invoices/fixer-invoice/:id"
+      component={ReceiptInvocie}
+    />
 
     {/*services */}
     <Route exact path="/admin/services" component={Service} />
-    <Route exact path="/admin/services/pause-service" component={PauseService} />
-    <Route exact path="/admin/services/return-service" component={ReturnService} />
-
-
+    <Route
+      exact
+      path="/admin/services/pause-service"
+      component={PauseService}
+    />
+    <Route
+      exact
+      path="/admin/services/return-service"
+      component={ReturnService}
+    />
 
     {routes.map((prop, key) => {
-      const jwt = window.sessionStorage.getItem('jwt')
+      const jwt = window.sessionStorage.getItem("jwt");
       if (prop.layout === "/admin") {
         return (
           <Route
@@ -166,10 +236,10 @@ export default function Admin({ ...rest }) {
   const [color, setColor] = React.useState("blue");
   const [fixedClasses, setFixedClasses] = React.useState("dropdown show");
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const handleImageClick = image => {
+  const handleImageClick = (image) => {
     setImage(image);
   };
-  const handleColorClick = color => {
+  const handleColorClick = (color) => {
     setColor(color);
   };
   const handleFixedClick = () => {
@@ -190,12 +260,33 @@ export default function Admin({ ...rest }) {
       setMobileOpen(false);
     }
   };
+  const [user, setUser] = React.useState({
+    store: {},
+  });
+  const [role, setRole] = React.useState([]);
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        EmployeeService.getStaffById().then((res) => {
+          let user = res.data;
+
+          setRole(user.roles.map((x) => x.id));
+
+          setUser({
+            store: user.store,
+          });
+        });
+      } catch (error) {}
+    }
+    fetchUser();
+  }, []);
+  console.log("ưeeee", role);
   // initialize and destroy the PerfectScrollbar plugin
   React.useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {
       ps = new PerfectScrollbar(mainPanel.current, {
         suppressScrollX: true,
-        suppressScrollY: false
+        suppressScrollY: false,
       });
       document.body.style.overflow = "hidden";
     }
@@ -208,20 +299,41 @@ export default function Admin({ ...rest }) {
       window.removeEventListener("resize", resizeFunction);
     };
   }, [mainPanel]);
+  const routes1 = () => {
+    if (!role) {
+      if (role.includes(1)) {
+        return dashboardRoutes1;
+      } else {
+        return routes;
+      }
+    }
+  };
   return (
     <div className={classes.wrapper}>
-      <Sidebar
-        routes={routes}
-        // logo={logo}
-        // image={image}
-        handleDrawerToggle={handleDrawerToggle}
-        open={mobileOpen}
-        color={color}
-        {...rest}
-      />
+      {role.includes(1) ? (
+        <Sidebar
+          routes={routes}
+          logo={logo}
+          image={image}
+          handleDrawerToggle={handleDrawerToggle}
+          open={mobileOpen}
+          color={color}
+          {...rest}
+        />
+      ) : (
+        <Sidebar
+          routes={routes}
+          // logo={logo}
+          // image={image}
+          handleDrawerToggle={handleDrawerToggle}
+          open={mobileOpen}
+          color={color}
+          {...rest}
+        />
+      )}
       <div className={classes.mainPanel} ref={mainPanel}>
         <Navbar
-          routes={routes}
+          routes={dashboardRoutes1}
           handleDrawerToggle={handleDrawerToggle}
           {...rest}
         />

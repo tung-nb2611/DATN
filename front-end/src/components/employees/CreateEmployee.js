@@ -3,9 +3,41 @@ import React, { useState, useEffect } from "react";
 import EmployeesService from "../../services/employees.js";
 import "../../assets/css/employees/createEmployee.css";
 import RolesService from "../../services/RoleService.js";
-import { ArrowDropDown, NavigateBefore, NavigateBeforeSharp, NavigateNext, NextWeek, People, SkipNext } from "@material-ui/icons";
-import Snackbars from 'components/Snackbar/Snackbar.js';
+import {
+  ArrowDropDown,
+  NavigateBefore,
+  NavigateBeforeSharp,
+  NavigateNext,
+  NextWeek,
+  People,
+  SkipNext,
+} from "@material-ui/icons";
+import Snackbars from "components/Snackbar/Snackbar.js";
 import StoreService from "../../services/StoreService.js";
+import {
+  Button,
+  Collapse,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Paper,
+  Radio,
+  RadioGroup,
+  Select,
+  Table,
+  TableBody,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextareaAutosize,
+  TextField,
+  Typography,
+} from "@material-ui/core";
 
 function CreateEmployee(props) {
   React.useEffect(() => {
@@ -18,12 +50,13 @@ function CreateEmployee(props) {
       }
     };
   });
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [tl, setTl] = React.useState(false);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [areName, setAreName] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -31,8 +64,8 @@ function CreateEmployee(props) {
   const [roles, setRoles] = useState([]);
   const [roleName, setRoleName] = useState("");
   const [roleDescription, setRoleDescription] = useState("");
-  const [roleClass, setRoleClass] = useState('');
-  const [modalClass, setModalClass] = useState('');
+  const [roleClass, setRoleClass] = useState("");
+  const [modalClass, setModalClass] = useState("");
   const [stores, setStores] = useState([]);
   const [store_id, setStoreId] = useState("");
   const [error, setError] = useState(null);
@@ -70,44 +103,44 @@ function CreateEmployee(props) {
   };
 
   const displayCreateRole = () => {
-    if (roleClass == '') {
-      setRoleClass('display-role');
-      setModalClass('display-modal');
+    if (roleClass == "") {
+      setRoleClass("display-role");
+      setModalClass("display-modal");
       console.log("ROLE : " + roleClass);
     } else {
-      setRoleClass('');
+      setRoleClass("");
     }
-  }
+  };
 
   const hiddenFormRole = () => {
-    if (roleClass == '') {
-      setRoleClass('hidden-role');
-      setModalClass('hidden-modal');
+    if (roleClass == "") {
+      setRoleClass("hidden-role");
+      setModalClass("hidden-modal");
       console.log("ROLE : " + roleClass);
     } else {
-      setRoleClass('');
-      setModalClass('');
+      setRoleClass("");
+      setModalClass("");
     }
-  }
+  };
 
   useEffect(() => {
     async function fetchRole() {
-      RolesService.getRoleUsing()
-        .then((res) => {
-          console.log("List Role : " + res.data);
-          let roles = res.data;
-          setRoles(
-            roles.map((role) => {
-              return {
-                select: false,
-                id: role.id,
-                code: role.code,
-                name: role.name,
-                description: role.description,
-                status: role.status
-              }
-            }));
-        })
+      RolesService.getRoleUsing().then((res) => {
+        console.log("List Role : " + res.data);
+        let roles = res.data;
+        setRoles(
+          roles.map((role) => {
+            return {
+              select: false,
+              id: role.id,
+              code: role.code,
+              name: role.name,
+              description: role.description,
+              status: role.status,
+            };
+          })
+        );
+      });
     }
     fetchRole();
   }, []);
@@ -115,38 +148,40 @@ function CreateEmployee(props) {
   useEffect(() => {
     async function fetchEmployeeList() {
       try {
-        StoreService.listStore(filters).then((res) => {
-          console.log("rrrr", res);
-          const stores = res.data.storeDTOS;
-          const pagination = res.data.pagination;
+        StoreService.listStore(filters)
+          .then((res) => {
+            console.log("rrrr", res);
+            const stores = res.data.storeDTOS;
+            const pagination = res.data.pagination;
 
-          setStores(
-            stores.map((store) => {
-              return {
-                select: false,
-                id: store.id,
-                code: store.code,
-                name: store.name,
-                address: store.address
-              }
-            }))
-          setIsLoaded(true);
-        }).catch(function (error) {
-          if (error.response.data.status == 403) {
-            alert("Không có quyền truy cập!")
-          }
-        })
+            setStores(
+              stores.map((store) => {
+                return {
+                  select: false,
+                  id: store.id,
+                  code: store.code,
+                  name: store.name,
+                  address: store.address,
+                };
+              })
+            );
+            setIsLoaded(true);
+          })
+          .catch(function (error) {
+            if (error.response.data.status == 403) {
+              alert("Không có quyền truy cập!");
+            }
+          });
       } catch (error) {
         if (error.status == 401) {
-          alert("Không quyền truy cập")
+          alert("Không quyền truy cập");
         }
         console.log("Failed to fetch employee list: ", error.message);
         setError(error);
-
       }
     }
     fetchEmployeeList();
-  }, [filters]);;
+  }, [filters]);
 
   //Tạo role mới
   const saveRole = (e) => {
@@ -159,86 +194,78 @@ function CreateEmployee(props) {
       })
       .catch(function (error) {
         if (error.response.data.errors) {
-          setMessage(error.response.data.errors[0].defaultMessage)
+          setMessage(error.response.data.errors[0].defaultMessage);
           setTl(true);
           // use this to make the notification autoclose
-          setTimeout(
-            function () {
-              setTl(false)
-            },
-            3000
-          );
+          setTimeout(function () {
+            setTl(false);
+          }, 3000);
         } else {
-          setMessage(error.response.data.message)
+          setMessage(error.response.data.message);
           setTl(true);
           // use this to make the notification autoclose
-          setTimeout(
-            function () {
-              setTl(false)
-            },
-            3000
-          );
+          setTimeout(function () {
+            setTl(false);
+          }, 3000);
         }
       });
-  }
-
+  };
+  const changeare = (e) => {
+    setAreName(e.target.value);
+    setStoreId(e.target.value);
+  };
   //tạo nhân viên mới
   const saveEmployee = (e) => {
     e.preventDefault();
     const roleId = [];
-    roles.forEach(role => {
+    roles.forEach((role) => {
       if (role.select) {
         roleId.push(role.id);
       }
     });
 
     if (roleId.length != 0) {
-      console.log("ID: " + roleId);
-      let employee = { store_id, username, password, name, address, email, phone, sex, roleId };
-      console.log("employee => " + JSON.stringify(employee));
+      let employee = {
+        store_id,
+        username,
+        password,
+        name,
+        address,
+        email,
+        phone,
+        sex,
+        roleId,
+      };
       EmployeesService.postEmployee(employee)
         .then(() => {
           props.history.push("/admin/store");
         })
         .catch(function (error) {
           if (error.response.data.errors) {
-            setMessage(error.response.data.errors[0].defaultMessage)
+            setMessage(error.response.data.errors[0].defaultMessage);
             setTl(true);
             // use this to make the notification autoclose
-            setTimeout(
-              function () {
-                setTl(false)
-              },
-              3000
-            );
-
+            setTimeout(function () {
+              setTl(false);
+            }, 3000);
           } else {
-            setMessage(error.response.data.message)
+            setMessage(error.response.data.message);
             setTl(true);
             // use this to make the notification autoclose
-            setTimeout(
-              function () {
-                setTl(false)
-              },
-              3000
-            );
+            setTimeout(function () {
+              setTl(false);
+            }, 3000);
           }
         });
     } else {
-      setMessage("Role không được để trống!")
+      setMessage("Role không được để trống!");
       setTl(true);
       // use this to make the notification autoclose
-      setTimeout(
-        function () {
-          setTl(false)
-        },
-        3000
-      );
+      setTimeout(function () {
+        setTl(false);
+      }, 3000);
     }
-
   };
-
-
 
   const cancel = () => {
     props.history.push("/admin/store");
@@ -256,10 +283,7 @@ function CreateEmployee(props) {
       />
 
       <div className="title-employees">
-        <div
-          className="button-cancel"
-          onClick={cancel}
-        >
+        <div className="button-cancel" onClick={cancel}>
           <NavigateBefore style={{ width: "15px" }} /> <span>Quay lại</span>
         </div>
         <button className="button-add" onClick={saveEmployee}>
@@ -275,7 +299,9 @@ function CreateEmployee(props) {
             <div className="group">
               <div className="group-left">
                 <div className="form-group">
-                  <label>Tên đăng nhập<span style={{ color: "red" }}>*</span>: </label>
+                  <label>
+                    Tên đăng nhập<span style={{ color: "red" }}>*</span>:{" "}
+                  </label>
                   <br />
                   <input
                     placeholder="Điền tên đăng nhập"
@@ -287,7 +313,9 @@ function CreateEmployee(props) {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Mật khẩu<span style={{ color: "red" }}>*</span>: </label>
+                  <label>
+                    Mật khẩu<span style={{ color: "red" }}>*</span>:{" "}
+                  </label>
                   <br />
                   <input
                     placeholder="Điền Mật khẩu"
@@ -299,7 +327,9 @@ function CreateEmployee(props) {
                   />
                 </div>
                 <div className="form-group-1">
-                  <label>Giới tính<span style={{ color: "red" }}>*</span>: </label>
+                  <label>
+                    Giới tính<span style={{ color: "red" }}>*</span>:{" "}
+                  </label>
                   <input
                     name="sex"
                     type="radio"
@@ -318,15 +348,30 @@ function CreateEmployee(props) {
                   <label>Nữ </label>
                 </div>
                 <div className="form-group-2">
+                  <label>
+                    Chức vụ <span style={{ color: "red" }}>*</span>:{" "}
+                  </label>
                   <div className="add-role">
-                    <div className="button-add-role" onClick={displayCreateRole}>
+                    <div
+                      className="button-add-role"
+                      onClick={displayCreateRole}
+                    >
                       <span>+ Thêm chức vụ mới</span>
                     </div>
                     <div id="modal" className={modalClass}>
                       <div id="create-role" className={roleClass}>
-                        <div className="title-add-role"><div className="title-role"><span >Thêm mới chức vụ</span></div> <div className="close"><span onClick={hiddenFormRole}>&times;</span></div></div>
+                        <div className="title-add-role">
+                          <div className="title-role">
+                            <span>Thêm mới chức vụ</span>
+                          </div>{" "}
+                          <div className="close">
+                            <span onClick={hiddenFormRole}>&times;</span>
+                          </div>
+                        </div>
                         <div className="form-group-role">
-                          <label>Tên Chức vụ<span style={{ color: "red" }}>*</span> </label>
+                          <label>
+                            Tên Chức vụ<span style={{ color: "red" }}>*</span>{" "}
+                          </label>
                           <br />
                           <input
                             placeholder="Điền tên chức vụ mới"
@@ -358,47 +403,65 @@ function CreateEmployee(props) {
                       <input
                         type="checkbox"
                         checked={role.select}
-                        onChange={e => {
+                        onChange={(e) => {
                           let value = e.target.checked;
                           setRoles(
-                            roles.map(roleCheck => {
+                            roles.map((roleCheck) => {
                               if (roleCheck.id === role.id) {
                                 roleCheck.select = value;
                               }
                               return roleCheck;
                             })
                           );
-                        }} />
+                        }}
+                      />
                       <label>{role.description}</label>
                     </div>
                   ))}
                 </div>
-                <div className="form-group-role-list">
-                  {stores.map((role) => (
-                    <div key={role.id} className="role-list">
-                      <input
-                        type="checkbox"
-                        checked={role.select}
-                        onChange={e => {
-                          let value = e.target.checked;
-                          setStoreId(role.id)
-                          setStores(
-                            stores.map(roleCheck => {
-                              if (roleCheck.id === role.id) {
-                                roleCheck.select = value;
-                              }
-                              return roleCheck;
-                            })
-                          );
-                        }} />
-                      <label>{role.name}</label>
-                    </div>
-                  ))}
+                <div style={{ display: "flex" }}>
+                  <div style={{ marginTop: "30px", marginLeft: "-10px" }}>
+                    <label>
+                      Chọn cửa hàng<span style={{ color: "red" }}>*</span>{" "}
+                    </label>
+                  </div>
+                  <FormControl
+                    style={{
+                      width: "70%",
+                      marginTop: "10px",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    <InputLabel
+                      style={{
+                        fontSize: "15px",
+                        color: "black",
+                      }}
+                    >
+                      Chọn cửa hàng
+                    </InputLabel>
+
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      label="Age"
+                      value={areName}
+                      onChange={changeare}
+                    >
+                      {stores.map((role) => (
+                        <MenuItem value={role.id} key={role}>
+                          {role.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </div>
               </div>
               <div className="group-right">
                 <div className="form-group">
-                  <label>Tên nhân viên<span style={{ color: "red" }}>*</span>: </label>
+                  <label>
+                    Tên nhân viên<span style={{ color: "red" }}>*</span>:{" "}
+                  </label>
                   <br />
                   <input
                     placeholder="Tên nhân viên"
@@ -421,7 +484,9 @@ function CreateEmployee(props) {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Số điện thoại<span style={{ color: "red" }}>*</span>: </label>
+                  <label>
+                    Số điện thoại<span style={{ color: "red" }}>*</span>:{" "}
+                  </label>
                   <br />
                   <input
                     placeholder="Điền số điện thoại của nhân viên"

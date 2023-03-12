@@ -3,6 +3,7 @@ package com.sapo.controllers.staff;
 import com.sapo.config.sercurity.jwt.JwtProvider;
 import com.sapo.entities.User;
 import com.sapo.services.UserService;
+import lombok.val;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,14 @@ public class UserController {
         this.userService = userService;
         this.jwtProvider = jwtProvider;
     }
+    public Integer getstoreId(HttpServletRequest request){
+        String tokenBearer = request.getHeader("Authorization");
+        String[] splits = tokenBearer.split(" ");
+        String username = jwtProvider.getUserNameFromJwtToken(splits[1]);
+        User user = userService.findUserByUsername(username);
+
+        return user.getStore().getId();
+    }
     @PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR') or hasRole('FIXER')")
     //Hàm tạo avatar
     @GetMapping("/avatar/{id}")
@@ -34,7 +43,8 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR')")
     //Hàm tìm list user đang rảnh
     @GetMapping("/ready")
-    public ResponseEntity<List<User>> findAllUserReadyFix(@RequestParam int store_id,@RequestParam String keyword){
+    public ResponseEntity<List<User>> findAllUserReadyFix(@RequestParam String keyword,HttpServletRequest request){
+        val store_id = getstoreId(request);
         List<User> users = userService.findAllUserReadyFix(store_id,keyword);
         return ResponseEntity.ok(users);
     }
@@ -58,8 +68,8 @@ public class UserController {
         String tokenBearer = request.getHeader("Authorization");
         String[] splits = tokenBearer.split(" ");
         String username = jwtProvider.getUserNameFromJwtToken(splits[1]);
-        System.out.println("Username: " +username);
         User user = userService.findUserByUsername(username);
+
         return ResponseEntity.ok(user);
     }
     

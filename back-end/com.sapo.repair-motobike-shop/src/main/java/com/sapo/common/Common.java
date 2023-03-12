@@ -11,6 +11,8 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -24,6 +26,10 @@ public class Common {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         password = encoder.encode(password);
         return password;
+    }
+    public static long getTimestamp() {
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        return Date.from(now.toInstant()).getTime() ;
     }
     public  static String GenerateCode(){
         String code = RandomStringUtils.randomAlphabetic(10).toUpperCase();
@@ -169,6 +175,14 @@ public class Common {
 
 
     public static long getMilliSeconds( String myDate) throws ParseException {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date date = sdf.parse(myDate);
+        long millis = date.getTime();
+        return millis;
+    }
+
+    public static long getMilliSeconds1( String myDate) throws ParseException {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date date = sdf.parse(myDate);

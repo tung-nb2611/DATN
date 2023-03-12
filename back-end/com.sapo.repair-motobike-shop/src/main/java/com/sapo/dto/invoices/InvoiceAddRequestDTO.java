@@ -17,9 +17,17 @@ public class InvoiceAddRequestDTO {
     private int payMethod;
     private List<InvoiceMaterialOrderRequestDTO> materialDTOS;
     private List<InvoiceServiceOrderRequestDTO> serviceDTOS;
+    private int store_id;
 
+    public int getStore_id() {
+        return store_id;
+    }
 
-    public InvoiceAddRequestDTO(Integer vehicleId, Integer customerId, Integer fixerId, String note, BigDecimal total, int payMethod, List<InvoiceMaterialOrderRequestDTO> materialDTOS, List<InvoiceServiceOrderRequestDTO> serviceDTOS,int area_id) {
+    public void setStore_id(int store_id) {
+        this.store_id = store_id;
+    }
+
+    public InvoiceAddRequestDTO(Integer vehicleId, Integer customerId, Integer fixerId, String note, BigDecimal total, int payMethod, List<InvoiceMaterialOrderRequestDTO> materialDTOS, List<InvoiceServiceOrderRequestDTO> serviceDTOS, int area_id, int store_id) {
         this.vehicleId = vehicleId;
         this.customerId = customerId;
         this.fixerId = fixerId;
@@ -29,6 +37,7 @@ public class InvoiceAddRequestDTO {
         this.materialDTOS = materialDTOS;
         this.serviceDTOS = serviceDTOS;
         this.area_id = area_id;
+        this.store_id=store_id;
     }
 
     public Integer getVehicleId() {

@@ -3,8 +3,16 @@ import React, { useState, useEffect } from "react";
 import EmployeesService from "../../services/employees.js";
 import "../../assets/css/employees/createEmployee.css";
 import RolesService from "services/RoleService.js";
-import { ArrowDropDown, NavigateBefore, NavigateBeforeSharp, NavigateNext, NextWeek, People, SkipNext } from "@material-ui/icons";
-import Snackbars from 'components/Snackbar/Snackbar.js';
+import {
+  ArrowDropDown,
+  NavigateBefore,
+  NavigateBeforeSharp,
+  NavigateNext,
+  NextWeek,
+  People,
+  SkipNext,
+} from "@material-ui/icons";
+import Snackbars from "components/Snackbar/Snackbar.js";
 import StoreService from "../../services/StoreService.js";
 import AreaService from "../../services/AreaService.js";
 
@@ -19,10 +27,9 @@ function CreateArea(props) {
       }
     };
   });
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [tl, setTl] = React.useState(false);
 
-  const [store_id, setStoreId] = useState(1);
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [status, setStatus] = useState(1);
@@ -32,47 +39,37 @@ function CreateArea(props) {
   const [roles, setRoles] = useState([]);
   const [roleName, setRoleName] = useState("");
   const [roleDescription, setRoleDescription] = useState("");
-  const [roleClass, setRoleClass] = useState('');
-  const [modalClass, setModalClass] = useState('');
+  const [roleClass, setRoleClass] = useState("");
+  const [modalClass, setModalClass] = useState("");
   const changeName = (event) => {
     setName(event.target.value);
   };
-  const changeStoreId = (event) => {
-    setStoreId(event.target.value);
-  };
+
   const saveStore = (e) => {
     e.preventDefault();
 
-    let area = { store_id, name, status };
+    let area = { name, status };
     AreaService.postArea(area)
       .then(() => {
         props.history.push("/admin/areas");
       })
       .catch(function (error) {
         if (error.response.data.errors) {
-          setMessage(error.response.data.errors[0].defaultMessage)
+          setMessage(error.response.data.errors[0].defaultMessage);
           setTl(true);
           // use this to make the notification autoclose
-          setTimeout(
-            function () {
-              setTl(false)
-            },
-            3000
-          );
-
+          setTimeout(function () {
+            setTl(false);
+          }, 3000);
         } else {
-          setMessage(error.response.data.message)
+          setMessage(error.response.data.message);
           setTl(true);
           // use this to make the notification autoclose
-          setTimeout(
-            function () {
-              setTl(false)
-            },
-            3000
-          );
+          setTimeout(function () {
+            setTl(false);
+          }, 3000);
         }
       });
-
   };
   const cancel = () => {
     props.history.push("/admin/store");
@@ -89,10 +86,7 @@ function CreateArea(props) {
       />
 
       <div className="title-employees">
-        <div
-          className="button-cancel"
-          onClick={cancel}
-        >
+        <div className="button-cancel" onClick={cancel}>
           <NavigateBefore style={{ width: "15px" }} /> <span>Quay lại</span>
         </div>
         <button className="button-add" onClick={saveStore}>
@@ -108,7 +102,9 @@ function CreateArea(props) {
             <div className="group">
               <div className="group-left">
                 <div className="form-group">
-                  <label>Tên khu vực<span style={{ color: "red" }}>*</span>: </label>
+                  <label>
+                    Tên khu vực<span style={{ color: "red" }}>*</span>:{" "}
+                  </label>
                   <br />
                   <input
                     placeholder="Điền tên khu vực"

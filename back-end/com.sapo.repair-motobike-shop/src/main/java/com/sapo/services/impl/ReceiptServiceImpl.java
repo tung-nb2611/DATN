@@ -47,8 +47,8 @@ public class ReceiptServiceImpl implements ReceiptService {
     }
     //Hàm search receipt
     @Override
-    public ReceiptPaginationDTO searchReceipt(int page, int limit, String keyword, String type){
-        List<Receipt> receipts = receiptDAO.findReceiptByKeyword(keyword, type);
+    public ReceiptPaginationDTO searchReceipt(int store_id,int page, int limit, String keyword, String type){
+        List<Receipt> receipts = receiptDAO.findReceiptByKeyword(store_id,keyword, type);
         ReceiptPaginationDTO receiptDTOsPagination = findAllReceiptDTO(page, limit, receipts);
         return receiptDTOsPagination;
     }

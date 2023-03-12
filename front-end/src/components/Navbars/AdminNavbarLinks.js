@@ -21,7 +21,7 @@ import Button from "components/CustomButtons/Button.js";
 
 import styles from "assets/jss/material-dashboard-react/components/headerLinksStyle.js";
 import { Redirect } from "react-router-dom/cjs/react-router-dom.min";
-import EmployeeService from "services/EmployeeService";
+import EmployeeService from "../../services/EmployeeService";
 
 const useStyles = makeStyles(styles);
 
@@ -31,10 +31,10 @@ export default function AdminNavbarLinks(props) {
   const [openProfile, setOpenProfile] = React.useState(null);
   const [user, setUser] = React.useState({
     id: 0,
-    name: ''
+    name: "",
   });
 
-  const handleClickNotification = event => {
+  const handleClickNotification = (event) => {
     if (openNotification && openNotification.contains(event.target)) {
       setOpenNotification(null);
     } else {
@@ -44,7 +44,7 @@ export default function AdminNavbarLinks(props) {
   const handleCloseNotification = () => {
     setOpenNotification(null);
   };
-  const handleClickProfile = event => {
+  const handleClickProfile = (event) => {
     if (openProfile && openProfile.contains(event.target)) {
       setOpenProfile(null);
     } else {
@@ -56,7 +56,7 @@ export default function AdminNavbarLinks(props) {
   };
   const logout = () => {
     setOpenProfile(null);
-    window.sessionStorage.removeItem('jwt')
+    window.sessionStorage.removeItem("jwt");
     window.location.reload();
   };
   useEffect(() => {
@@ -65,128 +65,17 @@ export default function AdminNavbarLinks(props) {
         EmployeeService.getStaffById().then((res) => {
           let user = res.data;
           console.log(res.data);
-          setUser(
-            {
-              id: user.id,
-              name: user.name
-            }
-          )
+          setUser({
+            id: user.id,
+            name: user.name,
+          });
         });
-      } catch (error) {
-        // console.log("Failed to fetch Invoicce list: ", error.message);
-      }
+      } catch (error) {}
     }
     fetchUser();
   }, []);
   return (
     <div style={{ display: "flex" }}>
-      {/* <div className={classes.searchWrapper}>
-        <CustomInput
-          formControlProps={{
-            className: classes.margin + " " + classes.search
-          }}
-          inputProps={{
-            placeholder: "Search",
-            inputProps: {
-              "aria-label": "Search"
-            }
-          }}
-        />
-        <Button color="white" aria-label="edit" justIcon round>
-          <Search />
-        </Button>
-      </div> */}
-
-      {/*<Button*/}
-      {/*  color={window.innerWidth > 959 ? "transparent" : "white"}*/}
-      {/*  justIcon={window.innerWidth > 959}*/}
-      {/*  simple={!(window.innerWidth > 959)}*/}
-      {/*  aria-label="Statistics"*/}
-      {/*  className={classes.buttonLink}*/}
-      {/*>*/}
-      {/*  <Statistics className={classes.icons} />*/}
-      {/*  <Hidden mdUp implementation="css">*/}
-      {/*    <p className={classes.linkText}>Statistics</p>*/}
-      {/*  </Hidden>*/}
-      {/*</Button>*/}
-      {/*<div className={classes.manager}>*/}
-      {/*  <Button*/}
-      {/*    color={window.innerWidth > 959 ? "transparent" : "white"}*/}
-      {/*    justIcon={window.innerWidth > 959}*/}
-      {/*    simple={!(window.innerWidth > 959)}*/}
-      {/*    aria-owns={openNotification ? "notification-menu-list-grow" : null}*/}
-      {/*    aria-haspopup="true"*/}
-      {/*    onClick={handleClickNotification}*/}
-      {/*    className={classes.buttonLink}*/}
-      {/*  >*/}
-      {/*    <Notifications className={classes.icons} />*/}
-      {/*    <span className={classes.notifications}>5</span>*/}
-      {/*    <Hidden mdUp implementation="css">*/}
-      {/*      <p onClick={handleCloseNotification} className={classes.linkText}>*/}
-      {/*        Notification*/}
-      {/*      </p>*/}
-      {/*    </Hidden>*/}
-      {/*  </Button>*/}
-      {/*  <Poppers*/}
-      {/*    open={Boolean(openNotification)}*/}
-      {/*    anchorEl={openNotification}*/}
-      {/*    transition*/}
-      {/*    disablePortal*/}
-      {/*    className={*/}
-      {/*      classNames({ [classes.popperClose]: !openNotification }) +*/}
-      {/*      " " +*/}
-      {/*      classes.popperNav*/}
-      {/*    }*/}
-      {/*  >*/}
-      {/*    {({ TransitionProps, placement }) => (*/}
-      {/*      <Grow*/}
-      {/*        {...TransitionProps}*/}
-      {/*        id="notification-menu-list-grow"*/}
-      {/*        style={{*/}
-      {/*          transformOrigin:*/}
-      {/*            placement === "bottom" ? "center top" : "center bottom"*/}
-      {/*        }}*/}
-      {/*      >*/}
-      {/*        <Paper>*/}
-      {/*          <ClickAwayListener onClickAway={handleCloseNotification}>*/}
-      {/*            <MenuList role="menu">*/}
-      {/*              <MenuItem*/}
-      {/*                onClick={handleCloseNotification}*/}
-      {/*                className={classes.dropdownItem}*/}
-      {/*              >*/}
-      {/*                Mike John responded to your email*/}
-      {/*              </MenuItem>*/}
-      {/*              <MenuItem*/}
-      {/*                onClick={handleCloseNotification}*/}
-      {/*                className={classes.dropdownItem}*/}
-      {/*              >*/}
-      {/*                You have 5 new tasks*/}
-      {/*              </MenuItem>*/}
-      {/*              <MenuItem*/}
-      {/*                onClick={handleCloseNotification}*/}
-      {/*                className={classes.dropdownItem}*/}
-      {/*              >*/}
-      {/*                You{"'"}re now friend with Andrew*/}
-      {/*              </MenuItem>*/}
-      {/*              <MenuItem*/}
-      {/*                onClick={handleCloseNotification}*/}
-      {/*                className={classes.dropdownItem}*/}
-      {/*              >*/}
-      {/*                Another Notification*/}
-      {/*              </MenuItem>*/}
-      {/*              <MenuItem*/}
-      {/*                onClick={handleCloseNotification}*/}
-      {/*                className={classes.dropdownItem}*/}
-      {/*              >*/}
-      {/*                Another One*/}
-      {/*              </MenuItem>*/}
-      {/*            </MenuList>*/}
-      {/*          </ClickAwayListener>*/}
-      {/*        </Paper>*/}
-      {/*      </Grow>*/}
-      {/*    )}*/}
-      {/*  </Poppers>*/}
-      {/*</div>*/}
       <div style={{ marginTop: "15px", marginRight: "5px" }}>
         <span>{user.name}</span>
       </div>
@@ -222,35 +111,13 @@ export default function AdminNavbarLinks(props) {
               id="profile-menu-list-grow"
               style={{
                 transformOrigin:
-                  placement === "bottom" ? "center top" : "center bottom"
+                  placement === "bottom" ? "center top" : "center bottom",
               }}
             >
               <Paper>
                 <ClickAwayListener onClickAway={handleCloseProfile}>
                   <MenuList role="menu">
-                    {/*<MenuItem*/}
-                    {/*  onClick={handleCloseProfile}*/}
-                    {/*  className={classes.dropdownItem}*/}
-                    {/*>*/}
-                    {/*  Profile*/}
-                    {/*</MenuItem>*/}
-                    {/*<MenuItem*/}
-                    {/*  onClick={handleCloseProfile}*/}
-                    {/*  className={classes.dropdownItem}*/}
-                    {/*>*/}
-                    {/*  Settings*/}
-                    {/*</MenuItem>*/}
-                    {/*<Divider light />*/}
-                    <MenuItem
-
-                      className={classes.dropdownItem}
-                    >
-                      Thay đổi thông tin cá nhân
-                    </MenuItem>
-                    <MenuItem
-                      onClick={logout}
-                      className={classes.dropdownItem}
-                    >
+                    <MenuItem onClick={logout} className={classes.dropdownItem}>
                       Đăng xuất
                     </MenuItem>
                   </MenuList>

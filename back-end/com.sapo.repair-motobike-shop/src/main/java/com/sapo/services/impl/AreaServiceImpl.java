@@ -71,7 +71,8 @@ public class AreaServiceImpl implements AreaService {
             AreaResponse area = new AreaResponse();
             if(test.getStatus() == 2)
             {
-                val test1 = invoiceDAO.findAllInvoiceInProcess(test.getId()); InvoiceMaterialResponseDTO invoiceListResponseDTOS = transferInvoiceToInvoiceMaterialDTO(test1);
+                val test1 = invoiceDAO.findAllInvoiceInProcess(test.getId());
+                InvoiceMaterialResponseDTO invoiceListResponseDTOS = transferInvoiceToInvoiceMaterialDTO(test1);
                 if(test1 != null){
                 area.setInvoice(invoiceListResponseDTOS);
                 area.setCode(test.getCode());

@@ -10,11 +10,19 @@ public class MaterialNewDTO {
     private String name;
     private String description;
     private String supplier;
-    
+     private int store_id;
     
     @NotNull(message = "Giá nhập không được để trống")
     private BigDecimal inputPrice;
-    
+
+    public int getStore_id() {
+        return store_id;
+    }
+
+    public void setStore_id(int store_id) {
+        this.store_id = store_id;
+    }
+
     private BigDecimal outputPrice;
 
     public String getName() {

@@ -1,8 +1,10 @@
 package com.sapo.controllers.admin;
 
+import com.sapo.config.sercurity.jwt.JwtProvider;
 import com.sapo.dto.users.*;
 import com.sapo.entities.User;
 import com.sapo.services.UserService;
+import lombok.val;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,22 +20,37 @@ import java.util.List;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminUserController {
     private final UserService userService;
-
-    public AdminUserController(UserService userService) {
+    private final JwtProvider jwtProvider;
+    public AdminUserController(UserService userService,JwtProvider jwtProvider) {
         this.userService = userService;
+        this.jwtProvider = jwtProvider;
     }
+    public Integer getstoreId(HttpServletRequest request){
+        String tokenBearer = request.getHeader("Authorization");
+        String[] splits = tokenBearer.split(" ");
+        String username = jwtProvider.getUserNameFromJwtToken(splits[1]);
+        User user = userService.findUserByUsername(username);
 
+        return user.getStore().getId();
+    }
     // API Tìm tất cả User và phân trang
     @GetMapping("/list")
-    public ResponseEntity<UserPaginationDTO> listUser(@RequestParam int store_id,@RequestParam int page, @RequestParam int limit, @RequestParam String keyword, @RequestParam int status, @RequestParam List<Integer> roleIds, HttpServletRequest request){
-        System.out.println("Authorization: " + request.getHeader("Authorization"));;
+    public ResponseEntity<UserPaginationDTO> listUser(@RequestParam int page, @RequestParam int limit, @RequestParam String keyword, @RequestParam int status, @RequestParam List<Integer> roleIds, HttpServletRequest request){
+        val store_id = getstoreId(request);
         UserPaginationDTO user = userService.searchUser(store_id,page, limit, keyword, status, roleIds);
         return ResponseEntity.ok(user);
     }
+    // API Tìm tất cả User và phân trang
+    @GetMapping("/all")
+    public ResponseEntity<UserPaginationDTO> listUserbýtoreId(@RequestParam int store_id,@RequestParam int page, @RequestParam int limit, @RequestParam String keyword, @RequestParam int status, @RequestParam List<Integer> roleIds){
 
+        UserPaginationDTO user = userService.searchUser(store_id,page, limit, keyword, status, roleIds);
+        return ResponseEntity.ok(user);
+    }
     // API Tạo User
     @PostMapping
-    public ResponseEntity<UserDTORequest> addUser(@Valid @RequestBody UserDTORequest user) throws IOException {
+    public ResponseEntity<UserDTORequest> addUser(@Valid @RequestBody UserDTORequest user,HttpServletRequest request) throws IOException {
+        val store_id = getstoreId(request);
         userService.saveUser(user);
         return ResponseEntity.ok(user);
     }

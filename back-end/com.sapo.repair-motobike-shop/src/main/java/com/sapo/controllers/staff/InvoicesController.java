@@ -1,12 +1,17 @@
 package com.sapo.controllers.staff;
 
+import com.sapo.config.sercurity.jwt.JwtProvider;
 import com.sapo.dto.invoices.*;
 import com.sapo.entities.Invoice;
+import com.sapo.entities.User;
 import com.sapo.services.InvoiceService;
+import com.sapo.services.UserService;
+import lombok.val;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -15,24 +20,37 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:3000")
 public class InvoicesController {
     private final InvoiceService invoiceService;
-
-    public InvoicesController(InvoiceService invoiceService) {
+    private final UserService userService;
+    private final JwtProvider jwtProvider;
+    public InvoicesController(InvoiceService invoiceService,UserService userService, JwtProvider jwtProvider) {
         this.invoiceService = invoiceService;
+        this.userService = userService;
+        this.jwtProvider = jwtProvider;
     }
 
+    public Integer getstoreId(HttpServletRequest request){
+        String tokenBearer = request.getHeader("Authorization");
+        String[] splits = tokenBearer.split(" ");
+        String username = jwtProvider.getUserNameFromJwtToken(splits[1]);
+        User user = userService.findUserByUsername(username);
+
+        return user.getStore().getId();
+    }
     //API lấy list hóa đơn đang xử lý và chờ xử lý
     @GetMapping("/list")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR') or hasRole('FIXER')")
-    public ResponseEntity<InvoiceListPaginationResponseDTO> listInvoice(@RequestParam int page, @RequestParam int limit, @RequestParam String keyword, @RequestParam List<Integer> status, @RequestParam int sort){
-
-        InvoiceListPaginationResponseDTO invoiceDTO = invoiceService.findAllInvoiceByStatus(  page, limit, keyword, status, sort);
+    public ResponseEntity<InvoiceListPaginationResponseDTO> listInvoice(@RequestParam int page, @RequestParam int limit, @RequestParam String keyword, @RequestParam List<Integer> status, @RequestParam int sort,HttpServletRequest request){
+        val store_id = getstoreId(request);
+        InvoiceListPaginationResponseDTO invoiceDTO = invoiceService.findAllInvoiceByStatus( store_id, page, limit, keyword, status, sort);
         return ResponseEntity.ok(invoiceDTO);
     }
 
     //API tạo hóa đơn mới
     @PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR')")
     @PostMapping
-    public ResponseEntity<Void> addNewInvoice(@Valid  @RequestBody InvoiceAddRequestDTO invoiceAddRequestDTO) {
+    public ResponseEntity<Void> addNewInvoice(@Valid  @RequestBody InvoiceAddRequestDTO invoiceAddRequestDTO,HttpServletRequest request) {
+        val store_id = getstoreId(request);
+        invoiceAddRequestDTO.setStore_id(store_id);
         invoiceService.saveInvoice(invoiceAddRequestDTO);
         return ResponseEntity.ok().build();
     }
@@ -93,10 +111,10 @@ public class InvoicesController {
         return ResponseEntity.ok().build();
     }
     @PreAuthorize("hasRole('ADMIN') or hasRole('FIXER')" )
-    //API xác nhận phiếu từ nhân viên sửa chữa(chuyển trạng thái từ 3->4)
+    //API chuyển trạng thái phiếu và nhân viên
     @PutMapping("/status-finishing/{id}")
-    public ResponseEntity<Void> finishFixer(@PathVariable("id") int id){
-        invoiceService.finishInvoiceByFixer(id);
+    public ResponseEntity<Void> changerstatus(@PathVariable("id") int id,@RequestParam  int status){
+        invoiceService.finishInvoiceByFixer(id, status);
         return ResponseEntity.ok().build();
     }
 

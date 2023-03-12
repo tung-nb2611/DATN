@@ -5,19 +5,19 @@ import com.sapo.dto.common.Pagination;
 import java.util.List;
 
 public class InvoiceListPaginationResponseDTO {
-    private List<InvoiceResponseDTO> invoiceListResponseDTOS;
+    private List<InvoiceResponse> invoiceListResponseDTOS;
     private Pagination pagination;
 
-    public InvoiceListPaginationResponseDTO(List<InvoiceResponseDTO> invoiceListResponseDTOS, Pagination pagination) {
+    public InvoiceListPaginationResponseDTO(List<InvoiceResponse> invoiceListResponseDTOS, Pagination pagination) {
         this.invoiceListResponseDTOS = invoiceListResponseDTOS;
         this.pagination = pagination;
     }
 
-    public List<InvoiceResponseDTO> getInvoiceListResponseDTOS() {
+    public List<InvoiceResponse> getInvoiceListResponseDTOS() {
         return invoiceListResponseDTOS;
     }
 
-    public void setInvoiceListResponseDTOS(List<InvoiceResponseDTO> invoiceListResponseDTOS) {
+    public void setInvoiceListResponseDTOS(List<InvoiceResponse> invoiceListResponseDTOS) {
         this.invoiceListResponseDTOS = invoiceListResponseDTOS;
     }
 

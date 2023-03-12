@@ -15,6 +15,7 @@ import com.sapo.repositories.TimesheetRepository;
 import com.sapo.repositories.UserRepository;
 import com.sapo.services.UserService;
 import com.sapo.validate.InputValidate;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -94,7 +95,6 @@ public class UserServiceImpl implements UserService {
         user.setPhone(userDTO.getPhone());
         user.setName(userDTO.getName());
         user.setPassword(Common.GeneratePassword(userDTO.getPassword()));
-        user.setPassword(userDTO.getPassword());
         user.setUsername(userDTO.getUsername());
         user.setAddress(userDTO.getAddress());
         user.setSex(userDTO.getSex());
@@ -157,8 +157,9 @@ public class UserServiceImpl implements UserService {
             }else {
                 user.setStatus(ConstantVariableCommon.STATUS_USER_1);
             }
+
             saveUserRepository(user);
-            UserDTOResponse userDTOResponse = new UserDTOResponse(user.getId(), user.getCode(), user.getName(),user.getPhone(), ConstantVariableCommon.statusUserIntToString(user.getStatus()));
+            UserDTOResponse userDTOResponse = new UserDTOResponse(user.getId(), user.getCode(), user.getName(),user.getPhone(), ConstantVariableCommon.statusUserIntToString(user.getStatus()),);
             return userDTOResponse;
     }
     //Hàm xóa user

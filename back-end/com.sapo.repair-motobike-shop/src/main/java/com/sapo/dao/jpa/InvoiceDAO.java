@@ -3,8 +3,11 @@ package com.sapo.dao.jpa;
 import com.sapo.common.ConstantVariableCommon;
 import com.sapo.entities.*;
 import com.sapo.services.impl.InvoiceServiceImpl;
+import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -15,15 +18,23 @@ import java.util.List;
 
 @Repository(value = "InvoiceDAO")
 @Transactional(rollbackOn = Exception.class)
-public class InvoiceDAO {
+public class InvoiceDAO  extends  BaseDao<Invoice>{
+    public InvoiceDAO() {
+        super(Invoice.class);
+    }
+    @Autowired
+    protected JdbcTemplate jdbc;
     @PersistenceContext
     private EntityManager entityManager;
     private static final Logger LOGGER = LoggerFactory.getLogger(InvoiceServiceImpl.class.toString());
 
+
+
     //Hàm lấy list hóa đơn theo trạng thái và keyword(nếu có)
-    public List<Invoice> findAllInvoiceByStatusAndKeyword(String keyword, List<Integer> status, String sort) {
+    public List<Invoice> findAllInvoiceByStatusAndKeyword( int store_id,String keyword, List<Integer> status, String sort) {
         String sql = "SELECT * FROM tbl_invoices,tbl_vehicles,tbl_customers,tbl_vehicle_customer" +
                 " WHERE tbl_invoices.vehicle_customer_id = tbl_vehicle_customer.id" +
+                " AND tbl_invoices.store_id=" +store_id +
                 " AND tbl_vehicle_customer.customer_id = tbl_customers.id" +
                 " AND tbl_vehicle_customer.vehicle_id = tbl_vehicles.id";
 
@@ -134,6 +145,11 @@ public class InvoiceDAO {
         Query query = entityManager.createNativeQuery(sql, Invoice.class);
         Invoice invoice = (Invoice) query.getSingleResult();
         return invoice;
+    }
+
+    //hàm tìm Invoice theo id
+    public List<Invoice> findInvoiceByDate(int storeId,long startDate,long enDate  ){
+        return query("SELECT * FROM tbl_invoices WHERE store_id = ? AND created_at between startDate=? and enDate=? ", new Object[]{storeId, startDate,enDate});
     }
     //Hàm tìm phụ kiện được xác nhận bằng id hóa đơn
     public List<MaterialOrder> findMaterialConfirmOrderByIdInvoice(int id){

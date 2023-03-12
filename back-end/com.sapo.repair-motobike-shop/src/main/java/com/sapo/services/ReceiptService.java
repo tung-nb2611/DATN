@@ -30,7 +30,7 @@ public interface ReceiptService {
     ReceiptDTOResponse changeStatusReceipt(int id);
 
     //Hàm search receipt
-    ReceiptPaginationDTO searchReceipt(int page, int limit, String keyword, String type);
+    ReceiptPaginationDTO searchReceipt( int store_id,int page, int limit, String keyword, String type);
 
     // hàm delete receipt
     void deleteReceipt(int id);

@@ -16,7 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.transaction.Transactional;
+import java.security.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @org.springframework.stereotype.Service
@@ -56,7 +58,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     //Hàm lấy list hóa đơn theo trạng thái
     @Override
-    public InvoiceListPaginationResponseDTO findAllInvoiceByStatus(int page, int limit, String keyword,List<Integer> status, int sort){
+    public InvoiceListPaginationResponseDTO findAllInvoiceByStatus(int store_id, int page, int limit, String keyword,List<Integer> status, int sort){
         String sortString = null;
         if(sort == 1) {
             sortString = "ASC";
@@ -65,7 +67,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         }else{
             sortString = null;
         }
-        List<Invoice> invoices = invoiceDAO.findAllInvoiceByStatusAndKeyword(keyword, status, sortString);
+        List<Invoice> invoices = invoiceDAO.findAllInvoiceByStatusAndKeyword(store_id,keyword, status, sortString);
 
         InvoiceListPaginationResponseDTO invoiceListPaginationResponseDTO = paginationListInvoice(page, limit, invoices);
         return invoiceListPaginationResponseDTO;
@@ -73,7 +75,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     //Hàm lấy list hóa đơn theo trạng thái
     @Override
-    public InvoiceMaterialPaginationResponseDTO findAllInvoiceAndBuyMaterialByStatus(int area_id,int page, int limit, String keyword,List<Integer> status, int sort){
+    public InvoiceMaterialPaginationResponseDTO findAllInvoiceAndBuyMaterialByStatus( int store_id,int area_id,int page, int limit, String keyword,List<Integer> status, int sort){
         String sortString = null;
         if(sort == 1) {
             sortString = "ASC";
@@ -82,7 +84,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         }else{
             sortString = null;
         }
-        List<Invoice> invoices = invoiceDAO.findAllInvoiceByStatusAndKeyword(keyword, status, sortString);
+        List<Invoice> invoices = invoiceDAO.findAllInvoiceByStatusAndKeyword(store_id,keyword, status, sortString);
         List<Invoice> invoicesBuyMaterial = invoiceDAO.findAllInvoiceBuyMaterial(keyword, status);
         List<Invoice> invoiceList = new ArrayList<>();
         for (Invoice invoice: invoices){
@@ -175,7 +177,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         if (invoiceAddRequestDTO.getPayMethod() != 0){
             invoice.setPayMethod(invoiceAddRequestDTO.getPayMethod());
         }
-
+        Date date = new Date();
+        invoice.setEndAt(Common.getTimestamp());
         if(invoiceAddRequestDTO.getFixerId() != 0){
             User user = userDAO.findUserById(invoiceAddRequestDTO.getFixerId());
             user.setStatus(ConstantVariableCommon.STATUS_USER_4);
@@ -201,31 +204,36 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     //Hàm chuyển invoice sang invoiceDTO
     private InvoiceListPaginationResponseDTO paginationListInvoice(int page, int limit, List<Invoice> invoices){
-        List<InvoiceResponseDTO> invoiceListResponseDTOS = transferInvoiceToInvoiceDTO(invoices);
+
+        List<InvoiceResponse> invoiceListResponseDTOS = transferInvoiceToInvoiceDTO(invoices);
+
         InvoiceListPaginationResponseDTO invoiceListPaginationResponseDTO = paginationInvoiceDTO(page, limit, invoiceListResponseDTOS);
         return invoiceListPaginationResponseDTO;
     }
 
     //Hàm chuyển từ invoice sang invoiceDTO
-    private List<InvoiceResponseDTO>  transferInvoiceToInvoiceDTO(List<Invoice> invoices){
-        List<InvoiceResponseDTO> invoiceListResponseDTOS = new ArrayList<>();
+    private List<InvoiceResponse>  transferInvoiceToInvoiceDTO(List<Invoice> invoices){
+        List<InvoiceResponse> invoiceListResponseDTOS = new ArrayList<>();
         for (Invoice invoice: invoices){
             System.out.println("Fixer id : " +invoice.getFixerId());
+            List<MaterialOrderResponseDTO> materialOrderResponseDTOS = findMaterialByIdInvoice(invoice.getId());
+            List<ServiceOrderResponseDTO> serviceOrderResponseDTOS = findServiceByIdInvoice(invoice.getId());
             Vehicle vehicle = vehicleDAO.findVehicleById(vehicleDAO.findVehicleCustomerById(invoice.getVehicleCustomerId()).getVehicleId());
             if(invoice.getFixerId() == null || invoice.getFixerId() ==0 ){
-                InvoiceResponseDTO invoiceResponseDTO = new InvoiceResponseDTO(invoice.getId(), invoice.getCode(), vehicle.getLicensePlate() , "", ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()));
+                InvoiceResponse invoiceResponseDTO = new InvoiceResponse(invoice.getId(), invoice.getCode(), vehicle.getLicensePlate() , "", ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()),Common.getDateByMilliSeconds(invoice.getCreatedAt()),materialOrderResponseDTOS,serviceOrderResponseDTOS);
                 invoiceListResponseDTOS.add(invoiceResponseDTO);
             }else{
-                InvoiceResponseDTO invoiceResponseDTO = new InvoiceResponseDTO(invoice.getId(), invoice.getCode(), vehicle.getLicensePlate(), userDAO.findUserById(invoice.getFixerId()).getName(), ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()));
+                InvoiceResponse invoiceResponseDTO = new InvoiceResponse(invoice.getId(), invoice.getCode(), vehicle.getLicensePlate(), userDAO.findUserById(invoice.getFixerId()).getName(), ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()),ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()),materialOrderResponseDTOS,serviceOrderResponseDTOS);
                 invoiceListResponseDTOS.add(invoiceResponseDTO);
             }
+
         }
         return invoiceListResponseDTOS;
     }
 
     //Hàm phân trang Invoice
-    private InvoiceListPaginationResponseDTO paginationInvoiceDTO(int page, int limit, List<InvoiceResponseDTO> invoiceListResponseDTOS ){
-        List<InvoiceResponseDTO> invoiceListDTOS = new ArrayList<InvoiceResponseDTO>();
+    private InvoiceListPaginationResponseDTO paginationInvoiceDTO(int page, int limit, List<InvoiceResponse> invoiceListResponseDTOS ){
+        List<InvoiceResponse> invoiceListDTOS = new ArrayList<InvoiceResponse>();
         if ((invoiceListResponseDTOS.size() - (page * limit - limit)) > limit) {
             for (int i = page * limit - limit; i < page * limit; i++) {
                 invoiceListDTOS.add(invoiceListResponseDTOS.get(i));
@@ -251,7 +259,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             checkQuantity(materialDTO.getId(), materialDTO.getQuantity());
         }
 
-        invoice.setCreatedAt();
+        invoice.setCreatedAt(Common.getTimestamp());
         if (invoiceAddRequestDTO.getFixerId() == null){
             invoice.setStatus(ConstantVariableCommon.STATUS_INVOICE_1);
             invoice.setFixerId(null);
@@ -259,7 +267,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             invoice.setFixerId(invoiceAddRequestDTO.getFixerId());
             invoice.setStatus(ConstantVariableCommon.STATUS_INVOICE_2);
         }
-
+        invoice.setStroeId(invoice.getStroeId());
         invoice.setNote(invoiceAddRequestDTO.getNote());
         invoice.setCode(Common.GenerateCodeInvoice());
         invoice.setPayMethod(invoiceAddRequestDTO.getPayMethod());
@@ -562,7 +570,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setNote(invoiceEditRequestDTO.getNote());
         invoice.setTotal(invoiceEditRequestDTO.getTotal());
         invoice.setPayMethod(invoiceEditRequestDTO.getPayMethod());
-        invoice.setStatus(ConstantVariableCommon.STATUS_INVOICE_7);
         if(invoiceEditRequestDTO.getAreaId() ==null ||invoiceEditRequestDTO.getAreaId() ==0) {
         }else {
             Areas areas = areaDao.findAreaById(invoiceEditRequestDTO.getAreaId());
@@ -682,12 +689,27 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public void finishInvoiceByFixer(int id){
+    public void finishInvoiceByFixer(int id,int status){
         Invoice invoice = invoiceDAO.findInvoiceById(id);
-        invoice.setStatus(ConstantVariableCommon.STATUS_INVOICE_4);
-        User user = userDAO.findUserById(invoice.getFixerId());
-        user.setStatus(ConstantVariableCommon.STATUS_USER_4);
-        userRepository.save(user);
+        if(status==3) {
+            invoice.setStatus(ConstantVariableCommon.STATUS_INVOICE_3);
+            User user = userDAO.findUserById(invoice.getFixerId());
+            user.setStatus(ConstantVariableCommon.STATUS_USER_3);
+            userRepository.save(user);
+        }
+        if(status==4) {
+            invoice.setStatus(ConstantVariableCommon.STATUS_INVOICE_4);
+            User user = userDAO.findUserById(invoice.getFixerId());
+            user.setStatus(ConstantVariableCommon.STATUS_USER_4);
+            Areas areas = areaDao.findAreaById(invoice.getArea_id());
+            areas.setStatus(1);
+            areaRepository.save(areas);
+            userRepository.save(user);
+        }
+        if(status==5) {
+            invoice.setStatus(ConstantVariableCommon.STATUS_INVOICE_5);
+        }
+
         saveInvoiceRepo(invoice);
     }
     //Hàm tìm invoice bằng id

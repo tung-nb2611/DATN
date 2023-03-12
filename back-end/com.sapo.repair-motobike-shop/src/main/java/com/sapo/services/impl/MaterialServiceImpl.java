@@ -221,6 +221,7 @@ public class MaterialServiceImpl implements MaterialService {
         material.setInputPrice(materialNewDTO.getInputPrice());
         material.setOutputPrice(materialNewDTO.getOutputPrice());
         material.setName(materialNewDTO.getName());
+        material.setStore_id(materialNewDTO.getStore_id());
         material.setImage(null);
         material.setCreatedAt();
         material.setCode(Common.GenerateCodeMaterial());

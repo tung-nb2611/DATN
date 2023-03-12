@@ -4,9 +4,9 @@ import React, { useState, useEffect } from "react";
 import MaterialService from "../../services/materialService.js";
 import "../../assets/css/materials/createMaterial.css";
 import { Label, NavigateBefore } from "@material-ui/icons";
-import Snackbars from 'components/Snackbar/Snackbar.js';
-import { Box, Container, TextareaAutosize, TextField, } from "@material-ui/core";
-import { createMuiTheme } from '@material-ui/core/styles';
+import Snackbars from "components/Snackbar/Snackbar.js";
+import { Box, Container, TextareaAutosize, TextField } from "@material-ui/core";
+import { createMuiTheme } from "@material-ui/core/styles";
 
 function CreateMaterial(props) {
   React.useEffect(() => {
@@ -20,9 +20,8 @@ function CreateMaterial(props) {
     };
   });
 
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [tl, setTl] = React.useState(false);
-  const [storeId, setStoreId] = useState(1);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [supplier, setSupplier] = useState("");
@@ -57,7 +56,15 @@ function CreateMaterial(props) {
   const saveMaterial = (e) => {
     e.preventDefault();
 
-    let material = { name, description, supplier, quantity, inputPrice, outputPrice, status, storeId };
+    let material = {
+      name,
+      description,
+      supplier,
+      quantity,
+      inputPrice,
+      outputPrice,
+      status,
+    };
     console.log("material => " + JSON.stringify(material));
     MaterialService.postMaterial(material)
       .then(() => {
@@ -65,25 +72,19 @@ function CreateMaterial(props) {
       })
       .catch(function (error) {
         if (error.response.data.errors) {
-          setMessage(error.response.data.errors[0].defaultMessage)
+          setMessage(error.response.data.errors[0].defaultMessage);
           setTl(true);
           // use this to make the notification autoclose
-          setTimeout(
-            function () {
-              setTl(false)
-            },
-            3000
-          );
+          setTimeout(function () {
+            setTl(false);
+          }, 3000);
         } else {
-          setMessage(error.response.data.message)
+          setMessage(error.response.data.message);
           setTl(true);
           // use this to make the notification autoclose
-          setTimeout(
-            function () {
-              setTl(false)
-            },
-            3000
-          );
+          setTimeout(function () {
+            setTl(false);
+          }, 3000);
         }
       });
   };
@@ -92,14 +93,13 @@ function CreateMaterial(props) {
     overrides: {
       MuiOutlinedInput: {
         multiline: {
-          fontWeight: 'bold',
-          fontSize: '20px',
-          color: 'purple',
-          width: '50vw'
-        }
-      }
-    }
-
+          fontWeight: "bold",
+          fontSize: "20px",
+          color: "purple",
+          width: "50vw",
+        },
+      },
+    },
   });
   const cancel = () => {
     props.history.push("/admin/materials");
@@ -116,10 +116,7 @@ function CreateMaterial(props) {
         close
       />
       <div className="title-materials">
-        <div
-          className="button-cancel"
-          onClick={cancel}
-        >
+        <div className="button-cancel" onClick={cancel}>
           <NavigateBefore style={{ width: "15px" }} /> <span>Quay lại</span>
         </div>
         <button className="button-add" onClick={saveMaterial}>
@@ -209,60 +206,61 @@ function CreateMaterial(props) {
         </div>
       </div> */}
       <Container fixed theme={theme}>
-        <Box sx={{ bgcolor: 'white', height: '60vh', display: "flex" }}>
-
+        <Box sx={{ bgcolor: "white", height: "60vh", display: "flex" }}>
           <div className="title">
             <span>Thêm phụ tùng mới</span>
           </div>
           <Box style={{ padding: "10px 15px", width: "50%" }}>
-
             <TextField
               label="Tên phụ tùng"
-              id="outlined-required" variant="outlined"
+              id="outlined-required"
+              variant="outlined"
               style={{
-                width: "90%"
+                width: "90%",
               }}
               size="small"
-
               value={name}
-              onChange={changeName} />
+              onChange={changeName}
+            />
             <TextField
               style={{ marginTop: "50px", width: "90%" }}
               data-tip="Điền nhà cung cấp"
               label="Hãng cung cấp"
-              id="outlined-required" variant="outlined"
+              id="outlined-required"
+              variant="outlined"
               size="small"
-
               value={supplier}
-              onChange={changeSupplier} />
+              onChange={changeSupplier}
+            />
             <TextField
               label="Điền số lượng của phụ tùng"
               size="small"
               width="55%"
-              id="outlined-basic" variant="outlined"
+              id="outlined-basic"
+              variant="outlined"
               value={quantity}
               onChange={changeQuantity}
-              style={{ marginTop: "50px", width: "90%" }} />
-
-
-
-
+              style={{ marginTop: "50px", width: "90%" }}
+            />
           </Box>
-          <Box style={{ padding: "10px 15px", width: "50%", }}>
+          <Box style={{ padding: "10px 15px", width: "50%" }}>
             <TextField
               label="Điền giá nhập"
               size="small"
               width="50%"
-              id="outlined-basic" variant="outlined"
+              id="outlined-basic"
+              variant="outlined"
               value={inputPrice}
               onChange={changeInputPrice}
-              style={{ width: "90%" }} />
+              style={{ width: "90%" }}
+            />
             <TextField
               label="Điền giá bán"
               fullWidth
               size="small"
               width="50%"
-              id="outlined-basic" variant="outlined"
+              id="outlined-basic"
+              variant="outlined"
               value={outputPrice}
               onChange={changeOutputPrice}
               style={{ marginTop: "50px", width: "90%" }}
@@ -270,21 +268,16 @@ function CreateMaterial(props) {
 
             <TextareaAutosize
               label="Điền mô tả của phụ tùng"
-              id="outlined-basic" variant="outlined"
+              id="outlined-basic"
+              variant="outlined"
               required
               value={description}
               onChange={changeDescription}
               style={{ marginTop: "50px", width: "90%" }}
-
             />
-
-
-
-
           </Box>
         </Box>
       </Container>
-
     </div>
   );
 }

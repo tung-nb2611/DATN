@@ -2,16 +2,31 @@ import React, { useState, useEffect } from "react";
 import Pagination from "components/Pagination/pagination";
 import "../../assets/css/materials/receipt.css";
 import FiltersForm from "../FiltersForm/ReceiptSearch.js";
-import LimitPagination from 'components/Pagination/limitPagination.js';
+import LimitPagination from "components/Pagination/limitPagination.js";
 
 // @material-ui/core components
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 // material-ui icons
 
-import Snackbars from 'components/Snackbar/Snackbar.js';
+import Snackbars from "components/Snackbar/Snackbar.js";
 import ReceiptsService from "../../services/ReceiptsService";
-import { KeyboardArrowDown, KeyboardArrowUp, NavigateBefore } from "@material-ui/icons";
-import { Button, Collapse, IconButton, Paper, Table, TableBody, TableContainer, TableHead, TableRow, Typography } from "@material-ui/core";
+import {
+  KeyboardArrowDown,
+  KeyboardArrowUp,
+  NavigateBefore,
+} from "@material-ui/icons";
+import {
+  Button,
+  Collapse,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@material-ui/core";
 import { Box } from "@sapo-presentation/sapo-ui-components";
 import MuiTableHead from "@material-ui/core/TableHead";
 import TableCell from "@material-ui/core/TableCell";
@@ -62,10 +77,10 @@ export default function Receipt(props) {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [receipts, setReceipts] = useState([]);
-  const [modalReceiptClass, setModalReceiptClass] = useState('');
+  const [modalReceiptClass, setModalReceiptClass] = useState("");
   const [listMaterialOrder, setListMaterialOrder] = useState([]);
-  const [receiptCode, setReceiptCode] = useState('');
-  const [receiptTotal, setReceiptTotal] = useState('');
+  const [receiptCode, setReceiptCode] = useState("");
+  const [receiptTotal, setReceiptTotal] = useState("");
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -104,30 +119,33 @@ export default function Receipt(props) {
   useEffect(() => {
     async function fetchReceiptList() {
       try {
-        ReceiptsService.getReceipt(filters).then((res) => {
-          let receipts = res.data.receiptDTOS;
+        ReceiptsService.getReceipt(filters)
+          .then((res) => {
+            let receipts = res.data.receiptDTOS;
 
-          setReceipts(
-            receipts.map((receipt) => {
-              return {
-                select: false,
-                id: receipt.id,
-                code: receipt.code,
-                createDate: receipt.createDate,
-                status: receipt.status,
-                total: receipt.total,
-                list: receipt.receiptMaterialResponseDTOs
-              }
-            }))
-          setPagination(pagination);
-          console.log(pagination);
-          setIsLoaded(true);
-        }).catch(function (error) {
-          console.log("ERROR: " + error.response.data.status)
-          if (error.response.data.status == 403) {
-            alert("Không có quyền truy cập!")
-          }
-        })
+            setReceipts(
+              receipts.map((receipt) => {
+                return {
+                  select: false,
+                  id: receipt.id,
+                  code: receipt.code,
+                  createDate: receipt.createDate,
+                  status: receipt.status,
+                  total: receipt.total,
+                  list: receipt.receiptMaterialResponseDTOs,
+                };
+              })
+            );
+            setPagination(pagination);
+            console.log(pagination);
+            setIsLoaded(true);
+          })
+          .catch(function (error) {
+            console.log("ERROR: " + error.response.data.status);
+            if (error.response.data.status == 403) {
+              alert("Không có quyền truy cập!");
+            }
+          });
       } catch (error) {
         console.log("Failed to fetch receipt list: ", error.message);
       }
@@ -136,62 +154,66 @@ export default function Receipt(props) {
   }, [filters]);
 
   const getListMaterialOrderByReceiptId = (receipt) => {
-    setReceiptCode(receipt.code)
-    if (modalReceiptClass == '') {
-      setModalReceiptClass('modal-material-order')
+    setReceiptCode(receipt.code);
+    if (modalReceiptClass == "") {
+      setModalReceiptClass("modal-material-order");
     }
 
     async function fetchMaterialOrderList() {
       try {
-        ReceiptsService.getReceiptById(receipt.id).then((res) => {
-          setReceiptTotal(res.data.total)
-          const data = res.data.receiptMaterialResponseDTOs;
-          setListMaterialOrder(
-            data.map((materialOrder) => {
-              return {
-                select: false,
-                idMaterial: materialOrder.idMaterial,
-                name: materialOrder.name,
-                code: materialOrder.code,
-                quantity: materialOrder.quantity,
-                price: materialOrder.price
-              }
-            }))
+        ReceiptsService.getReceiptById(receipt.id)
+          .then((res) => {
+            setReceiptTotal(res.data.total);
+            const data = res.data.receiptMaterialResponseDTOs;
+            setListMaterialOrder(
+              data.map((materialOrder) => {
+                return {
+                  select: false,
+                  idMaterial: materialOrder.idMaterial,
+                  name: materialOrder.name,
+                  code: materialOrder.code,
+                  quantity: materialOrder.quantity,
+                  price: materialOrder.price,
+                };
+              })
+            );
 
-          setIsLoaded(true);
-        }).catch(function (error) {
-          console.log("ERROR: " + error.response.data.status)
-          if (error.response.data.status == 403) {
-            alert("Không có quyền truy cập!")
-          }
-        })
+            setIsLoaded(true);
+          })
+          .catch(function (error) {
+            console.log("ERROR: " + error.response.data.status);
+            if (error.response.data.status == 403) {
+              alert("Không có quyền truy cập!");
+            }
+          });
       } catch (error) {
         console.log("Failed to fetch material order list: ", error.message);
         setError(error);
       }
-    } fetchMaterialOrderList();
-  }
+    }
+    fetchMaterialOrderList();
+  };
 
   const hiddenListMaterialOrder = () => {
-    setModalReceiptClass('')
-  }
+    setModalReceiptClass("");
+  };
   const TableHead = withStyles(() => ({
     root: {
-      backgroundColor: "#F9FAFC"
-    }
+      backgroundColor: "#F9FAFC",
+    },
   }))(MuiTableHead);
   const TableHeaderCell = withStyles(() => ({
     root: {
       fontSize: "14px",
-      fontWeight: "bold"
-    }
+      fontWeight: "bold",
+    },
   }))(TableCell);
   const back = () => {
-    props.history.push('/admin/materials');
-  }
+    props.history.push("/admin/materials");
+  };
   const addOrder = () => {
-    props.history.push('/admin/receipts/add-receipt');
-  }
+    props.history.push("/admin/receipts/add-receipt");
+  };
   function createData(name, calories, fat, carbs, protein, price) {
     return {
       name,
@@ -202,13 +224,13 @@ export default function Receipt(props) {
       price,
       history: [
         {
-          date: '2020-01-05',
-          customerId: '11091700',
+          date: "2020-01-05",
+          customerId: "11091700",
           amount: 3,
         },
         {
-          date: '2020-01-02',
-          customerId: 'Anonymous',
+          date: "2020-01-02",
+          customerId: "Anonymous",
           amount: 1,
         },
       ],
@@ -219,11 +241,9 @@ export default function Receipt(props) {
     const { row } = props;
     const [open, setOpen] = useState(false);
 
-
     return (
       <React.Fragment>
-
-        <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+        <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
           <TableCell>
             <IconButton
               aria-label="expand row"
@@ -245,7 +265,7 @@ export default function Receipt(props) {
             <Collapse in={open} timeout="auto" unmountOnExit>
               <Box sx={{ margin: 1 }}>
                 <Typography variant="h6" gutterBottom component="div">
-                  Chi tiết hóa đơn
+                  Chi tiết phiếu nhập
                 </Typography>
                 <Table size="small" aria-label="purchases">
                   <TableHead>
@@ -263,10 +283,10 @@ export default function Receipt(props) {
                           {historyRow.code}
                         </TableCell>
                         <TableCell>{historyRow.name}</TableCell>
-                        <TableCell align="right">{historyRow.quantity}</TableCell>
                         <TableCell align="right">
-                          {historyRow.price}
+                          {historyRow.quantity}
                         </TableCell>
+                        <TableCell align="right">{historyRow.price}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -279,42 +299,50 @@ export default function Receipt(props) {
     );
   }
 
-
   if (error) {
     return <div>Error: {error.message}</div>;
   } else if (!isLoaded) {
     return <div>Loading....</div>;
   } else {
     return (
-
       <div className="list-receipts">
         <div className="title-receipts">
           <div className="name-title">
             <div className="button-cancel" onClick={back}>
               <NavigateBefore style={{ width: "15px" }} /> <span>Quay lại</span>
             </div>
-            <div className="name-list"><span>Danh sách hóa đơn nhập hàng</span></div>
+            <div className="name-list">
+              <span>Danh sách phiếu nhập hàng</span>
+            </div>
           </div>
         </div>
-        <Button style={{
-          background: "#218FFE",
-          color: "white",
-          height: "40px",
-          marginBottom: "10px",
-          marginTop: "opx",
-          float: "right",
-          marginRight: "10px",
-        }} variant="outlined" onClick={addOrder}>Tạo phiếu nhập </Button>
+        <Button
+          style={{
+            background: "#218FFE",
+            color: "white",
+            height: "40px",
+            marginBottom: "10px",
+            marginTop: "opx",
+            float: "right",
+            marginRight: "10px",
+          }}
+          variant="outlined"
+          onClick={addOrder}
+        >
+          Tạo phiếu nhập{" "}
+        </Button>
         <Box style={{ marginTop: "70px" }}>
           <TableContainer component={Paper}>
-            <Table aria-label="collapsible table" >
+            <Table aria-label="collapsible table">
               <TableHead variant="h6">
                 <TableRow>
                   <TableCell />
-                  <TableHeaderCell variant="h6">Mã hóa đơn</TableHeaderCell>
+                  <TableHeaderCell variant="h6">Mã Phiếu</TableHeaderCell>
                   <TableHeaderCell align="right">Thời gian </TableHeaderCell>
                   <TableHeaderCell align="right">Trạng thái</TableHeaderCell>
-                  <TableHeaderCell align="right">Tổng thanh toán</TableHeaderCell>
+                  <TableHeaderCell align="right">
+                    Tổng thanh toán
+                  </TableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -325,8 +353,6 @@ export default function Receipt(props) {
             </Table>
           </TableContainer>
         </Box>
-
-
       </div>
     );
   }
