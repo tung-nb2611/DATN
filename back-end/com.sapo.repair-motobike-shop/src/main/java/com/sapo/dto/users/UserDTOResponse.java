@@ -14,12 +14,5 @@ public class UserDTOResponse {
     private String status;
     private  String role;
 
-    public UserDTOResponse(int id, String code, String name, String phone, String status, String role) {
-        this.id = id;
-        this.code = code;
-        this.name = name;
-        this.phone = phone;
-        this.status = status;
-        this.role = role;
-    }
+
 }

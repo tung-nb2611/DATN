@@ -157,9 +157,16 @@ public class UserServiceImpl implements UserService {
             }else {
                 user.setStatus(ConstantVariableCommon.STATUS_USER_1);
             }
-
             saveUserRepository(user);
-            UserDTOResponse userDTOResponse = new UserDTOResponse(user.getId(), user.getCode(), user.getName(),user.getPhone(), ConstantVariableCommon.statusUserIntToString(user.getStatus()),);
+            UserDTOResponse userDTOResponse = new UserDTOResponse();
+            userDTOResponse.setId(user.getId());
+            userDTOResponse.setCode(user.getCode());
+            userDTOResponse.setName(user.getName());
+            userDTOResponse.setStatus(ConstantVariableCommon.statusUserIntToString(user.getStatus()));
+            for (val i : user.getRoles()){
+                userDTOResponse.setRole(i.getDescription());
+
+            }
             return userDTOResponse;
     }
     //Hàm xóa user
@@ -215,8 +222,16 @@ public class UserServiceImpl implements UserService {
     private List<UserDTOResponse> transferUserToUserDTO(List<User> users){
         List<UserDTOResponse> userDTOS = new ArrayList<>();
         users.forEach(user -> {
-            UserDTOResponse userDTO = new UserDTOResponse(user.getId(), user.getCode(),user.getName(), user.getPhone(), ConstantVariableCommon.statusUserIntToString(user.getStatus()));
-            userDTOS.add(userDTO);
+            UserDTOResponse userDTOResponse = new UserDTOResponse();
+            userDTOResponse.setId(user.getId());
+            userDTOResponse.setCode(user.getCode());
+            userDTOResponse.setName(user.getName());
+            userDTOResponse.setStatus(ConstantVariableCommon.statusUserIntToString(user.getStatus()));
+            for (val i : user.getRoles()){
+                userDTOResponse.setRole(i.getDescription());
+
+            }
+            userDTOS.add(userDTOResponse);
         });
         return userDTOS;
     }
