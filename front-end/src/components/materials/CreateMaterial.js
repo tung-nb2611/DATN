@@ -5,7 +5,7 @@ import MaterialService from "../../services/materialService.js";
 import "../../assets/css/materials/createMaterial.css";
 import { Label, NavigateBefore } from "@material-ui/icons";
 import Snackbars from "components/Snackbar/Snackbar.js";
-import { Box, Container, TextareaAutosize, TextField } from "@material-ui/core";
+import { Box, Container, TextareaAutosize, TextField, Typography } from "@material-ui/core";
 import { createMuiTheme } from "@material-ui/core/styles";
 
 function CreateMaterial(props) {
@@ -206,10 +206,17 @@ function CreateMaterial(props) {
         </div>
       </div> */}
       <Container fixed theme={theme}>
+        <Typography
+          variant="h4"
+          style={{
+            marginBottom: "15px",
+            marginTop: "15px",
+          }}
+        >
+          Thêm mới phụ tùng
+        </Typography>
         <Box sx={{ bgcolor: "white", height: "60vh", display: "flex" }}>
-          <div className="title">
-            <span>Thêm phụ tùng mới</span>
-          </div>
+
           <Box style={{ padding: "10px 15px", width: "50%" }}>
             <TextField
               label="Tên phụ tùng"
@@ -273,7 +280,7 @@ function CreateMaterial(props) {
               required
               value={description}
               onChange={changeDescription}
-              style={{ marginTop: "50px", width: "90%" }}
+              style={{ marginTop: "50px", width: "90%", height: "30px" }}
             />
           </Box>
         </Box>

@@ -545,7 +545,7 @@ export default function Invoices(props) {
                 <Paper sx={{ width: "100%", mb: 2, minHeight: "100px" }}>
                   <TableContainer>
                     <Box style={{}}>
-                      <FormControl
+                      {/* <FormControl
                         style={{
                           width: "70%",
                           marginTop: "10px",
@@ -571,7 +571,7 @@ export default function Invoices(props) {
                           <MenuItem value={2}>Hóa Đơn chờ sửa</MenuItem>
                           <MenuItem value={3}>Hóa Đơn đang sửa</MenuItem>
                         </Select>
-                      </FormControl>
+                      </FormControl> */}
                       <TextField
                         id="filled-search"
                         label="Tìm kiếm hóa đơn"

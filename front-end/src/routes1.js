@@ -25,10 +25,10 @@ const dashboardRoutes1 = [
     layout: "/admin",
   },
   {
-    path: "/invoices",
-    name: "Phiếu sửa chữa",
-    icon: "content_paste",
-    component: Invoices,
+    path: "/store",
+    name: "Cửa Hàng",
+    icon: PeopleOutline,
+    component: Store,
     layout: "/admin",
   },
   {

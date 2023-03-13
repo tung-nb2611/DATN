@@ -20,7 +20,7 @@ const updateArea = (id, area) => {
 
 
 const deleteArea = (id) => {
-    return axios.delete(AREA_API_URL + "/" + id);
+    return axios.put(AREA_API_URL + "/delete/" + id);
 }
 const getAreaById = (area_id) => {
     return axios.get(AREA_API_URL + "/" + area_id);

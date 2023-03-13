@@ -1,8 +1,7 @@
-package com.sapo.controllers.admin;
+package com.sapo.controllers.admin.superAdmin;
 
 import com.sapo.dto.store.StoreDtoRequest;
 import com.sapo.dto.store.StorePaginationDTO;
-import com.sapo.dto.store.StoreResponse;
 import com.sapo.dto.store.StroeResponeById;
 import com.sapo.services.StoreService;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +14,7 @@ import java.io.IOException;
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/admin/stores")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('SUPER_ADMIN')")
 public class AdminStoresController {
 
     private final StoreService storeService;

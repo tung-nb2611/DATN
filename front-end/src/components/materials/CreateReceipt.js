@@ -10,7 +10,7 @@ import {
 } from "@material-ui/icons";
 import "../../assets/css/search/ReceiptSearch.css";
 import { showPrice } from "../../helper/function";
-import Snackbars from "components/Snackbar/Snackbar.js";
+import Snackbars from "../../components/Snackbar/Snackbar.js";
 import "../../assets/css/invoices/InvoiceMaterialSearch.css";
 import MaterialService from "services/materialService";
 // import ServicesService from "services/ServicesService";
@@ -56,8 +56,9 @@ export default function CreateReceipt(props) {
     };
   });
 
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState();
   const [tl, setTl] = React.useState(false);
+  const [fail, setFail] = React.useState(false);
 
   const [materialChoose, setMaterialChoose] = useState([]);
   const [listMaterial, setListMaterial] = useState("");
@@ -66,8 +67,8 @@ export default function CreateReceipt(props) {
   const typingTimeoutRef = useRef(null);
   const [modalMaterialClass, setModalMaterialClass] = useState("");
   const [note, setNote] = useState("");
-  const [type, setType] = useState("");
-  const [payMethod, setPayMethod] = useState();
+  const [type, setType] = useState(null);
+  const [payMethod, setPayMethod] = useState(null);
   const [nameMaterial, setNameMaterial] = useState();
   const [inputPrice, setInputPrice] = useState();
   const [outputPrice, setOutputPrice] = useState();
@@ -197,44 +198,73 @@ export default function CreateReceipt(props) {
     setSumMaterial(currentSum);
   };
 
+  function check() {
+    if (type === null) {
+      setMessage("Chọn loại phiếu!")
+      console.log("check11", message);
+      return true
+    }
+    if (materialChoose.length === 0) {
+      setMessage("Chọn phụ kiện!")
+      return true
+    }
+    if (payMethod === null) {
+      setMessage("chọn phương thức thanh toán")
+      return true
+    }
+  }
   //Hàm thêm phiếu nhập hàng mới
   const addReceipt = (e) => {
-    e.preventDefault();
-    let materialDTO = [];
-    materialChoose.map((material) => {
-      let material1 = {
-        id: material.id,
-        quantity: material.quantityInput,
-      };
-      materialDTO.push(material1);
-    });
-    let receiptDTO = {
-      materialDTOS: materialDTO,
-      note: note,
-      type: type,
-    };
-    console.log("receipt => " + JSON.stringify(receiptDTO));
-    ReceiptsService.postReceipt(receiptDTO)
-      .then(() => {
-        props.history.push("/admin/receipts");
-      })
-      .catch(function (error) {
-        if (error.response.data.errors) {
-          setMessage(error.response.data.errors[0].defaultMessage);
-          setTl(true);
-          // use this to make the notification autoclose
-          setTimeout(function () {
-            setTl(false);
-          }, 3000);
-        } else {
-          setMessage(error.response.data.message);
-          setTl(true);
-          // use this to make the notification autoclose
-          setTimeout(function () {
-            setTl(false);
-          }, 3000);
-        }
+    if (!check()) {
+      e.preventDefault();
+      let materialDTO = [];
+      materialChoose.map((material) => {
+        let material1 = {
+          id: material.id,
+          quantity: material.quantityInput,
+        };
+        materialDTO.push(material1);
       });
+      let receiptDTO = {
+        materialDTOS: materialDTO,
+        note: note,
+        type: type,
+      };
+      ReceiptsService.postReceipt(receiptDTO)
+        .then(() => {
+          setMessage("Tạo phiếu thành công!")
+          setTl(true)
+          console.log("check12", type);
+          {
+            type == 1 ?
+              props.history.push("/admin/materials")
+              :
+              props.history.push("/admin/materials")
+          }
+        })
+        .catch(function (error) {
+          if (error.response.data.errors) {
+            setMessage(error.response.data.errors[0].defaultMessage);
+            setTl(true);
+            // use this to make the notification autoclose
+            setTimeout(function () {
+              setTl(false);
+            }, 3000);
+          } else {
+            setMessage(error.response.data.message);
+            setTl(true);
+            // use this to make the notification autoclose
+            setTimeout(function () {
+              setTl(false);
+            }, 3000);
+          }
+        });
+    } else {
+      setFail(true)
+      setTimeout(function () {
+        setFail(false);
+      }, 30);
+    }
   };
   const changePayMethod = (e) => {
     setPayMethod(e.target.value);
@@ -379,8 +409,25 @@ export default function CreateReceipt(props) {
       </React.Fragment>
     );
   }
+  console.log("check11", type);
   return (
     <div className="body-add-receipt">
+      <Snackbars
+        place="tc"
+        color="success"
+        message={message}
+        open={tl}
+        closeNotification={() => setTl(false)}
+        close
+      />
+      <Snackbars
+        place="tc"
+        color="danger"
+        message={message}
+        open={fail}
+        closeNotification={() => setFail(false)}
+        close
+      />
       <Box style={{ marginBottom: "25px", backgroundColor: "#F6F6FA" }}>
         <Typography onClick={back}>
           {" "}

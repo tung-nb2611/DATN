@@ -263,8 +263,8 @@ export default function ExportMaterial(props) {
     return <div>Loading....</div>;
   } else {
     return (
-      <div className="list-receipts">
-        <div className="title-receipts">
+      <div className="list-receipts" >
+        <div className="title-receipts" style={{ marginTop: "30px" }}>
           <div className="name-title">
             <div className="button-cancel" onClick={back}>
               <NavigateBefore style={{ width: "15px" }} /> <span>Quay lại</span>

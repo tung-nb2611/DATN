@@ -12,12 +12,14 @@ import { makeStyles } from "@material-ui/core/styles";
 import {
   Add,
   ArrowDropDown,
+  BorderTop,
+  Clear,
   Delete,
   DeleteForever,
   EditAttributesTwoTone,
 } from "@material-ui/icons";
 // material-ui icons
-import Snackbars from "components/Snackbar/Snackbar.js";
+import Snackbars from "../../components/Snackbar/Snackbar.js";
 import Edit from "@material-ui/icons/Edit";
 import EmployeeFilters from "components/FiltersForm/EmployeeFilters";
 import RoleFilters from "components/FiltersForm/RoleFilters";
@@ -44,6 +46,7 @@ import {
   TableBody,
   TableCell,
   TableHead,
+  TextField,
   Typography,
 } from "@material-ui/core";
 import {
@@ -105,10 +108,15 @@ export default function (props) {
   const [messageError, setMessageError] = useState("");
   const [tl, setTl] = React.useState(false);
   const [fail, setFail] = React.useState(false);
+  const [add, setAdd] = React.useState(false);
   const [open, setOpen] = React.useState(false);
+  const [open1, setOpen1] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const handleClose1 = () => setAdd(false);
+  const handleClose2 = () => setOpen1(false);
   const [id, setId] = useState();
+  const [areaId, setAreaId] = useState();
   const [area, setArea] = useState([]);
   const [employeeId, setEmployeeId] = useState();
   const [salaryDay, setSalaryDay] = useState();
@@ -130,6 +138,7 @@ export default function (props) {
   const [status, setStatus] = useState("");
   const [idInvoice, setIdInvoice] = useState(0);
   const [areaChose, setAreaChose] = useState({});
+  const [name, setName] = useState("");
   const [customer, setCustomer] = useState({
     id: 0,
     code: "",
@@ -267,11 +276,39 @@ export default function (props) {
       roleIds: newRole.ids,
     });
   }
+  const saveStore = (e) => {
+    e.preventDefault();
+
+    let area = { name, status };
+    AreaService.postArea(area)
+      .then(() => {
+        props.history.push("/admin/areas");
+      })
+      .catch(function (error) {
+        if (error.response.data.errors) {
+          setMessage(error.response.data.errors[0].defaultMessage);
+          setTl(true);
+          // use this to make the notification autoclose
+          setTimeout(function () {
+            setTl(false);
+          }, 3000);
+        } else {
+          setMessage(error.response.data.message);
+          setTl(true);
+          // use this to make the notification autoclose
+          setTimeout(function () {
+            setTl(false);
+          }, 3000);
+        }
+      });
+  };
   const addEmployee = () => {
     props.history.push("/admin/employees/add-employee");
   };
   const addInvoice = () => {
     props.history.push("/admin/invoices/add-invoice");
+
+
   };
   useEffect(() => {
     async function fetchEmployeeList() {
@@ -395,14 +432,9 @@ export default function (props) {
   const changeStatus = (id, status) => {
     InvoicesService.finish(id, status)
       .then((res) => {
-        toast.success("Cập nhật hóa đơn thành công");
         setMessageSuccess("Thành công!");
         setTl(true);
-        // use this to make the notification autoclose
-        setTimeout(function () {
-          setTl(false);
-        }, 3000);
-        props.history.push("/admin/areas");
+        window.location.reload();
       })
       .catch(function (error) {
         if (error.response.data.errors) {
@@ -422,40 +454,7 @@ export default function (props) {
         }
       });
   };
-  const putSalaryDay = (e) => {
-    e.preventDefault();
 
-    EmployeesService.changeSalaryDay(employeeId, filters)
-      .then(() => {
-        setFilters({
-          ...filters,
-        });
-        setMessageSuccess("Điều chỉnh lương thành công!");
-        setTl(true);
-        // use this to make the notification autoclose
-        setTimeout(function () {
-          setTl(false);
-        }, 3000);
-        setModalSalaryDayClass("");
-      })
-      .catch(function (error) {
-        if (error.response.data.errors) {
-          setMessageError(error.response.data.errors[0].defaultMessage);
-          setTl(true);
-          // use this to make the notification autoclose
-          setTimeout(function () {
-            setFail(false);
-          }, 3000);
-        } else {
-          setMessageError(error.response.data.message);
-          setFail(true);
-          // use this to make the notification autoclose
-          setTimeout(function () {
-            setFail(false);
-          }, 3000);
-        }
-      });
-  };
   const updateArea = (id) => {
     props.history.push(`/admin/areas/update-area/${id}`);
   };
@@ -467,19 +466,16 @@ export default function (props) {
     setWarningModalClass("");
   };
   //Xóa nhân viên
-  const deleteEmployee = (e) => {
-    EmployeesService.deleteEmployee(id)
+  const deleteArea = () => {
+    AreaService.deleteArea(areaId)
       .then(() => {
-        setFilters({
-          ...filters,
-        });
-        setWarningModalClass("");
         setMessageSuccess("Xóa thành công!");
         setTl(true);
         // use this to make the notification autoclose
         setTimeout(function () {
           setTl(false);
         }, 3000);
+        window.location.reload();
       })
       .catch(function (error) {
         console.log(error.response);
@@ -567,6 +563,8 @@ export default function (props) {
     };
     InvoicesService.changeStatusInvoiceToCompletePayment(idInvoice, invoice)
       .then(() => {
+        setMessageSuccess("Thanh toán thành công!")
+        setTl(true)
         window.location.reload();
         props.history.push("/admin/areas");
       })
@@ -578,7 +576,10 @@ export default function (props) {
         }
       });
   };
-
+  const test2 = (id) => {
+    setAreaId(id)
+    setOpen1(true)
+  }
   const style = {
     position: "absolute",
     top: "50%",
@@ -589,289 +590,421 @@ export default function (props) {
     border: "1px solid rgb(167 165 165)",
     boxShadow: 24,
     p: 4,
+    borderRadius: "20px"
   };
   const addArea = () => {
-    debugger;
-    console.log("5555");
-    toast.success("Wow so easy!");
+    setAdd(true)
   };
-
+  const changeName = (event) => {
+    setName(event.target.value);
+  };
   if (error) {
     return <div>Error: {error.message}</div>;
   } else if (!isLoaded) {
     return <div>Loading....</div>;
   } else {
     return (
-      <div className="list-employees">
-        <div className="title-employees">
-          <div className="name-title">
-            <span>khu vực sửa xe</span>
-          </div>
-          <div className="add-new-invoice">
-            <button onClick={addArea} className="button-add">
-              Thêm khu vực
-            </button>
-            <ToastContainer
-              position="bottom-center"
-              autoClose={3000}
-              hideProgressBar
-              newestOnTop
-              closeOnClick
-              rtl={false}
-              pauseOnVisibilityChange
-              draggable
-              pauseOnHover={false}
-              toastClassName="toast-modify"
-              className="toast-container"
-            />
-          </div>
-        </div>
+      <>
+        <Modal
+          open={open1}
+          onClose={handleClose2}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
 
-        <div id="warning-modal" className={warningModalClass}>
-          <div id="warning" className={warningClass}>
-            <div className="title-warning">
-              <span>Xóa nhân viên?</span>
-            </div>
-            <div className="content-warning">
-              <div className="text-warning">
-                <span>
-                  Bạn có chắc muốn xóa nhân viên này? Thao tác này không thể
-                  khôi phục.
-                </span>
-              </div>
-              <div className="button-warning">
-                <button className="delete-permission" onClick={deleteEmployee}>
-                  <span>Xóa</span>
-                </button>
-                <div className="back" onClick={backconfirm}>
-                  <span>Thoát</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+          <Box sx={style}>
+            <Typography variant="h5">Xóa Khu vực này ra khỏi hệ thống</Typography>
+            <Box style={{ borderBottom: "1px solid #dfe4e8", borderTop: "1px solid #dfe4e8", height: "40px", padding: "10px" }}>
+              <Typography
 
-        <Grid container spacing={2}>
-          <Grid item xs={4}>
-            <Box
-              sx={{
-                width: "100%",
-                height: "100%",
-                maxHeight: "490px",
-                bgcolor: "background.paper",
-                marginTop: "50px",
-              }}
-            >
-              <CardHeader title="Danh sách hóa đơn chờ"></CardHeader>
-              <Button
+              >Bạn có chắc muồn xóa khu vực này ra khỏi hệ thống</Typography>
+            </Box>
+            <Button
+              style={{
+                background: "linear-gradient(180deg,#fff,#f9fafb)",
+                color: "#182537",
+                height: "40px",
+                marginBottom: "10px",
+                marginTop: "15px",
+                border: "1px solid #c4cdd5"
+
+              }} onClick={handleClose2}>Hủy</Button>
+            <Button
+              style={{
+                background: "linear-gradient(180deg,#ff4d4d,#ff4d4d)",
+                color: "white",
+                height: "40px",
+                marginBottom: "10px",
+                marginTop: "15px",
+                marginLeft: "12px"
+
+              }} onClick={() => deleteArea()}>Xác nhận xóa</Button>
+
+          </Box>
+
+        </Modal>
+        <Modal
+          open={add}
+          onClose={handleClose1}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          {add ?
+            <Box sx={style}>
+              <Typography>Thêm cửa hàng</Typography>
+              <TextField
+                label="Tên phụ tùng"
+                id="outlined-required"
                 variant="outlined"
-                startIcon={<Add />}
-                onClick={addInvoice}
                 style={{
+                  width: "90%",
+                }}
+                size="small"
+                value={name}
+                onChange={changeName}
+              />
+              <Button
+                style={{
+                  background: "#218FFE",
+                  color: "white",
+                  height: "40px",
+                  marginBottom: "10px",
+                  marginTop: "15px",
+
+                }} onClick={saveStore}>Tạo mới</Button>
+
+            </Box>
+            : ""}
+        </Modal>
+        <Snackbars
+          place="tc"
+          color="success"
+          message={messageSuccess}
+          open={tl}
+          closeNotification={() => setTl(false)}
+          close
+        />
+        <Snackbars
+          place="tc"
+          color="danger"
+          message={messageError}
+          open={fail}
+          closeNotification={() => setFail(false)}
+          close
+        />
+        <div className="list-employees">
+          <div className="title-employees">
+            <div className="name-title">
+              <span>khu vực sửa xe</span>
+            </div>
+            <div className="add-new-invoice">
+              <button onClick={addArea} className="button-add">
+                Thêm khu vực
+              </button>
+              <ToastContainer
+                position="bottom-center"
+                autoClose={3000}
+                hideProgressBar
+                newestOnTop
+                closeOnClick
+                rtl={false}
+                pauseOnVisibilityChange
+                draggable
+                pauseOnHover={false}
+                toastClassName="toast-modify"
+                className="toast-container"
+              />
+            </div>
+          </div>
+
+
+          <Grid container spacing={2}>
+            <Grid item xs={4}>
+              <Box
+                sx={{
                   width: "100%",
-                  fontWeight: 600,
-                  font: "icon",
-                  border: 0,
+                  height: "100%",
+                  maxHeight: "490px",
+                  bgcolor: "background.paper",
+                  marginTop: "50px",
                 }}
               >
-                Thêm hóa đơn
-              </Button>
-              <FixedSizeList
-                height={490}
-                width="100%"
-                itemSize={46}
-                itemCount={1}
-                color="red"
-                style={{ borderRadius: "10px" }}
-              >
-                {renderRow}
-              </FixedSizeList>
-            </Box>
-          </Grid>
-          <Grid item xs={8}>
-            <div style={{ display: "-webkit-inline-box" }}>
-              {area.map((area) => (
-                <div style={{ padding: "10px", marginTop: "40px" }}>
-                  <Card style={{ maxWidth: "200px" }}>
-                    <Paper elevation={3} />
-                    <CardHeader title={area.name}></CardHeader>
-                    <CardContent style={{ padding: "8px" }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Mã khu vực: <span>{area.code}</span>
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {area.status && area.status === 1 ? (
-                          <Typography variant="body2" color="text.secondary">
-                            Trạng thái: <span>Đang trống</span>
-                          </Typography>
-                        ) : (
-                          <div>
-                            <Typography variant="body2" color="text.secondary">
-                              Trạng thái:{" "}
-                              <span style={{ color: "red" }}>Đang sửa xe</span>
+                <CardHeader title="Danh sách hóa đơn chờ"></CardHeader>
+                <Button
+                  variant="outlined"
+                  startIcon={<Add />}
+                  onClick={addInvoice}
+                  style={{
+                    width: "100%",
+                    fontWeight: 600,
+                    font: "icon",
+                    border: 0,
+                  }}
+                >
+                  Thêm hóa đơn
+                </Button>
+                <FixedSizeList
+                  height={490}
+                  width="100%"
+                  itemSize={46}
+                  itemCount={1}
+                  color="red"
+                  style={{ borderRadius: "10px" }}
+                >
+                  {renderRow}
+                </FixedSizeList>
+              </Box>
+            </Grid>
+            <Grid item xs={8}>
+              <div style={{ display: "-webkit-inline-box" }}>
+                {area.map((area) => (
+                  <div style={{ padding: "10px", marginTop: "40px" }}>
+                    <Card style={{ maxWidth: "240px" }}>
+                      <Paper elevation={3} />
+                      <CardHeader title={area.name}></CardHeader>
+                      <Clear
+                        style={{
+                          float: "right",
+                          fontSize: "14px",
+                          marginTop: "-59px"
+                        }}
+                        size="small"
+                        onClick={() => test2(area.id)}
+                      />
+                      <CardContent style={{ padding: "8px" }}>
+                        <Typography variant="body1" color="text.secondary">
+                          Mã khu vực: <span>{area.code}</span>
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary">
+                          {area.status && area.status === 1 ? (
+                            <Typography variant="body1" color="text.secondary">
+                              Trạng thái: <span>Đang trống</span>
                             </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              Tên khách: <span>{area.invoice.name}</span>
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              Biển số xe:{" "}
-                              <span>{area.invoice.licensePlate}</span>
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              Mã hóa đơn: <span>{area.invoice.code}</span>
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              Nhân viên sửa:{" "}
-                              <span>{area.invoice.fixerName}</span>
-                            </Typography>
-                          </div>
-                        )}
-                      </Typography>
-                    </CardContent>
-                    {area.status && area.status === 1 ? (
-                      <CardActions>
-                        <Button
-                          size="small"
-                          color="primary"
-                          onClick={() => invoice(area.id)}
-                        >
-                          Danh sách phiếu
-                        </Button>
-                      </CardActions>
-                    ) : (
-                      <div>
+                          ) : (
+                            <div>
+                              <Typography variant="body1" color="text.secondary">
+                                Trạng thái:{" "}
+                                <span style={{ color: "red" }}>Đang sửa xe</span>
+                              </Typography>
+                              <Typography variant="body1" color="text.secondary">
+                                Tên khách: <span>{area.invoice.name}</span>
+                              </Typography>
+                              <Typography variant="body1" color="text.secondary">
+                                Biển số xe:{" "}
+                                <span>{area.invoice.licensePlate}</span>
+                              </Typography>
+                              <Typography variant="body1" color="text.secondary">
+                                Mã hóa đơn: <span>{area.invoice.code}</span>
+                              </Typography>
+                              <Typography variant="body1" color="text.secondary">
+                                Nhân viên sửa:{" "}
+                                <span>{area.invoice.fixerName}</span>
+                              </Typography>
+                            </div>
+                          )}
+                        </Typography>
+                      </CardContent>
+                      {area.status && area.status === 1 ? (
                         <CardActions>
                           <Button
                             size="small"
                             color="primary"
-                            onClick={() => okModal(area.invoice.id)}
+                            onClick={() => invoice(area.id)}
                           >
-                            Thanh toán
-                          </Button>
-                          <Button
-                            size="small"
-                            color="primary"
-                            onClick={() => editInvoice(area.invoice.id)}
-                          >
-                            Sửa hóa đơn
+                            Danh sách phiếu
                           </Button>
                         </CardActions>
-                      </div>
-                    )}
-                  </Card>
-                  <Modal
-                    open={open}
-                    onClose={handleClose}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
-                  >
-                    {open == true ? (
-                      <Box sx={style}>
-                        <Typography
-                          id="modal-modal-title"
-                          variant="h1"
-                          component="h2"
-                        >
-                          Hóa đơn {idInvoice}
-                        </Typography>
-                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                          Tên khách hàng:{customer.name}
-                        </Typography>
-                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                          số điện thoại:{customer.phone}
-                        </Typography>
-                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                          Biển số xe:{vehicle.licensePlate}
-                        </Typography>
-                        <Box style={{ display: "flex" }}>
-                          <Typography
-                            id="modal-modal-description"
-                            variant="h6"
-                            sx={{ mt: 2 }}
-                          >
-                            Sản phẩm
-                          </Typography>
-                          <Typography
-                            id="modal-modal-description"
-                            variant="h6"
-                            sx={{ mt: 2 }}
-                            style={{ marginLeft: "110px" }}
-                          >
-                            số lượng
-                          </Typography>
-                        </Box>
+                      ) : (
+                        <div>
+                          <CardActions>
+                            <Button
+                              size="small"
+                              style={{
+                                background: "#218FFE",
+                                color: "white",
+                                height: "40px",
+                                marginBottom: "10px",
+                                marginTop: "15px",
 
-                        <Box style={{ display: "flex" }}>
-                          {materialChoose.map((x) => (
-                            <div style={{ display: "flex" }}>
-                              <Typography
-                                id="modal-modal-description"
-                                sx={{ mt: 2 }}
-                              >
-                                {x.name}
-                              </Typography>
-                              <Typography
-                                id="modal-modal-description"
-                                sx={{ mt: 2 }}
-                                style={{ marginLeft: "110px" }}
-                              >
-                                {x.quantityBuy}
-                              </Typography>
-                            </div>
-                          ))}
-                        </Box>
-                        <Box style={{ display: "flex" }}>
-                          {serviceChoose.map((x) => (
-                            <div style={{ display: "flex" }}>
-                              <Typography
-                                id="modal-modal-description"
-                                sx={{ mt: 2 }}
-                              >
-                                {x.name}
-                              </Typography>
-                              <Typography
-                                id="modal-modal-description"
-                                sx={{ mt: 2 }}
-                                style={{ marginLeft: "110px" }}
-                              >
-                                1
-                              </Typography>
-                            </div>
-                          ))}
-                        </Box>
-                        <Box style={{ display: "flex" }}>
+                              }}
+                              onClick={() => okModal(area.invoice.id)}
+                            >
+                              Thanh toán
+                            </Button>
+                            <Button
+                              size="small"
+                              style={{
+                                background: "rgb(244, 148, 35)",
+                                color: "white",
+                                height: "40px",
+                                marginBottom: "10px",
+                                marginTop: "15px",
+
+                              }}
+                              onClick={() => editInvoice(area.invoice.id)}
+                            >
+                              Sửa hóa đơn
+                            </Button>
+                          </CardActions>
+                        </div>
+                      )}
+                    </Card>
+                    <Modal
+                      open={open}
+                      onClose={handleClose}
+                      aria-labelledby="modal-modal-title"
+                      aria-describedby="modal-modal-description"
+                    >
+                      {open == true ? (
+                        <Box sx={style}>
                           <Typography
-                            id="modal-modal-description"
-                            variant="h6"
-                            sx={{ mt: 2 }}
+                            id="modal-modal-title"
+                            variant="h4"
+                            component="h2"
+                            style={{
+                              textAlign: "center", borderBottom: "1px dashed rgb(166, 170, 174)"
+                            }}
                           >
-                            Tổng tiền
+                            Hóa đơn {idInvoice}
                           </Typography>
-                          <Typography
-                            id="modal-modal-description"
-                            variant="h6"
-                            sx={{ mt: 2 }}
-                            style={{ marginLeft: "110px" }}
+                          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                            Tên khách hàng:{customer.name}
+                          </Typography>
+                          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                            Số điện thoại:{customer.phone}
+                          </Typography>
+                          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                            Biển số xe:{vehicle.licensePlate}
+                          </Typography>
+                          <Box style={{
+                            display: "flex", borderTop: "1px dashed rgb(166, 170, 174)"
+                          }}>
+                            <Typography
+                              id="modal-modal-description"
+                              style={{ fontSize: "15px", fontWeight: "600" }}
+                              sx={{ mt: 2 }}
+                            >
+                              Sản phẩm
+                            </Typography>
+                            <Typography
+                              id="modal-modal-description"
+                              style={{ fontSize: "15px", fontWeight: "600", marginLeft: "225px" }}
+                              sx={{ mt: 2 }}
+
+                            >
+                              số lượng
+                            </Typography>
+                          </Box>
+
+                          <Box >
+                            {materialChoose.map((x) => (
+                              <Typography >
+                                <Typography
+                                  id="modal-modal-description"
+                                  sx={{ mt: 2 }}
+                                >
+                                  {x.name}
+                                </Typography>
+                                <Typography
+                                  id="modal-modal-description"
+                                  sx={{ mt: 2 }}
+                                  style={{ marginLeft: "328px", marginTop: "-18px" }}
+                                >
+                                  {x.quantityBuy}
+                                </Typography>
+                              </Typography>
+                            ))}
+                          </Box>
+                          <Box >
+                            {serviceChoose.map((x) => (
+                              <div >
+                                <Typography
+                                  id="modal-modal-description"
+                                  sx={{ mt: 2 }}
+
+                                >
+                                  {x.name}
+                                </Typography>
+                                <Typography
+                                  id="modal-modal-description"
+                                  sx={{ mt: 2 }}
+                                  style={{ marginLeft: "328px", marginTop: "-18px" }}
+                                >
+                                  1
+                                </Typography>
+                              </div>
+                            ))}
+                          </Box>
+                          <Box style={{ display: "flex", fontSize: "15px", fontWeight: "600" }}>
+                            <Typography
+                              id="modal-modal-description"
+                              style={{ fontSize: "15px", fontWeight: "600" }}
+                              sx={{ mt: 2 }}
+                            >
+                              Tổng tiền
+                            </Typography>
+                            <Typography
+                              id="modal-modal-description"
+                              style={{ fontSize: "15px", fontWeight: "600", marginLeft: "240px" }}
+                              sx={{ mt: 2 }}
+
+                            >
+                              {sumMaterial + sumServices}đ
+                            </Typography>
+                          </Box>
+                          <Box
+                            style={{
+                              borderTop: "1px dashed rgb(166, 170, 174)"
+
+                            }}
                           >
-                            {sumMaterial + sumServices}đ
-                          </Typography>
+                            <Button
+                              style={{
+                                background: "#218FFE",
+                                color: "white",
+                                height: "40px",
+                                marginBottom: "10px",
+                                marginTop: "15px",
+
+                              }} onClick={payment}>Thanh toán</Button>
+                            <Button
+                              style={{
+                                background: "linear-gradient(180deg,#0fd186,#0fd186)",
+                                color: "white",
+                                height: "40px",
+                                marginBottom: "10px",
+                                marginTop: "15px",
+                                marginLeft: "12px"
+
+                              }}
+                              onClick={() => changeStatus(idInvoice, 4)}>
+                              Lưu đơn
+                            </Button>
+                            <Button
+                              style={{
+                                background: "linear-gradient(180deg,#fff,#f9fafb)",
+                                color: "#182537",
+                                height: "40px",
+                                marginBottom: "10px",
+                                marginTop: "15px",
+                                border: "1px solid #c4cdd5",
+                                marginLeft: "12px"
+                              }}
+                              onClick={handleClose}
+                              autoFocus>Hủy</Button>
+                          </Box>
                         </Box>
-                        <Button onClick={payment}>Thanh toán</Button>
-                        <Button onClick={() => changeStatus(idInvoice, 4)}>
-                          Lưu đơn
-                        </Button>
-                        <Button autoFocus>Hủy</Button>
-                      </Box>
-                    ) : (
-                      ""
-                    )}
-                  </Modal>
-                </div>
-              ))}
-            </div>
+                      ) : (
+                        ""
+                      )}
+                    </Modal>
+                  </div>
+                ))}
+              </div>
+            </Grid>
           </Grid>
-        </Grid>
-      </div>
+        </div>
+      </>
     );
   }
 }

@@ -150,8 +150,8 @@ public class AreaServiceImpl implements AreaService {
     @Override
     public void deleteArea(int id){
         Areas areas = findAreaById(id);
-
-            areas.setDeletedAt();
+        areas.setDeletedAt();
+        areas.setStatus(3);
         saveAreaRepository(areas);
 
     }

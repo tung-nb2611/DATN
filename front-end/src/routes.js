@@ -31,15 +31,9 @@ const dashboardRoutes = [
     component: Employees,
     layout: "/admin",
   },
+
   {
-    path: "/store",
-    name: "Cửa Hàng",
-    icon: PeopleOutline,
-    component: Store,
-    layout: "/admin",
-  },
-  {
-    path: "/admin/materials",
+    path: "/materials",
     name: "Kho hàng",
     icon: People,
     component: Material,

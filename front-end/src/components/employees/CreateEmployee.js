@@ -399,23 +399,29 @@ function CreateEmployee(props) {
                 </div>
                 <div className="form-group-role-list">
                   {roles.map((role) => (
-                    <div key={role.id} className="role-list">
-                      <input
-                        type="checkbox"
-                        checked={role.select}
-                        onChange={(e) => {
-                          let value = e.target.checked;
-                          setRoles(
-                            roles.map((roleCheck) => {
-                              if (roleCheck.id === role.id) {
-                                roleCheck.select = value;
-                              }
-                              return roleCheck;
-                            })
-                          );
-                        }}
-                      />
-                      <label>{role.description}</label>
+                    < div key={role.id} className="role-list" >
+                      {role.id !== 4 ?
+
+                        (
+                          <input
+                            type="checkbox"
+                            checked={role.select}
+                            onChange={(e) => {
+                              let value = e.target.checked;
+                              setRoles(
+                                roles.map((roleCheck) => {
+                                  if (roleCheck.id === role.id) {
+                                    roleCheck.select = value;
+                                  }
+                                  return roleCheck;
+                                })
+                              );
+                            }}
+                          />
+                        ) : ""}
+                      {role.id !== 4 ?
+                        <label>{role.description}</label>
+                        : ""}
                     </div>
                   ))}
                 </div>

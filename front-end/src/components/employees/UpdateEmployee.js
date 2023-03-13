@@ -37,7 +37,7 @@ function UpdateEmployee(props) {
   const [salaryDay, setSalaryDay] = useState("");
   const [createDate, setCreateDate] = useState("");
   const [username, setUsername] = useState("");
-  
+
   // eslint-disable-next-line react/prop-types
   const [id, setId] = useState(props.match.params.id);
 
@@ -215,14 +215,6 @@ function UpdateEmployee(props) {
               <div className="info-group">
                 <label>Tên đăng nhập:</label><br />
                 <input type="text" className="info-detail" value={username} disabled />
-              </div>
-              <div className="info-group">
-                <label>Lương nv:</label><br />
-                <input type="text" className="info-detail" value={salaryDay} disabled />
-              </div>
-              <div className="info-group">
-                <label>Ngày Tạo:</label><br />
-                <input type="text" className="info-detail" value={createDate} disabled />
               </div>
             </div>
           </div>

@@ -6,10 +6,11 @@ import com.sapo.dao.jpa.RoleDao;
 import com.sapo.dao.jpa.StoreDao;
 import com.sapo.dao.jpa.UserDAO;
 import com.sapo.dto.common.Pagination;
-import com.sapo.dto.customers.CustomerDTOResponse;
-import com.sapo.dto.role.RoleDTOListResponse;
 import com.sapo.dto.users.*;
-import com.sapo.entities.*;
+import com.sapo.entities.Role;
+import com.sapo.entities.Store;
+import com.sapo.entities.Timesheet;
+import com.sapo.entities.User;
 import com.sapo.exception.InputException;
 import com.sapo.repositories.TimesheetRepository;
 import com.sapo.repositories.UserRepository;
@@ -162,6 +163,7 @@ public class UserServiceImpl implements UserService {
             userDTOResponse.setId(user.getId());
             userDTOResponse.setCode(user.getCode());
             userDTOResponse.setName(user.getName());
+        userDTOResponse.setPhone(user.getPhone());
             userDTOResponse.setStatus(ConstantVariableCommon.statusUserIntToString(user.getStatus()));
             for (val i : user.getRoles()){
                 userDTOResponse.setRole(i.getDescription());
@@ -226,6 +228,7 @@ public class UserServiceImpl implements UserService {
             userDTOResponse.setId(user.getId());
             userDTOResponse.setCode(user.getCode());
             userDTOResponse.setName(user.getName());
+            userDTOResponse.setPhone(user.getPhone());
             userDTOResponse.setStatus(ConstantVariableCommon.statusUserIntToString(user.getStatus()));
             for (val i : user.getRoles()){
                 userDTOResponse.setRole(i.getDescription());

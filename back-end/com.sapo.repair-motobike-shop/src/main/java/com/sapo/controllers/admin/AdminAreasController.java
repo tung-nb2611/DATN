@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/admin/areas")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR')")
 public class AdminAreasController {
 
     private final AreaService areaService;

@@ -191,6 +191,7 @@ export default function (props) {
                   code: employee.code,
                   name: employee.name,
                   phone: employee.phone,
+                  role: employee.role,
                   status: employee.status,
                 };
               })
@@ -562,6 +563,9 @@ export default function (props) {
                         Số điện thoại
                       </TableHeaderCell>
                       <TableHeaderCell align="center">
+                        Chức vụ
+                      </TableHeaderCell>
+                      <TableHeaderCell align="center">
                         Trạng thái
                       </TableHeaderCell>
                       <TableHeaderCell></TableHeaderCell>
@@ -579,7 +583,7 @@ export default function (props) {
                           </TableCell>
                           <TableCell align="center">{row.name}</TableCell>
                           <TableCell align="center">{row.phone}</TableCell>
-
+                          <TableCell align="center">{row.role}</TableCell>
                           <TableCell align="center">
                             {" "}
                             {colorStatusInvoice(row.status)}

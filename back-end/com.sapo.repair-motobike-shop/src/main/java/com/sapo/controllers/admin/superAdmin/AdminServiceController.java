@@ -1,10 +1,8 @@
-package com.sapo.controllers.admin;
+package com.sapo.controllers.admin.superAdmin;
 
 import com.sapo.dto.services.ServiceDTORequest;
 import com.sapo.dto.services.ServiceDTOUpdateRequest;
 import com.sapo.dto.services.ServicePaginationDTO;
-import com.sapo.dto.users.UserDTOUpdateRequest;
-import com.sapo.entities.Service;
 import com.sapo.services.ServiceService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,7 +14,7 @@ import java.io.IOException;
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/admin/services")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR') or hasRole('SUPER_ADMIN')")
 public class AdminServiceController {
     private final ServiceService serviceService;
     

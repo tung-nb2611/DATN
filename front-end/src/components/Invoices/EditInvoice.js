@@ -571,9 +571,9 @@ function EditInvoice(props) {
     let vehicleCustomerDTORequest = { name, phone, licensePlate };
     console.log(
       "vehicleCustomerDTORequest => " +
-        vehicleCustomerDTORequest.name +
-        vehicleCustomerDTORequest.phone +
-        vehicleCustomerDTORequest.licensePlate
+      vehicleCustomerDTORequest.name +
+      vehicleCustomerDTORequest.phone +
+      vehicleCustomerDTORequest.licensePlate
     );
 
     CustomerService.postCustomerAndVehicle(vehicleCustomerDTORequest)
@@ -749,7 +749,7 @@ function EditInvoice(props) {
           setTimeout(function () {
             setTl(false);
           }, 3000);
-          props.history.push("/admin/invoices");
+          props.history.push("/admin/areas");
         })
         .catch(function (error) {
           if (error.response.data.errors) {
@@ -1727,27 +1727,50 @@ function EditInvoice(props) {
                 <span>Hóa Đơn tạm tính</span>
               </div>
               <div className="content-pay-invoice">
+                <div
+                  style={{
+                    fontWeight: "500",
+                    display: "flex",
+                    fontSize: "10px",
+                  }}
+                >
+                  <div style={{ width: "170px" }}>
+                    <div>Tên khách hàng: {customer.name}</div>
+                    <div>Số điện thoại: {customer.phone}</div>
+                    <div>Tên Nhân viên sửa: {employee.name}</div>
+                  </div>
+                  <div>
+                    <div>Biển số xe: {vehicle.licensePlate}</div>
+                    <div>Khu vực sửa: {areaChose.name}</div>
+                  </div>
+                </div>
                 <div className="pay-method">
                   <div className="content-pay-method">
                     <table>
                       <thead>
-                        <tr style={{ fontWeight: "bold", fontSize: "15px" }}>
+                        <tr style={{ fontWeight: "bold", fontSize: "12px" }}>
                           <td className="td">
-                            <span>Phụ kiện</span>
+                            <span style={{ marginLeft: "-30px" }}>
+                              Phụ kiện
+                            </span>
                           </td>
                           <td>
-                            <span style={{ marginLeft: "52px" }}>Số lượng</span>
+                            <span style={{ marginLeft: " 22px" }}>
+                              Số lượng
+                            </span>
                           </td>
                           <td className="tf">
-                            <span style={{ marginLeft: "85px" }}>Giá</span>
+                            <span style={{ marginLeft: "66px" }}>Giá</span>
                           </td>
                         </tr>
                       </thead>
                       <tbody>
                         {materialChoose.map((materital) => (
-                          <tr key={materital.id}>
+                          <tr key={materital.id} style={{ fontSize: "10px" }}>
                             <td className="td-2">
-                              <span style={{ width: "100px" }}>
+                              <span
+                                style={{ width: "100px", marginLeft: "-30px" }}
+                              >
                                 {materital.name}
                               </span>
                             </td>
@@ -1761,6 +1784,7 @@ function EditInvoice(props) {
                                 {showPrice(
                                   materital.outputPrice * materital.quantityBuy
                                 ).toString()}
+                                ₫
                               </span>
                             </td>
                           </tr>
@@ -1769,26 +1793,28 @@ function EditInvoice(props) {
                     </table>
                     <table>
                       <thead>
-                        <tr style={{ fontWeight: "bold", fontSize: "15px" }}>
-                          <td className="td">
-                            <span>Dịch vụ</span>
+                        <tr style={{ fontWeight: "bold", fontSize: "12px" }}>
+                          <td>
+                            <span style={{ marginLeft: "-30px" }}>Dịch vụ</span>
                           </td>
-                          <td className="tf">
-                            <span style={{ marginLeft: "220px" }}>Giá</span>
+                          <td>
+                            <span style={{ marginLeft: "200px" }}>Giá</span>
                           </td>
                         </tr>
                       </thead>
                       <tbody>
                         {serviceChoose.map((service) => (
-                          <tr key={service.id}>
+                          <tr key={service.id} style={{ fontSize: "10px" }}>
                             <td className="td-2">
-                              <span style={{ width: "100px" }}>
+                              <span
+                                style={{ width: "100px", marginLeft: "-28px" }}
+                              >
                                 {service.name}
                               </span>
                             </td>
                             <td className="td-4">
-                              <span style={{ marginLeft: "207px" }}>
-                                {showPrice(service.price).toString()}
+                              <span style={{ marginLeft: "190px" }}>
+                                {showPrice(service.price).toString()}₫
                               </span>
                             </td>
                           </tr>
@@ -1808,7 +1834,9 @@ function EditInvoice(props) {
                     >
                       <th>Tổng tiền thanh toán tạm tính</th>
                       <td>:</td>
-                      <td>{showPrice(sumMaterial + sumServices).toString()}</td>
+                      <td>
+                        {showPrice(sumMaterial + sumServices).toString()}₫
+                      </td>
                     </tr>
                   </table>
                 </div>

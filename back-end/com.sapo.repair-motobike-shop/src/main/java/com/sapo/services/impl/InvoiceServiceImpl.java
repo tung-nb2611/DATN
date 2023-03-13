@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.transaction.Transactional;
-import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -267,7 +266,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             invoice.setFixerId(invoiceAddRequestDTO.getFixerId());
             invoice.setStatus(ConstantVariableCommon.STATUS_INVOICE_2);
         }
-        invoice.setStroeId(invoice.getStroeId());
+        invoice.setStroeId(invoiceAddRequestDTO.getStore_id());
         invoice.setNote(invoiceAddRequestDTO.getNote());
         invoice.setCode(Common.GenerateCodeInvoice());
         invoice.setPayMethod(invoiceAddRequestDTO.getPayMethod());

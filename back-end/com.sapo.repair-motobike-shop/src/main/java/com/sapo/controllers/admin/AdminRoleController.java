@@ -1,19 +1,21 @@
 package com.sapo.controllers.admin;
 
-import com.sapo.dto.role.*;
+import com.sapo.dto.role.RoleDTOListResponse;
+import com.sapo.dto.role.RoleDTORequest;
+import com.sapo.dto.role.RoleDTOResponse;
+import com.sapo.dto.role.RolePaginationDTOResponse;
 import com.sapo.services.RoleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/roles")
 @CrossOrigin(origins = "http://localhost:3000")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
 public class AdminRoleController {
     private final RoleService roleService;
 

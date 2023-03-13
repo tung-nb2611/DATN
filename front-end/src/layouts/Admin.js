@@ -69,6 +69,7 @@ import ExportMaterial from "components/materials/ExportMaterial";
 import EmployeeService from "services/EmployeeService.js";
 import dashboardRoutes1 from "routes1.js";
 import StatisticsAdmin from "views/StaticAdmin/StatisticsAdmin.js";
+import Login1 from "components/Login/login1.js";
 
 let ps;
 
@@ -77,6 +78,7 @@ const switchRoutes = (
     {/* employees */}
 
     <Route exact path="/login" component={Login} />
+    <Route exact path="/login/admin" component={Login1} />
     <Route
       exact
       path="/admin/employees/add-employee"
@@ -276,7 +278,7 @@ export default function Admin({ ...rest }) {
             store: user.store,
           });
         });
-      } catch (error) {}
+      } catch (error) { }
     }
     fetchUser();
   }, []);
@@ -310,9 +312,9 @@ export default function Admin({ ...rest }) {
   };
   return (
     <div className={classes.wrapper}>
-      {role.includes(1) ? (
+      {role.includes(4) ? (
         <Sidebar
-          routes={routes}
+          routes={dashboardRoutes1}
           logo={logo}
           image={image}
           handleDrawerToggle={handleDrawerToggle}
@@ -323,8 +325,8 @@ export default function Admin({ ...rest }) {
       ) : (
         <Sidebar
           routes={routes}
-          // logo={logo}
-          // image={image}
+          logo={logo}
+          image={image}
           handleDrawerToggle={handleDrawerToggle}
           open={mobileOpen}
           color={color}

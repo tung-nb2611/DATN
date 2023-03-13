@@ -21,6 +21,7 @@ import typography from "./typography";
 import { colorBorder, colorInk } from "./palette";
 import "react-toastify/dist/ReactToastify.css";
 import EmployeeService from "services/EmployeeService";
+import Login1 from "components/Login/login1";
 const hist = createBrowserHistory();
 const logged = window.sessionStorage.getItem("jwt");
 const store = reduxStore();
@@ -39,11 +40,13 @@ ReactDOM.render(
               <Admin />
             </UIComponentProvider>
           ) : (
-            <Redirect to="/login" />
+            <Redirect to="/login" />,
+            <Redirect to="/login/admin" />
           );
         }}
       />
       <Route path="/login" component={Login} />
+      <Route path="/login/admin" component={Login1} />
       <Redirect from="/" to="/admin/areas" />
     </Switch>
   </Router>,
