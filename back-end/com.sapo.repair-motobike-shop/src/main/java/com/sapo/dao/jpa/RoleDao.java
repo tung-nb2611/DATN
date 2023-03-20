@@ -22,7 +22,7 @@ public class RoleDao {
 
     //Hàm lấy list role đang sử dụng
     public List<Role> findAllRoleByStatus(){
-        String sql = "SELECT * FROM tbl_roles WHERE AND  status = " + ConstantVariableCommon.STATUS_ROLE_1; //deleted_at IS NULL or deleted_by IS NULL
+        String sql = "SELECT * FROM tbl_roles WHERE status = " + ConstantVariableCommon.STATUS_ROLE_1; //deleted_at IS NULL or deleted_by IS NULL
         Query query = entityManager.createNativeQuery(sql, Role.class);
         return query.getResultList();
     }

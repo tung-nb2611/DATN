@@ -10,6 +10,7 @@ import EmployeesService from "../../services/employees";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 import {
+  ArrowBackIosOutlined,
   ArrowDropDown,
   Delete,
   DeleteForever,
@@ -20,6 +21,7 @@ import Snackbars from "components/Snackbar/Snackbar.js";
 import Edit from "@material-ui/icons/Edit";
 import EmployeeFilters from "components/FiltersForm/EmployeeFilters";
 import RoleFilters from "components/FiltersForm/RoleFilters";
+import { Typography } from "@material-ui/core";
 const styles = {
   cardCategoryWhite: {
     "&,& a,& a:hover,& a:focus": {
@@ -363,7 +365,9 @@ export default function (props) {
         }
       });
   };
-
+  const cancel = () => {
+    props.history.push("/admin/store");
+  };
   if (error) {
     return <div>Error: {error.message}</div>;
   } else if (!isLoaded) {
@@ -387,6 +391,10 @@ export default function (props) {
           closeNotification={() => setFail(false)}
           close
         />
+        <Typography onClick={cancel}>
+          {" "}
+          <ArrowBackIosOutlined style={{ height: "10px" }} /> Quay lại
+        </Typography>
         <div className="title-employees">
           <div className="name-title">
             <span>Danh sách nhân viên</span>

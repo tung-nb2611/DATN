@@ -17,7 +17,7 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/admin/users")
-@PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('FIXER') or hasRole('COORDINATOR') or hasRole('SUPER_ADMIN')")
 public class AdminUserController {
     private final UserService userService;
     private final JwtProvider jwtProvider;

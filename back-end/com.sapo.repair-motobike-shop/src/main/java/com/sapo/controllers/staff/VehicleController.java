@@ -14,7 +14,7 @@ import java.util.List;
 
 @RequestMapping("/api/vehicles")
 @CrossOrigin("http://localhost:3000")
-@PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR') or hasRole('FIXER') or hasRole('SUPER_ADMIN')")
 @RestController
 public class VehicleController {
     private final VehicleService vehicleService;

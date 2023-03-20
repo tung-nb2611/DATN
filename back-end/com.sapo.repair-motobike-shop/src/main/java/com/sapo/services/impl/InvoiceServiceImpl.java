@@ -71,7 +71,19 @@ public class InvoiceServiceImpl implements InvoiceService {
         InvoiceListPaginationResponseDTO invoiceListPaginationResponseDTO = paginationListInvoice(page, limit, invoices);
         return invoiceListPaginationResponseDTO;
     }
+    @Override
+   public InvoiceResponse findInvoiceByfixer(int fixer_Id,String fixerName) {
 
+        Invoice invoice = invoiceDAO.finInvoiceByFixer(fixer_Id);
+        if(invoice == null){
+            return null;
+        }
+        List<MaterialOrderResponseDTO> materialOrderResponseDTOS = findMaterialByIdInvoice(invoice.getId());
+        List<ServiceOrderResponseDTO> serviceOrderResponseDTOS = findServiceByIdInvoice(invoice.getId());
+        Vehicle vehicle = vehicleDAO.findVehicleById(vehicleDAO.findVehicleCustomerById(invoice.getVehicleCustomerId()).getVehicleId());
+        InvoiceResponse invoiceResponse = new InvoiceResponse(invoice.getId(), invoice.getCode(), vehicle.getLicensePlate() , fixerName, ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()),Common.getDateByMilliSeconds(invoice.getCreatedAt()),invoice.getConfirm(),materialOrderResponseDTOS,serviceOrderResponseDTOS);
+  return invoiceResponse;
+    }
     //Hàm lấy list hóa đơn theo trạng thái
     @Override
     public InvoiceMaterialPaginationResponseDTO findAllInvoiceAndBuyMaterialByStatus( int store_id,int area_id,int page, int limit, String keyword,List<Integer> status, int sort){
@@ -127,18 +139,18 @@ public class InvoiceServiceImpl implements InvoiceService {
             Customer customer = customerDAO.findCustomerById(vehicleDAO.findVehicleCustomerById(invoice.getVehicleCustomerId()).getCustomerId());
             if(invoice.getFixerId() ==null ){
                 if(vehicleDAO.findVehicleCustomerById(invoice.getVehicleCustomerId()).getVehicleId() == null){
-                    InvoiceMaterialResponseDTO invoiceResponseDTO = new InvoiceMaterialResponseDTO(invoice.getId(), invoice.getCode(), "","", customer.getName(), customer.getPhone(), ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()));
+                    InvoiceMaterialResponseDTO invoiceResponseDTO = new InvoiceMaterialResponseDTO(invoice.getId(), invoice.getCode(), "","", customer.getName(), customer.getPhone(), ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()),invoice.getConfirm());
                     invoiceListResponseDTOS.add(invoiceResponseDTO);
                 }else {
                     Vehicle vehicle = vehicleDAO.findVehicleById(vehicleDAO.findVehicleCustomerById(invoice.getVehicleCustomerId()).getVehicleId());
-                    InvoiceMaterialResponseDTO invoiceResponseDTO = new InvoiceMaterialResponseDTO(invoice.getId(), invoice.getCode(), vehicle.getLicensePlate(),"", customer.getName(), customer.getPhone(), ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()));
+                    InvoiceMaterialResponseDTO invoiceResponseDTO = new InvoiceMaterialResponseDTO(invoice.getId(), invoice.getCode(), vehicle.getLicensePlate(),"", customer.getName(), customer.getPhone(), ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()),invoice.getConfirm());
                     invoiceListResponseDTOS.add(invoiceResponseDTO);
                 }
 
             }else{
                 Vehicle vehicle = vehicleDAO.findVehicleById(vehicleDAO.findVehicleCustomerById(invoice.getVehicleCustomerId()).getVehicleId());
                 User user = userDAO.findUserById(invoice.getFixerId());
-                InvoiceMaterialResponseDTO invoiceResponseDTO = new InvoiceMaterialResponseDTO(invoice.getId(), invoice.getCode(),vehicle.getLicensePlate(),user.getName(), customer.getName(), customer.getPhone(), ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()));
+                InvoiceMaterialResponseDTO invoiceResponseDTO = new InvoiceMaterialResponseDTO(invoice.getId(), invoice.getCode(),vehicle.getLicensePlate(),user.getName(), customer.getName(), customer.getPhone(), ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()),invoice.getConfirm());
                 invoiceListResponseDTOS.add(invoiceResponseDTO);
             }
 
@@ -214,15 +226,14 @@ public class InvoiceServiceImpl implements InvoiceService {
     private List<InvoiceResponse>  transferInvoiceToInvoiceDTO(List<Invoice> invoices){
         List<InvoiceResponse> invoiceListResponseDTOS = new ArrayList<>();
         for (Invoice invoice: invoices){
-            System.out.println("Fixer id : " +invoice.getFixerId());
             List<MaterialOrderResponseDTO> materialOrderResponseDTOS = findMaterialByIdInvoice(invoice.getId());
             List<ServiceOrderResponseDTO> serviceOrderResponseDTOS = findServiceByIdInvoice(invoice.getId());
             Vehicle vehicle = vehicleDAO.findVehicleById(vehicleDAO.findVehicleCustomerById(invoice.getVehicleCustomerId()).getVehicleId());
             if(invoice.getFixerId() == null || invoice.getFixerId() ==0 ){
-                InvoiceResponse invoiceResponseDTO = new InvoiceResponse(invoice.getId(), invoice.getCode(), vehicle.getLicensePlate() , "", ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()),Common.getDateByMilliSeconds(invoice.getCreatedAt()),materialOrderResponseDTOS,serviceOrderResponseDTOS);
+                InvoiceResponse invoiceResponseDTO = new InvoiceResponse(invoice.getId(), invoice.getCode(), vehicle.getLicensePlate() , "", ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()),Common.getDateByMilliSeconds(invoice.getCreatedAt()),invoice.getConfirm(),materialOrderResponseDTOS,serviceOrderResponseDTOS);
                 invoiceListResponseDTOS.add(invoiceResponseDTO);
             }else{
-                InvoiceResponse invoiceResponseDTO = new InvoiceResponse(invoice.getId(), invoice.getCode(), vehicle.getLicensePlate(), userDAO.findUserById(invoice.getFixerId()).getName(), ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()),ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()),materialOrderResponseDTOS,serviceOrderResponseDTOS);
+                InvoiceResponse invoiceResponseDTO = new InvoiceResponse(invoice.getId(), invoice.getCode(), vehicle.getLicensePlate(), userDAO.findUserById(invoice.getFixerId()).getName(), ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()),Common.getDateByMilliSeconds(invoice.getCreatedAt()),invoice.getConfirm(),materialOrderResponseDTOS,serviceOrderResponseDTOS);
                 invoiceListResponseDTOS.add(invoiceResponseDTO);
             }
 
@@ -259,17 +270,17 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
 
         invoice.setCreatedAt(Common.getTimestamp());
-        if (invoiceAddRequestDTO.getFixerId() == null){
+        if (invoiceAddRequestDTO.getFixerId() == 0){
             invoice.setStatus(ConstantVariableCommon.STATUS_INVOICE_1);
             invoice.setFixerId(null);
         } else {
             invoice.setFixerId(invoiceAddRequestDTO.getFixerId());
             invoice.setStatus(ConstantVariableCommon.STATUS_INVOICE_2);
         }
-        invoice.setStroeId(invoiceAddRequestDTO.getStore_id());
-        invoice.setNote(invoiceAddRequestDTO.getNote());
+        invoice.setStroeId(invoiceAddRequestDTO.getStore_id());invoice.setNote(invoiceAddRequestDTO.getNote());
         invoice.setCode(Common.GenerateCodeInvoice());
         invoice.setPayMethod(invoiceAddRequestDTO.getPayMethod());
+        invoice.setConfirm(1);
         saveInvoiceRepo(invoice);
         if(invoiceAddRequestDTO.getMaterialDTOS().size() > 0){
             addMaterialOrder(invoiceAddRequestDTO, invoice);
@@ -398,7 +409,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoiceEditResponseDTO.setPayMethod(invoice.getPayMethod());
         invoiceEditResponseDTO.setId(id);
         invoiceEditResponseDTO.setStatus(ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()));
-
+        invoiceEditResponseDTO.setConfirm(invoice.getConfirm());
 
         //set customer vehicle
         InvoiceCustomerVehicleDTO customerVehicleDTO = findCustomerVehicle(invoice);
@@ -447,15 +458,19 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
     // Hàm xóa hóa đơn 1,2,7 (sửa status về 6)
     @Override
-    public void deleteInvoice(int id) {
+    public void deleteInvoice(int id, String note) {
         Invoice invoice = invoiceDAO.findInvoiceById(id);
         InvoiceValidate.checkInvoiceDelete(invoice.getStatus());
         invoice.setDeletedAt();
+        invoice.setNote(note);
         invoice.setStatus(ConstantVariableCommon.STATUS_INVOICE_6);
+        Areas areas = areaDao.findAreaById(invoice.getArea_id());
+        changeStatusArea(invoice.getArea_id(),1);
         if(invoice.getFixerId() != 0 && invoice.getFixerId() != null ){
             User user = userDAO.findUserById(invoice.getFixerId());
             user.setStatus(ConstantVariableCommon.STATUS_USER_4);
         }
+        if(invoice.getStatus() !=3 || invoice.getStatus()!=6){
         List<MaterialOrderResponseDTO> materialOrderResponseDTOS = findMaterialByIdInvoice(id);
 //       List<MaterialOrder> materialOrders = invoiceDAO.findMaterialOrderByIdInvoice(id);
         materialOrderResponseDTOS.forEach(materialOrderResponseDTO -> {
@@ -467,6 +482,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             System.out.println(material.getQuantity());
             materialRepository.save(material);
         });
+        }
 
         saveInvoiceRepo(invoice);
     }
@@ -565,7 +581,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             user.setStatus(ConstantVariableCommon.STATUS_USER_3);
             userRepository.save(user);
         }
-
+        invoice.setConfirm(invoiceEditRequestDTO.getConfirm());
         invoice.setNote(invoiceEditRequestDTO.getNote());
         invoice.setTotal(invoiceEditRequestDTO.getTotal());
         invoice.setPayMethod(invoiceEditRequestDTO.getPayMethod());
@@ -576,8 +592,26 @@ public class InvoiceServiceImpl implements InvoiceService {
             invoice.setStatus(ConstantVariableCommon.STATUS_INVOICE_3);
             changeStatusArea(invoiceEditRequestDTO.getAreaId(),2);
         }
+
         editServiceOrder(invoiceEditRequestDTO, invoice);
         editMaterialOrder(invoiceEditRequestDTO, invoice);
+
+
+        saveInvoiceRepo(invoice);
+    }
+    //hàm update  hóa đơn chờ sửa
+    @Override
+    public void editInvoice1(int id, InvoiceEditRequestDTO invoiceEditRequestDTO){
+        Invoice invoice = invoiceDAO.findInvoiceById(id);
+        invoice.setUpdatedAt(Common.getTimestamp());
+        invoice.setNote(invoiceEditRequestDTO.getNote());
+        invoice.setTotal(invoiceEditRequestDTO.getTotal());
+        editServiceOrder(invoiceEditRequestDTO, invoice);
+        editMaterialOrder(invoiceEditRequestDTO, invoice);
+        invoice.setConfirm(1);
+        invoice.setFixerId(invoiceEditRequestDTO.getFixerId());
+        invoice.setStatus(ConstantVariableCommon.STATUS_INVOICE_7);
+
 
 
         saveInvoiceRepo(invoice);
@@ -688,13 +722,28 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public void finishInvoiceByFixer(int id,int status){
+    public void finishInvoiceByFixer(int id,int status , int  confirm , String note){
         Invoice invoice = invoiceDAO.findInvoiceById(id);
-        if(status==3) {
+        if(status==1) {
+            invoice.setStatus(ConstantVariableCommon.STATUS_INVOICE_2);
+        }
+        if(status==2) {
+            invoice.setStatus(ConstantVariableCommon.STATUS_INVOICE_3);
+        }
+        //duyệt phiếu
+        if(status==3 && confirm == 1) {
             invoice.setStatus(ConstantVariableCommon.STATUS_INVOICE_3);
             User user = userDAO.findUserById(invoice.getFixerId());
             user.setStatus(ConstantVariableCommon.STATUS_USER_3);
             userRepository.save(user);
+        }
+        // xác nhận sửa
+        if(status==3 && confirm == 2) {
+       invoice.setConfirm(2);
+        }
+        // yêu cầu cập nhật
+        if(status==3 && confirm == 3) {
+            invoice.setConfirm(3);
         }
         if(status==4) {
             invoice.setStatus(ConstantVariableCommon.STATUS_INVOICE_4);
@@ -708,7 +757,12 @@ public class InvoiceServiceImpl implements InvoiceService {
         if(status==5) {
             invoice.setStatus(ConstantVariableCommon.STATUS_INVOICE_5);
         }
-
+        //yêu cầu hủy phiếu
+        if(status==6) {
+            invoice.setStatus(ConstantVariableCommon.STATUS_INVOICE_6);
+            invoice.setConfirm(1);
+            invoice.setNote(note);
+        }
         saveInvoiceRepo(invoice);
     }
     //Hàm tìm invoice bằng id

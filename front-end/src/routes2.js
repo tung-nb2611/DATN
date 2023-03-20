@@ -18,62 +18,12 @@ import Area from "components/Area/Area";
 import Invoices1 from "components/Invoices/Invoices1";
 import FixerInvoice from "components/Invoices/FixerInvoice";
 
-const dashboardRoutes = [
-  // {
-  //   path: "/dashboard",
-  //   name: "Tổng Quan",
-  //   icon: Dashboard,
-  //   component: DashboardPage,
-  //   layout: "/admin",
-  // },
-  {
-    path: "/employees",
-    name: "Nhân viên",
-    icon: PeopleOutline,
-    component: Employees,
-    layout: "/admin",
-  },
-
-  {
-    path: "/materials",
-    name: "Kho hàng",
-    icon: People,
-    component: Material,
-    layout: "/admin",
-  },
-  {
-    path: "/services",
-    name: "Dịch vụ",
-    icon: Build,
-    component: Services,
-    layout: "/admin",
-  },
-  {
-    path: "/Area",
-    name: "Khu vực",
-    icon: BusinessCenter,
-    component: Area,
-    layout: "/admin",
-  },
-  {
-    path: "/invoices",
-    name: "Phiếu sửa chữa",
-    icon: "content_paste",
-    component: Invoices,
-    layout: "/admin",
-  },
+const dashboardRoutes2 = [
   {
     path: "/invoices-customer",
     name: "Phiếu chờ sửa",
     icon: "content_paste",
     component: Invoices1,
-    layout: "/admin",
-  },
-  {
-    path: "/statistics",
-    name: "Thống kê",
-    icon: Equalizer,
-    component: Statistics,
     layout: "/admin",
   },
   {
@@ -85,4 +35,4 @@ const dashboardRoutes = [
   },
 ];
 
-export default dashboardRoutes;
+export default dashboardRoutes2;

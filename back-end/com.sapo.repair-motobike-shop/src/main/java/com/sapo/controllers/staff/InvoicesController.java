@@ -44,6 +44,19 @@ public class InvoicesController {
         InvoiceListPaginationResponseDTO invoiceDTO = invoiceService.findAllInvoiceByStatus( store_id, page, limit, keyword, status, sort);
         return ResponseEntity.ok(invoiceDTO);
     }
+    //API lấy list hóa đơn đang xử lý và chờ xử lý
+    @GetMapping("/list/fixer")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR') or hasRole('FIXER')")
+    public InvoiceResponse Invoicefixer(HttpServletRequest request){
+        val store_id = getstoreId(request);
+        String tokenBearer = request.getHeader("Authorization");
+        String[] splits = tokenBearer.split(" ");
+        String username = jwtProvider.getUserNameFromJwtToken(splits[1]);
+        User user = userService.findUserByUsername(username);
+        InvoiceResponse invoice = invoiceService.findInvoiceByfixer( user.getId(),user.getName());
+        return invoice;
+    }
+
 
     //API tạo hóa đơn mới
     @PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR')")
@@ -70,7 +83,13 @@ public class InvoicesController {
         invoiceService.editInvoice(id,invoiceEditRequestDTO);
         return ResponseEntity.ok().build();
     }
-
+    //API sửa hóa đơn
+    @PutMapping("/fixer/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR') or hasRole('FIXER')")
+    public ResponseEntity<Void> getInvoiceId(@PathVariable("id") int id,@RequestBody InvoiceEditRequestDTO invoiceEditRequestDTO){
+        invoiceService.editInvoice1(id,invoiceEditRequestDTO);
+        return ResponseEntity.ok().build();
+    }
     //API sửa trạng thái của material-order và service-order
     @PutMapping("/status/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR')")
@@ -110,11 +129,12 @@ public class InvoicesController {
         invoiceService.receiptInvoiceByFixer(id);
         return ResponseEntity.ok().build();
     }
-    @PreAuthorize("hasRole('ADMIN') or hasRole('FIXER')" )
     //API chuyển trạng thái phiếu và nhân viên
+    @PreAuthorize("hasRole('ADMIN') or hasRole('FIXER')" )
     @PutMapping("/status-finishing/{id}")
-    public ResponseEntity<Void> changerstatus(@PathVariable("id") int id,@RequestParam  int status){
-        invoiceService.finishInvoiceByFixer(id, status);
+    public ResponseEntity<Void> changerstatus(@PathVariable("id") int id,@RequestParam  int status, @RequestParam int  confirm, @RequestParam String note)
+    {
+        invoiceService.finishInvoiceByFixer(id, status,confirm,note);
         return ResponseEntity.ok().build();
     }
 

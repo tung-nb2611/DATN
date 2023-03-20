@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("/api/materials")
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
-@PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR') or hasRole('COORDINATOR')" )
+@PreAuthorize("hasRole('ADMIN') or hasRole('FIXER') or hasRole('COORDINATOR') or hasRole('SUPER_ADMIN')")
 public class MaterialController {
     private final MaterialService materialService;
     private final UserService userService;

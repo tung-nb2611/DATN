@@ -10,6 +10,7 @@ import EmployeesService from "services/employees";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   ArrowDropDown,
+  Create,
   Delete,
   DeleteForever,
   EditAttributesTwoTone,
@@ -19,7 +20,7 @@ import Snackbars from "components/Snackbar/Snackbar.js";
 import Edit from "@material-ui/icons/Edit";
 import EmployeeFilters from "components/FiltersForm/EmployeeFilters";
 import RoleFilters from "components/FiltersForm/RoleFilters";
-import StoreService from "services/StoreService";
+import StoreService from "../../services/StoreService";
 import {
   Box,
   Checkbox,
@@ -282,6 +283,37 @@ export default function (props) {
       setId(id);
     }
   };
+  //Xóa nhân viên
+  const deleteAStore = (id) => {
+    StoreService.deleteStore(id)
+      .then(() => {
+        setMessageSuccess("Xóa thành công!");
+        setTl(true);
+        // use this to make the notification autoclose
+        setTimeout(function () {
+          setTl(false);
+        }, 3000);
+        window.location.reload();
+      })
+      .catch(function (error) {
+        console.log(error.response);
+        if (error.response.data.errors) {
+          setMessageError(error.response.data.errors[0].defaultMessage);
+          setFail(true);
+          // use this to make the notification autoclose
+          setTimeout(function () {
+            setFail(false);
+          }, 3000);
+        } else {
+          setMessageError(error.response.data.message);
+          setFail(true);
+          // use this to make the notification autoclose
+          setTimeout(function () {
+            setFail(false);
+          }, 3000);
+        }
+      });
+  };
   const TableHeaderCell = withStyles(() => ({
     root: {
       fontSize: "14px",
@@ -323,6 +355,7 @@ export default function (props) {
           }}
           variant="outlined"
           startIcon={<Add />}
+          onClick={addStore}
         >
           Thêm cửa hàng
         </Button>
@@ -371,7 +404,15 @@ export default function (props) {
                         <TableCell align="center">{row.address}</TableCell>
 
                         <TableCell align="left">
-                          <Clear size="small" />
+                          <Create
+                            size="small"
+                            onClick={() => updateStore(row.id)}
+                          ></Create>
+                          <Clear
+                            style={{ marginLeft: "10px" }}
+                            size="small"
+                            onClick={() => deleteAStore(row.id)}
+                          />
                         </TableCell>
                       </TableRow>
                     );

@@ -70,6 +70,11 @@ import EmployeeService from "services/EmployeeService.js";
 import dashboardRoutes1 from "routes1.js";
 import StatisticsAdmin from "views/StaticAdmin/StatisticsAdmin.js";
 import Login1 from "components/Login/login1.js";
+import AddInvoices from "components/Invoices/AddInvocies.js";
+import Invoices1 from "components/Invoices/Invoices1.js";
+import EditInvoice1 from "components/Invoices/EditInvoice1.js";
+import FixerInvoice from "components/Invoices/FixerInvoice.js";
+import dashboardRoutes2 from "routes2.js";
 
 let ps;
 
@@ -144,14 +149,17 @@ const switchRoutes = (
       component={ViewReceipt}
     />
     <Route exact path="/admin/invoices/add-invoice" component={AddInvoice} />
+    <Route exact path="/admin/invoices-customer" component={Invoices1} />
     <Route exact path="/admin/invoices/payment" component={Payment} />
     <Route exact path="/admin/reports" component={StatisticsAdmin} />
     {/* roles */}
     <Route exact path="/admin/roles" component={Roles} />
     <Route exact path="/admin/roles/add-role" component={CreateRole} />
     {/* invoices */}
+    <Route exact path="/admin/invoices/fixer" component={FixerInvoice} />
     <Route exact path="/admin/invoices" component={Invoices} />
     <Route exact path="/admin/invoices/:id" component={Invoices} />
+    <Route exact path="/admin/create-invoices" component={AddInvoices} />
 
     {/* <Route exact path="/admin/invoices/add-invoice" component={AddInvoice} /> */}
     <Route
@@ -163,6 +171,11 @@ const switchRoutes = (
       exact
       path="/admin/invoices/edit-invoice/:id"
       component={EditInvoice}
+    />
+    <Route
+      exact
+      path="/admin/invoices/edit-invoice1/:id"
+      component={EditInvoice1}
     />
     <Route
       exact
@@ -278,7 +291,7 @@ export default function Admin({ ...rest }) {
             store: user.store,
           });
         });
-      } catch (error) { }
+      } catch (error) {}
     }
     fetchUser();
   }, []);
@@ -315,6 +328,16 @@ export default function Admin({ ...rest }) {
       {role.includes(4) ? (
         <Sidebar
           routes={dashboardRoutes1}
+          logo={logo}
+          image={image}
+          handleDrawerToggle={handleDrawerToggle}
+          open={mobileOpen}
+          color={color}
+          {...rest}
+        />
+      ) : role.includes(3) ? (
+        <Sidebar
+          routes={dashboardRoutes2}
           logo={logo}
           image={image}
           handleDrawerToggle={handleDrawerToggle}

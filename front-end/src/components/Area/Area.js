@@ -306,9 +306,7 @@ export default function (props) {
     props.history.push("/admin/employees/add-employee");
   };
   const addInvoice = () => {
-    props.history.push("/admin/invoices/add-invoice");
-
-
+    props.history.push("/admin/create-invoices");
   };
   useEffect(() => {
     async function fetchEmployeeList() {
@@ -429,8 +427,8 @@ export default function (props) {
       }, 3000);
     }
   };
-  const changeStatus = (id, status) => {
-    InvoicesService.finish(id, status)
+  const changeStatus = (id, status, confirm, note) => {
+    InvoicesService.finish(id, status, confirm, note)
       .then((res) => {
         setMessageSuccess("Thành công!");
         setTl(true);
@@ -501,7 +499,6 @@ export default function (props) {
   };
   const detailInvocie = (id) => {
     try {
-      console.log("oke", id);
       InvoicesService.getInvoiceById(id).then((res) => {
         let customer = {
           id: res.data.customerVehicleDTO.customerDTO.id,
@@ -516,7 +513,6 @@ export default function (props) {
         };
         let materials = res.data.materialOrderResponseDTOS;
         let services = res.data.serviceOrderResponseDTOS;
-        console.log("1111", res.data);
         setStatus(res.data.status);
         setCustomer(customer);
         setAreaChose(res.data.areaDTO);
@@ -563,10 +559,9 @@ export default function (props) {
     };
     InvoicesService.changeStatusInvoiceToCompletePayment(idInvoice, invoice)
       .then(() => {
-        setMessageSuccess("Thanh toán thành công!")
-        setTl(true)
+        setMessageSuccess("Thanh toán thành công!");
+        setTl(true);
         window.location.reload();
-        props.history.push("/admin/areas");
       })
       .catch(function (error) {
         if (error.response.data.errors) {
@@ -577,9 +572,9 @@ export default function (props) {
       });
   };
   const test2 = (id) => {
-    setAreaId(id)
-    setOpen1(true)
-  }
+    setAreaId(id);
+    setOpen1(true);
+  };
   const style = {
     position: "absolute",
     top: "50%",
@@ -590,10 +585,10 @@ export default function (props) {
     border: "1px solid rgb(167 165 165)",
     boxShadow: 24,
     p: 4,
-    borderRadius: "20px"
+    borderRadius: "20px",
   };
   const addArea = () => {
-    setAdd(true)
+    setAdd(true);
   };
   const changeName = (event) => {
     setName(event.target.value);
@@ -611,13 +606,21 @@ export default function (props) {
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
         >
-
           <Box sx={style}>
-            <Typography variant="h5">Xóa Khu vực này ra khỏi hệ thống</Typography>
-            <Box style={{ borderBottom: "1px solid #dfe4e8", borderTop: "1px solid #dfe4e8", height: "40px", padding: "10px" }}>
-              <Typography
-
-              >Bạn có chắc muồn xóa khu vực này ra khỏi hệ thống</Typography>
+            <Typography variant="h5">
+              Xóa Khu vực này ra khỏi hệ thống
+            </Typography>
+            <Box
+              style={{
+                borderBottom: "1px solid #dfe4e8",
+                borderTop: "1px solid #dfe4e8",
+                height: "40px",
+                padding: "10px",
+              }}
+            >
+              <Typography>
+                Bạn có chắc muồn xóa khu vực này ra khỏi hệ thống
+              </Typography>
             </Box>
             <Button
               style={{
@@ -626,9 +629,12 @@ export default function (props) {
                 height: "40px",
                 marginBottom: "10px",
                 marginTop: "15px",
-                border: "1px solid #c4cdd5"
-
-              }} onClick={handleClose2}>Hủy</Button>
+                border: "1px solid #c4cdd5",
+              }}
+              onClick={handleClose2}
+            >
+              Hủy
+            </Button>
             <Button
               style={{
                 background: "linear-gradient(180deg,#ff4d4d,#ff4d4d)",
@@ -636,12 +642,13 @@ export default function (props) {
                 height: "40px",
                 marginBottom: "10px",
                 marginTop: "15px",
-                marginLeft: "12px"
-
-              }} onClick={() => deleteArea()}>Xác nhận xóa</Button>
-
+                marginLeft: "12px",
+              }}
+              onClick={() => deleteArea()}
+            >
+              Xác nhận xóa
+            </Button>
           </Box>
-
         </Modal>
         <Modal
           open={add}
@@ -649,7 +656,7 @@ export default function (props) {
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
         >
-          {add ?
+          {add ? (
             <Box sx={style}>
               <Typography>Thêm cửa hàng</Typography>
               <TextField
@@ -670,11 +677,15 @@ export default function (props) {
                   height: "40px",
                   marginBottom: "10px",
                   marginTop: "15px",
-
-                }} onClick={saveStore}>Tạo mới</Button>
-
+                }}
+                onClick={saveStore}
+              >
+                Tạo mới
+              </Button>
             </Box>
-            : ""}
+          ) : (
+            ""
+          )}
         </Modal>
         <Snackbars
           place="tc"
@@ -716,7 +727,6 @@ export default function (props) {
               />
             </div>
           </div>
-
 
           <Grid container spacing={2}>
             <Grid item xs={4}>
@@ -766,7 +776,7 @@ export default function (props) {
                         style={{
                           float: "right",
                           fontSize: "14px",
-                          marginTop: "-59px"
+                          marginTop: "-59px",
                         }}
                         size="small"
                         onClick={() => test2(area.id)}
@@ -778,25 +788,64 @@ export default function (props) {
                         <Typography variant="body1" color="text.secondary">
                           {area.status && area.status === 1 ? (
                             <Typography variant="body1" color="text.secondary">
-                              Trạng thái: <span>Đang trống</span>
+                              Trạng thái:{" "}
+                              <span
+                                style={{
+                                  color: "rgb(255 255 255)",
+                                  background: "rgb(102, 184, 255)",
+                                  borderRadius: "20px",
+                                  width: "fit-content",
+                                  margin: "auto",
+                                  color: "rgb(255, 255, 255)",
+                                  padding: "2px 10px",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                Đang trống
+                              </span>
                             </Typography>
                           ) : (
                             <div>
-                              <Typography variant="body1" color="text.secondary">
+                              <Typography
+                                variant="body1"
+                                color="text.secondary"
+                              >
                                 Trạng thái:{" "}
-                                <span style={{ color: "red" }}>Đang sửa xe</span>
+                                {area.invoice.status.localeCompare(
+                                  "Đang sửa"
+                                ) == 0 && area.invoice.confirm === 4 ? (
+                                  <span style={{ color: "#fd7e14" }}>
+                                    Chờ thanh toán
+                                  </span>
+                                ) : (
+                                  <span style={{ color: "red" }}>
+                                    Đang sửa xe
+                                  </span>
+                                )}
                               </Typography>
-                              <Typography variant="body1" color="text.secondary">
+                              <Typography
+                                variant="body1"
+                                color="text.secondary"
+                              >
                                 Tên khách: <span>{area.invoice.name}</span>
                               </Typography>
-                              <Typography variant="body1" color="text.secondary">
+                              <Typography
+                                variant="body1"
+                                color="text.secondary"
+                              >
                                 Biển số xe:{" "}
                                 <span>{area.invoice.licensePlate}</span>
                               </Typography>
-                              <Typography variant="body1" color="text.secondary">
+                              <Typography
+                                variant="body1"
+                                color="text.secondary"
+                              >
                                 Mã hóa đơn: <span>{area.invoice.code}</span>
                               </Typography>
-                              <Typography variant="body1" color="text.secondary">
+                              <Typography
+                                variant="body1"
+                                color="text.secondary"
+                              >
                                 Nhân viên sửa:{" "}
                                 <span>{area.invoice.fixerName}</span>
                               </Typography>
@@ -825,26 +874,29 @@ export default function (props) {
                                 height: "40px",
                                 marginBottom: "10px",
                                 marginTop: "15px",
-
                               }}
                               onClick={() => okModal(area.invoice.id)}
                             >
                               Thanh toán
                             </Button>
-                            <Button
-                              size="small"
-                              style={{
-                                background: "rgb(244, 148, 35)",
-                                color: "white",
-                                height: "40px",
-                                marginBottom: "10px",
-                                marginTop: "15px",
-
-                              }}
-                              onClick={() => editInvoice(area.invoice.id)}
-                            >
-                              Sửa hóa đơn
-                            </Button>
+                            {area.invoice.status.localeCompare("Đang sửa") ==
+                              0 && area.invoice.confirm === 4 ? (
+                              ""
+                            ) : (
+                              <Button
+                                size="small"
+                                style={{
+                                  background: "rgb(244, 148, 35)",
+                                  color: "white",
+                                  height: "40px",
+                                  marginBottom: "10px",
+                                  marginTop: "15px",
+                                }}
+                                onClick={() => editInvoice(area.invoice.id)}
+                              >
+                                Sửa hóa đơn
+                              </Button>
+                            )}
                           </CardActions>
                         </div>
                       )}
@@ -862,23 +914,36 @@ export default function (props) {
                             variant="h4"
                             component="h2"
                             style={{
-                              textAlign: "center", borderBottom: "1px dashed rgb(166, 170, 174)"
+                              textAlign: "center",
+                              borderBottom: "1px dashed rgb(166, 170, 174)",
                             }}
                           >
                             Hóa đơn {idInvoice}
                           </Typography>
-                          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                          <Typography
+                            id="modal-modal-description"
+                            sx={{ mt: 2 }}
+                          >
                             Tên khách hàng:{customer.name}
                           </Typography>
-                          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                          <Typography
+                            id="modal-modal-description"
+                            sx={{ mt: 2 }}
+                          >
                             Số điện thoại:{customer.phone}
                           </Typography>
-                          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                          <Typography
+                            id="modal-modal-description"
+                            sx={{ mt: 2 }}
+                          >
                             Biển số xe:{vehicle.licensePlate}
                           </Typography>
-                          <Box style={{
-                            display: "flex", borderTop: "1px dashed rgb(166, 170, 174)"
-                          }}>
+                          <Box
+                            style={{
+                              display: "flex",
+                              borderTop: "1px dashed rgb(166, 170, 174)",
+                            }}
+                          >
                             <Typography
                               id="modal-modal-description"
                               style={{ fontSize: "15px", fontWeight: "600" }}
@@ -888,17 +953,20 @@ export default function (props) {
                             </Typography>
                             <Typography
                               id="modal-modal-description"
-                              style={{ fontSize: "15px", fontWeight: "600", marginLeft: "225px" }}
+                              style={{
+                                fontSize: "15px",
+                                fontWeight: "600",
+                                marginLeft: "225px",
+                              }}
                               sx={{ mt: 2 }}
-
                             >
                               số lượng
                             </Typography>
                           </Box>
 
-                          <Box >
+                          <Box>
                             {materialChoose.map((x) => (
-                              <Typography >
+                              <Typography>
                                 <Typography
                                   id="modal-modal-description"
                                   sx={{ mt: 2 }}
@@ -908,34 +976,45 @@ export default function (props) {
                                 <Typography
                                   id="modal-modal-description"
                                   sx={{ mt: 2 }}
-                                  style={{ marginLeft: "328px", marginTop: "-18px" }}
+                                  style={{
+                                    marginLeft: "328px",
+                                    marginTop: "-18px",
+                                  }}
                                 >
                                   {x.quantityBuy}
                                 </Typography>
                               </Typography>
                             ))}
                           </Box>
-                          <Box >
+                          <Box>
                             {serviceChoose.map((x) => (
-                              <div >
+                              <div>
                                 <Typography
                                   id="modal-modal-description"
                                   sx={{ mt: 2 }}
-
                                 >
                                   {x.name}
                                 </Typography>
                                 <Typography
                                   id="modal-modal-description"
                                   sx={{ mt: 2 }}
-                                  style={{ marginLeft: "328px", marginTop: "-18px" }}
+                                  style={{
+                                    marginLeft: "328px",
+                                    marginTop: "-18px",
+                                  }}
                                 >
                                   1
                                 </Typography>
                               </div>
                             ))}
                           </Box>
-                          <Box style={{ display: "flex", fontSize: "15px", fontWeight: "600" }}>
+                          <Box
+                            style={{
+                              display: "flex",
+                              fontSize: "15px",
+                              fontWeight: "600",
+                            }}
+                          >
                             <Typography
                               id="modal-modal-description"
                               style={{ fontSize: "15px", fontWeight: "600" }}
@@ -945,17 +1024,19 @@ export default function (props) {
                             </Typography>
                             <Typography
                               id="modal-modal-description"
-                              style={{ fontSize: "15px", fontWeight: "600", marginLeft: "240px" }}
+                              style={{
+                                fontSize: "15px",
+                                fontWeight: "600",
+                                marginLeft: "240px",
+                              }}
                               sx={{ mt: 2 }}
-
                             >
                               {sumMaterial + sumServices}đ
                             </Typography>
                           </Box>
                           <Box
                             style={{
-                              borderTop: "1px dashed rgb(166, 170, 174)"
-
+                              borderTop: "1px dashed rgb(166, 170, 174)",
                             }}
                           >
                             <Button
@@ -965,33 +1046,41 @@ export default function (props) {
                                 height: "40px",
                                 marginBottom: "10px",
                                 marginTop: "15px",
-
-                              }} onClick={payment}>Thanh toán</Button>
+                              }}
+                              onClick={payment}
+                            >
+                              Thanh toán
+                            </Button>
                             <Button
                               style={{
-                                background: "linear-gradient(180deg,#0fd186,#0fd186)",
+                                background:
+                                  "linear-gradient(180deg,#0fd186,#0fd186)",
                                 color: "white",
                                 height: "40px",
                                 marginBottom: "10px",
                                 marginTop: "15px",
-                                marginLeft: "12px"
-
+                                marginLeft: "12px",
                               }}
-                              onClick={() => changeStatus(idInvoice, 4)}>
+                              onClick={() => changeStatus(idInvoice, 4, 2, "")}
+                            >
                               Lưu đơn
                             </Button>
                             <Button
                               style={{
-                                background: "linear-gradient(180deg,#fff,#f9fafb)",
+                                background:
+                                  "linear-gradient(180deg,#fff,#f9fafb)",
                                 color: "#182537",
                                 height: "40px",
                                 marginBottom: "10px",
                                 marginTop: "15px",
                                 border: "1px solid #c4cdd5",
-                                marginLeft: "12px"
+                                marginLeft: "12px",
                               }}
                               onClick={handleClose}
-                              autoFocus>Hủy</Button>
+                              autoFocus
+                            >
+                              Hủy
+                            </Button>
                           </Box>
                         </Box>
                       ) : (

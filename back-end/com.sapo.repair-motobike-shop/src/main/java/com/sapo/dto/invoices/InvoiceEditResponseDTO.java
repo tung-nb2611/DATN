@@ -17,8 +17,9 @@ public class InvoiceEditResponseDTO {
     private String status;
     private  int code;
     private AreaResponeById areaDTO;
+    private  int confirm;
 
-    public InvoiceEditResponseDTO(AreaResponeById areaDTO,int code,int id, String note, int payMethod, BigDecimal total, List<MaterialOrderResponseDTO> materialOrderResponseDTOS, List<ServiceOrderResponseDTO> serviceOrderResponseDTOS, InvoiceCustomerVehicleDTO customerVehicleDTO, InvoiceUserResponseDTO userDTO, String status) {
+    public InvoiceEditResponseDTO(AreaResponeById areaDTO,int code,int id, String note, int payMethod, BigDecimal total, List<MaterialOrderResponseDTO> materialOrderResponseDTOS, List<ServiceOrderResponseDTO> serviceOrderResponseDTOS, InvoiceCustomerVehicleDTO customerVehicleDTO, InvoiceUserResponseDTO userDTO, String status,int confirm) {
         this.areaDTO=areaDTO;
         this.code=code;
         this.id = id;
@@ -30,6 +31,15 @@ public class InvoiceEditResponseDTO {
         this.customerVehicleDTO = customerVehicleDTO;
         this.userDTO = userDTO;
         this.status = status;
+        this.confirm=confirm;
+    }
+
+    public int getConfirm() {
+        return confirm;
+    }
+
+    public void setConfirm(int confirm) {
+        this.confirm = confirm;
     }
 
     public int getCode() {

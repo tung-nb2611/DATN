@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/admin/areas")
-@PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('FIXER') or hasRole('COORDINATOR') or hasRole('SUPER_ADMIN')")
 public class AdminAreasController {
 
     private final AreaService areaService;
@@ -39,7 +39,7 @@ public class AdminAreasController {
 
         return user.getStore().getId();
     }
-    // tim tat ca cac khu vực va phan trang
+
     @GetMapping("/list")
     public ResponseEntity<AreasResponse> searchArea( @RequestParam List<Integer> status ,HttpServletRequest request ){
         val store_id = getstoreId(request);

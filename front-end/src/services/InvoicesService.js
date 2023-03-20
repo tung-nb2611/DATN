@@ -34,6 +34,9 @@ const getInvoiceConfirmById = (id) => {
 const putInvoice = (id, invoice) => {
   return axios.put(INVOICES_API_URL_2 + "/" + `${id}`, invoice);
 };
+const putInvoice1 = (id, invoice) => {
+  return axios.put(INVOICES_API_URL_2 + "/fixer/" + `${id}`, invoice);
+};
 const changeStatusInvoice = (id, agreement) => {
   return axios.put(INVOICES_API_URL_2 + "/status/" + `${id}`, agreement);
 };
@@ -62,8 +65,8 @@ const getInvoiceCanDelete = (filters) => {
   );
 };
 
-const deleteInvoice = (id) => {
-  return axios.put(INVOICES_API_URL_1 + "/delete/" + `${id}`);
+const deleteInvoice = (id, note) => {
+  return axios.put(INVOICES_API_URL_1 + "/delete/" + `${id}?note=${note}`);
 };
 
 const receiptInvoiceByFixer = (id, userId) => {
@@ -75,10 +78,14 @@ const confirm = (id) => {
 const getListInvoiceOfStaff = () => {
   return axios.get(INVOICES_API_URL_2 + "/list/status");
 };
-const finish = (id, status) => {
+const finish = (id, status, confirm, note) => {
   return axios.put(
-    INVOICES_API_URL_2 + `/status-finishing/${id}?status=${status}`
+    INVOICES_API_URL_2 +
+      `/status-finishing/${id}?status=${status}&confirm=${confirm}&note=${note}`
   );
+};
+const fixer = () => {
+  return axios.get(INVOICES_API_URL_2 + `/list/fixer`);
 };
 
 const checkMaterial = (checkQuantity) => {
@@ -94,6 +101,7 @@ export default {
   postInvoice,
   getInvoiceById,
   putInvoice,
+  putInvoice1,
   changeStatusInvoice,
   listInvoiceNoFixer,
   getInvoiceInProcess,
@@ -108,4 +116,5 @@ export default {
   checkMaterial,
   postInvoiceMaterial,
   getInvoiceBuyMaterial,
+  fixer,
 };

@@ -71,12 +71,13 @@ import {
   Watch,
 } from "@material-ui/icons";
 import Edit from "@material-ui/icons/Edit";
-import InvoicesService from "../../services/InvoicesService";
-import InvoiceFilterStatus from "../../components/FiltersForm/InvoiceFilterStatus";
+import InvoicesService from "services/InvoicesService";
+import InvoiceFilterStatus from "../FiltersForm/InvoiceFilterStatus";
 import { TabContent, TabPane } from "reactstrap";
 import cardIconStyle from "assets/jss/material-dashboard-react/components/cardIconStyle";
 import cancelSmallMinor from "../../common/cancelSmallMinor.svg";
 import UISelect from "common/UISelect";
+import { Link } from "react-router-dom";
 const styles = {
   cardCategoryWhite: {
     "&,& a,& a:hover,& a:focus": {
@@ -109,7 +110,7 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export default function Invoices(props) {
+export default function Invoices1(props) {
   const classes = useStyles();
 
   React.useEffect(() => {
@@ -124,7 +125,6 @@ export default function Invoices(props) {
   });
   const [open, setOpen] = useState(false);
   const [open1, setOpen1] = useState(false);
-  const [open2, setOpen2] = useState(false);
   const [tl, setTl] = React.useState(false);
   const [fail, setFail] = React.useState(false);
   const [messageSuccess, setMessageSuccess] = useState("");
@@ -145,9 +145,8 @@ export default function Invoices(props) {
   const [status, setStatus] = useState();
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen1(false);
-  const handleClose1 = () => setOpen2(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [value, setValue] = React.useState("");
+  const [value, setValue] = React.useState("1");
   const [idInvoice, setIdInvoice] = useState(0);
   const [serviceChoose, setServiceChoose] = useState([]);
   const showButtonOther = () => {
@@ -166,7 +165,7 @@ export default function Invoices(props) {
     page: 1,
     limit: 10,
     keyword: "",
-    status: [2, 3, 4, 5, 7],
+    status: [1],
     sort: 0,
   });
   const [filters1, setFilters1] = useState({
@@ -288,7 +287,6 @@ export default function Invoices(props) {
                   status: invoice.status,
                   materials: invoice.materialOrderResponseDTOS,
                   service: invoice.serviceOrderResponseDTOS,
-                  confirm: invoice.confirm,
                 };
               })
             );
@@ -307,21 +305,21 @@ export default function Invoices(props) {
         setError(error);
       }
     }
+    debugger;
     fetchInvoicesList();
   }, [filters]);
   const changeare = (e) => {
+    debugger;
     const value = e.target.value;
     setStatus(value);
-  };
-  const oke = () => {
     setFilters({
       ...filters,
       page: 1,
-      status: [status],
+      status: [value],
     });
   };
   const editInvoice = (id) => {
-    props.history.push(`/admin/invoices/edit-invoice/${id}`);
+    props.history.push(`/admin/invoices/edit-invoice1/${id}`);
   };
   const viewInvoice = () => {
     setOpen(true);
@@ -384,7 +382,7 @@ export default function Invoices(props) {
         }
       });
   };
-  const colorStatusInvoice = (status, confirm) => {
+  const colorStatusInvoice = (status) => {
     if (status.localeCompare("Đang chờ thợ") == 0) {
       return (
         <span
@@ -402,7 +400,7 @@ export default function Invoices(props) {
           {status}
         </span>
       );
-    } else if (status.localeCompare("Đã thanh toán") == 0) {
+    } else if (status.localeCompare("Chờ xử lý") == 0) {
       return (
         <span
           style={{
@@ -419,32 +417,10 @@ export default function Invoices(props) {
           {status}
         </span>
       );
-    } else if (status.localeCompare("Đã hủy") == 0) {
-      return (
-        <span
-          style={{
-            color: "rgb(238, 71, 71)",
-            background: "rgb(255, 219, 219)",
-            borderRadius: "20px",
-            width: "fit-content",
-            margin: "auto",
-            padding: "2px 10px",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {status}
-        </span>
-      );
     } else if (status.localeCompare("Chờ thanh toán") == 0) {
       return <span style={{ color: "#3c91f1" }}>{status}</span>;
-    } else if (status.localeCompare("Đang sửa") == 0 && confirm === 3) {
-      return <span style={{ color: "rgb(41, 164, 182)" }}>Cập nhật đơn</span>;
-    } else if (status.localeCompare("Đang sửa") == 0 && confirm === 2) {
-      return <span style={{ color: "red" }}>Đang sửa</span>;
-    } else if (status.localeCompare("Đang sửa") == 0 && confirm === 4) {
-      return <span style={{ color: "#0fd186" }}>Hoàn thành sửa</span>;
-    } else if (status.localeCompare("Đang xét duyệt") == 0) {
-      return <span style={{ color: "rgb(118, 64, 239" }}>Đang xét duyệt</span>;
+    } else if (status.localeCompare("Đang sửa") == 0) {
+      return <span style={{ color: "red" }}>{status}</span>;
     }
   };
   const handleChangeTab = (event, newValue) => {
@@ -452,31 +428,7 @@ export default function Invoices(props) {
   };
 
   const changeStatus = (status) => {
-    InvoicesService.finish(id, status, 1, "")
-      .then((res) => {
-        setMessageSuccess("Thành công!");
-        setTl(true);
-      })
-      .catch(function (error) {
-        if (error.response.data.errors) {
-          setMessageError(error.response.data.errors[0].defaultMessage);
-          setFail(true);
-          // use this to make the notification autoclose
-          setTimeout(function () {
-            setFail(false);
-          }, 3000);
-        } else {
-          setMessageError(error.response.data.message);
-          setFail(true);
-          // use this to make the notification autoclose
-          setTimeout(function () {
-            setFail(false);
-          }, 3000);
-        }
-      });
-  };
-  const changeStatus1 = (id, status, confirm, note) => {
-    InvoicesService.finish(id, status, confirm, note)
+    InvoicesService.finish(id, status, 2, "")
       .then((res) => {
         setMessageSuccess("Thành công!");
         setTl(true);
@@ -504,183 +456,19 @@ export default function Invoices(props) {
     setId(id);
     setOpen1(true);
   };
-  const test4 = (id) => {
-    setId(id);
-    setOpen2(true);
-  };
-
-  const changeArea = () => {
-    props.history.push("/admin/area");
-  };
-  console.log("okeeee", status);
   function Row(props) {
     const { row } = props;
     const [open, setOpen] = useState(false);
-    console.log("2222", row);
     return (
       <React.Fragment>
         <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
-          <TableCell>
-            <IconButton
-              aria-label="expand row"
-              size="small"
-              onClick={() => setOpen(!open)}
-            >
-              {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-            </IconButton>
-          </TableCell>
           <TableCell component="th" scope="row">
-            {row.code}
+            <Link onClick={() => editInvoice(row.id)}> {row.code}</Link>
           </TableCell>
           <TableCell align="center">{row.licensePlate}</TableCell>
-          <TableCell align="center">{row.fixerName}</TableCell>
           <TableCell align="center">
             {" "}
-            {colorStatusInvoice(row.status, row.confirm)}
-          </TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-            <Collapse in={open} timeout="auto" unmountOnExit>
-              <Box sx={{ margin: 1 }}>
-                <Typography variant="h6" gutterBottom component="div">
-                  Chi tiết hóa đơn
-                </Typography>
-                {row.materials ? (
-                  <Table size="small" aria-label="purchases">
-                    <Typography
-                      variant="h6"
-                      gutterBottom
-                      component="div"
-                    ></Typography>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell1 style={{}}>Tên linh kiện</TableCell1>
-                        <TableCell1 align="center">Số lượng mua </TableCell1>
-                        <TableCell1 align="center">Giá Thành</TableCell1>
-                        <TableCell1 align="right">tổng tiền(đ)</TableCell1>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {row.materials.map((historyRow) => (
-                        <TableRow key={historyRow.id}>
-                          <TableCell component="th" scope="row">
-                            {historyRow.name}
-                          </TableCell>
-                          <TableCell align="center">
-                            {historyRow.quantityBuy}
-                          </TableCell>
-                          <TableCell align="center">
-                            {historyRow.outputPrice}
-                          </TableCell>
-                          <TableCell align="right">
-                            {historyRow.outputPrice * historyRow.quantityBuy}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
-                  ""
-                )}
-                {row.service ? (
-                  <Table size="small" aria-label="purchases">
-                    <Typography
-                      variant="h6"
-                      gutterBottom
-                      component="div"
-                    ></Typography>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell1>Tên dịch vụ</TableCell1>
-                        <TableCell1 align="center">Số lượng</TableCell1>
-                        <TableCell1 align="center">Giá Thành</TableCell1>
-                        <TableCell1 align="right">tổng tiền(đ)</TableCell1>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {row.service.map((historyRow) => (
-                        <TableRow key={historyRow.id}>
-                          <TableCell component="th" scope="row">
-                            {historyRow.name}
-                          </TableCell>
-                          <TableCell align="center">1</TableCell>
-                          <TableCell align="center">
-                            {historyRow.price}
-                          </TableCell>
-                          <TableCell align="right">
-                            {historyRow.price}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                    <TableRow>
-                      <TableCell>ghi chú</TableCell>
-                      <TableCell>{row.note}</TableCell>
-                    </TableRow>
-                  </Table>
-                ) : (
-                  ""
-                )}
-                {row.status.localeCompare("Chờ thanh toán") == 0 ? (
-                  <Button
-                    style={{
-                      background: "#218FFE",
-                      color: "white",
-                      height: "20px",
-                      marginBottom: "10px",
-                      marginTop: "15px",
-                    }}
-                    onClick={() => test3(row.id)}
-                  >
-                    Thanh toán
-                  </Button>
-                ) : row.status.localeCompare("Đang xét duyệt") == 0 ? (
-                  <Button
-                    style={{
-                      background: "#218FFE",
-                      color: "white",
-                      height: "20px",
-                      marginBottom: "10px",
-                      marginTop: "15px",
-                    }}
-                    onClick={() => editInvoice(row.id)}
-                  >
-                    xác nhận phiếu
-                  </Button>
-                ) : row.status.localeCompare("Đang sửa") == 0 &&
-                  row.confirm === 3 ? (
-                  <Button
-                    style={{
-                      background: "#218FFE",
-                      color: "white",
-                      height: "20px",
-                      marginBottom: "10px",
-                      marginTop: "15px",
-                    }}
-                    onClick={() => changeStatus1(row.id, 3, 2, "")}
-                  >
-                    Xác nhận cập nhật
-                  </Button>
-                ) : row.status.localeCompare("Đang sửa") == 0 &&
-                  row.confirm === 4 ? (
-                  <Button
-                    style={{
-                      background: "#218FFE",
-                      color: "white",
-                      height: "20px",
-                      marginBottom: "10px",
-                      marginTop: "15px",
-                    }}
-                    onClick={() => changeArea()}
-                  >
-                    Xác nhận Thanh toán
-                  </Button>
-                ) : (
-                  ""
-                )}
-              </Box>
-            </Collapse>
+            {colorStatusInvoice(row.status)}
           </TableCell>
         </TableRow>
       </React.Fragment>
@@ -753,69 +541,9 @@ export default function Invoices(props) {
             </Button>
           </Box>
         </Modal>
-        <Modal
-          open={open2}
-          onClose={handleClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
-        >
-          <Box sx={style}>
-            <Typography variant="h5">Xác nhận phiếu sửa</Typography>
-            <Box
-              style={{
-                borderBottom: "1px solid #dfe4e8",
-                borderTop: "1px solid #dfe4e8",
-                height: "40px",
-                padding: "10px",
-              }}
-            >
-              <Typography>Bạn có chắc xác nhận phiếu sửa này không!</Typography>
-            </Box>
-            <Button
-              style={{
-                background: "linear-gradient(180deg,#fff,#f9fafb)",
-                color: "#182537",
-                height: "40px",
-                marginBottom: "10px",
-                marginTop: "15px",
-                border: "1px solid #c4cdd5",
-              }}
-              onClick={handleClose1}
-            >
-              Hủy
-            </Button>
-            <Button
-              style={{
-                background: "#218FFE",
-                color: "white",
-                height: "40px",
-                marginBottom: "10px",
-                marginTop: "15px",
-                marginLeft: "12px",
-              }}
-              onClick={() => changeStatus(3)}
-            >
-              Xác nhận sửa phiếu
-            </Button>
-          </Box>
-        </Modal>
 
         <div className="list-invoices">
           <Container>
-            <Button
-              style={{
-                background: "#218FFE",
-                color: "white",
-                height: "40px",
-                marginBottom: "10px",
-                marginTop: "-3px",
-                float: "right",
-                marginRight: "10px",
-              }}
-              variant="outlined"
-            >
-              Tạo phiếu
-            </Button>
             <TabContent value={value}>
               <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
                 <Typography
@@ -825,7 +553,7 @@ export default function Invoices(props) {
                     marginTop: "15px",
                   }}
                 >
-                  Hóa đơn
+                  Phiếu chờ xác nhận
                 </Typography>
               </Box>
               <TabPane value="1">
@@ -833,57 +561,33 @@ export default function Invoices(props) {
                   <Paper sx={{ width: "100%", mb: 2, minHeight: "100px" }}>
                     <TableContainer>
                       <Box style={{}}>
-                        <Box>
-                          <FormControl
-                            style={{
-                              width: "50%",
-                              marginTop: "10px",
-                              marginLeft: "10px",
-                            }}
-                          >
-                            <InputLabel
-                              style={{
-                                fontSize: "15px",
-                                color: "black",
-                              }}
-                            >
-                              Chọn loại phiếu
-                            </InputLabel>
+                        {/* <FormControl
+                        style={{
+                          width: "70%",
+                          marginTop: "10px",
+                          marginLeft: "10px",
+                        }}
+                      >
+                        <InputLabel
+                          style={{
+                            fontSize: "15px",
+                            color: "black",
+                          }}
+                        >
+                          Chọn cửa hàng
+                        </InputLabel>
 
-                            <Select
-                              labelId="demo-simple-select-label"
-                              id="demo-simple-select"
-                              label="Age"
-                              onChange={changeare}
-                              value={status ? status : ""}
-                            >
-                              <MenuItem value={7}>Hóa Đơn chờ duyệt</MenuItem>
-                              <MenuItem value={3}>Hóa Đơn đang sửa</MenuItem>
-                              <MenuItem value={6}>Hóa Đơn hủy</MenuItem>
-                              <MenuItem value={4}>
-                                Hóa Đơn chờ thanh toán
-                              </MenuItem>
-                              <MenuItem value={5}>
-                                Hóa Đơn đã thanh toán
-                              </MenuItem>
-                            </Select>
-                          </FormControl>
-                          <Button
-                            style={{
-                              background:
-                                "linear-gradient(180deg,#fff,#f9fafb)",
-                              color: "#182537",
-                              height: "40px",
-                              marginBottom: "10px",
-                              marginTop: "20px",
-                              border: "1px solid #c4cdd5",
-                              marginLeft: "40px",
-                            }}
-                            onClick={oke}
-                          >
-                            Lọc phiếu
-                          </Button>
-                        </Box>
+                        <Select
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          label="Age"
+                          onChange={changeare}
+                          value={status ? status : ""}
+                        >
+                          <MenuItem value={2}>Hóa Đơn chờ sửa</MenuItem>
+                          <MenuItem value={3}>Hóa Đơn đang sửa</MenuItem>
+                        </Select>
+                      </FormControl> */}
                         <TextField
                           id="filled-search"
                           label="Tìm kiếm hóa đơn"
@@ -905,15 +609,11 @@ export default function Invoices(props) {
                       >
                         <TableHead variant="h6">
                           <TableRow>
-                            <TableHeaderCell></TableHeaderCell>
                             <TableHeaderCell variant="h6">
                               Tên hóa đơn
                             </TableHeaderCell>
                             <TableHeaderCell align="center">
                               Biển số xe
-                            </TableHeaderCell>
-                            <TableHeaderCell align="center">
-                              Tên thợ sửa
                             </TableHeaderCell>
                             <TableHeaderCell align="center">
                               Trạng thái

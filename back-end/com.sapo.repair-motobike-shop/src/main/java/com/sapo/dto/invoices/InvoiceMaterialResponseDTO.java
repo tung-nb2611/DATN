@@ -8,8 +8,9 @@ public class InvoiceMaterialResponseDTO {
     private String name;
     private String phone;
     private String status;
+    private int confirm;
 
-    public InvoiceMaterialResponseDTO(int id, String code, String licensePlate, String fixerName, String name, String phone, String status) {
+    public InvoiceMaterialResponseDTO(int id, String code, String licensePlate, String fixerName, String name, String phone, String status,int confirm) {
         this.id = id;
         this.code = code;
         this.licensePlate = licensePlate;
@@ -17,6 +18,7 @@ public class InvoiceMaterialResponseDTO {
         this.name = name;
         this.phone = phone;
         this.status = status;
+        this.confirm=confirm;
     }
 
     public String getLicensePlate() {
@@ -25,6 +27,14 @@ public class InvoiceMaterialResponseDTO {
 
     public void setLicensePlate(String licensePlate) {
         this.licensePlate = licensePlate;
+    }
+
+    public int getConfirm() {
+        return confirm;
+    }
+
+    public void setConfirm(int confirm) {
+        this.confirm = confirm;
     }
 
     public String getFixerName() {

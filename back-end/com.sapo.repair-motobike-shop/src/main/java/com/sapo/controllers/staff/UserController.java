@@ -40,7 +40,7 @@ public class UserController {
         userService.saveAvatar(id, avatar);
         return ResponseEntity.ok().build();
     }
-    @PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR') or hasRole('FIXER') or hasRole('SUPER_ADMIN')")
     //Hàm tìm list user đang rảnh
     @GetMapping("/ready")
     public ResponseEntity<List<User>> findAllUserReadyFix(@RequestParam String keyword,HttpServletRequest request){

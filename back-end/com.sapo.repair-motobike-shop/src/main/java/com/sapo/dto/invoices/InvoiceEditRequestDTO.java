@@ -15,10 +15,18 @@ public class InvoiceEditRequestDTO {
         private int payMethod;
         private List<MaterialOrderRequestDTO> materialDTOS;
         private List<ServiceOrderRequestDTO> serviceDTOS;
+private int confirm;
 
 
+    public int getConfirm() {
+        return confirm;
+    }
 
-    public InvoiceEditRequestDTO(String areaName, Integer areaId, Integer customerId, Integer vehicleId, Integer fixerId, String note, BigDecimal total, int payMethod, List<MaterialOrderRequestDTO> materialDTOS, List<ServiceOrderRequestDTO> serviceDTOS) {
+    public void setConfirm(int confirm) {
+        this.confirm = confirm;
+    }
+
+    public InvoiceEditRequestDTO(String areaName, Integer areaId, Integer customerId, Integer vehicleId, Integer fixerId, String note, BigDecimal total, int payMethod, List<MaterialOrderRequestDTO> materialDTOS, List<ServiceOrderRequestDTO> serviceDTOS, int confirm) {
         this.customerId = customerId;
         this.vehicleId = vehicleId;
         this.fixerId = fixerId;
@@ -29,6 +37,7 @@ public class InvoiceEditRequestDTO {
         this.serviceDTOS = serviceDTOS;
         this.areaId=areaId;
         this.areaName=areaName;
+        this.confirm=confirm;
     }
 
     public Integer getCustomerId() {

@@ -741,7 +741,7 @@ export default function StatisticsAdmin() {
             <Typography style={{ display: "flex" }}>
               <Typography>
                 <Typography variant="h6" style={{ marginRight: "10px" }}>
-                  Ngày bắt đầu 1asdasasdasd
+                  Ngày bắt đầu
                 </Typography>
                 <label className="start inp">
                   <input
@@ -833,7 +833,7 @@ export default function StatisticsAdmin() {
           >
             <CardHeader>
               <Typography style={{ color: "#29A4B6", fontSize: "20px" }}>
-                số hóa đơn
+                Số hóa đơn
               </Typography>
               <div display="flex">
                 <Typography variant="h4" display="flex">
@@ -908,7 +908,7 @@ export default function StatisticsAdmin() {
           >
             <CardHeader>
               <Typography style={{ color: "#F4628D", fontSize: "20px" }}>
-                khách hàng
+                Khách hàng
               </Typography>
               <div display="flex">
                 <Typography variant="h4" display="flex">

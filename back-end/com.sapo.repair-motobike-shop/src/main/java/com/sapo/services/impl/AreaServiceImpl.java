@@ -164,18 +164,18 @@ public class AreaServiceImpl implements AreaService {
             if(invoice.getFixerId() ==null )
             {
                 if(vehicleDAO.findVehicleCustomerById(invoice.getVehicleCustomerId()).getVehicleId() == null){
-                    InvoiceMaterialResponseDTO invoiceResponseDTO = new InvoiceMaterialResponseDTO(invoice.getId(), invoice.getCode(), "","", customer.getName(), customer.getPhone(), ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()));
+                    InvoiceMaterialResponseDTO invoiceResponseDTO = new InvoiceMaterialResponseDTO(invoice.getId(), invoice.getCode(), "","", customer.getName(), customer.getPhone(), ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()),invoice.getConfirm());
                     invoiceListResponseDTOS=invoiceResponseDTO;
                 }else {
                     Vehicle vehicle = vehicleDAO.findVehicleById(vehicleDAO.findVehicleCustomerById(invoice.getVehicleCustomerId()).getVehicleId());
-                    InvoiceMaterialResponseDTO invoiceResponseDTO = new InvoiceMaterialResponseDTO(invoice.getId(), invoice.getCode(), vehicle.getLicensePlate(),"", customer.getName(), customer.getPhone(), ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()));
+                    InvoiceMaterialResponseDTO invoiceResponseDTO = new InvoiceMaterialResponseDTO(invoice.getId(), invoice.getCode(), vehicle.getLicensePlate(),"", customer.getName(), customer.getPhone(), ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()),invoice.getConfirm());
                     invoiceListResponseDTOS=invoiceResponseDTO;
                 }
 
             } else{
                 Vehicle vehicle = vehicleDAO.findVehicleById(vehicleDAO.findVehicleCustomerById(invoice.getVehicleCustomerId()).getVehicleId());
                 User user = userDAO.findUserById(invoice.getFixerId());
-                InvoiceMaterialResponseDTO invoiceResponseDTO = new InvoiceMaterialResponseDTO(invoice.getId(), invoice.getCode(),vehicle.getLicensePlate(),user.getName(), customer.getName(), customer.getPhone(), ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()));
+                InvoiceMaterialResponseDTO invoiceResponseDTO = new InvoiceMaterialResponseDTO(invoice.getId(), invoice.getCode(),vehicle.getLicensePlate(),user.getName(), customer.getName(), customer.getPhone(), ConstantVariableCommon.statusInvoiceIntToString(invoice.getStatus()),invoice.getConfirm());
                 invoiceListResponseDTOS = invoiceResponseDTO;
             }
 

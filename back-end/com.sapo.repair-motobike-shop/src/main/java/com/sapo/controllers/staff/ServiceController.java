@@ -25,13 +25,13 @@ public class ServiceController {
     }
     
     //API lấy list service đang sử dụng
-    @PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR') or hasRole('COORDINATOR')" )
+    @PreAuthorize("hasRole('ADMIN') or hasRole('FIXER') or hasRole('COORDINATOR') or hasRole('SUPER_ADMIN')" )
     @GetMapping("/still-serving")
     public ResponseEntity<List<ServiceListInvoiceResponseDTO>> listServiceStillServing(@RequestParam String keyword){
         List<ServiceListInvoiceResponseDTO> serviceDTOResponse = serviceService.searchListServiceStillServing(keyword);
         return ResponseEntity.ok(serviceDTOResponse);
     }
-    @PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR') or hasRole('COORDINATOR')" )
+    @PreAuthorize("hasRole('ADMIN') or hasRole('FIXER') or hasRole('COORDINATOR') or hasRole('SUPER_ADMIN')" )
     //API tìm service bằng id
     @GetMapping("/{id}")
     public ResponseEntity<Service> findServiceById(@PathVariable("id") int id){

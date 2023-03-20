@@ -94,9 +94,8 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public void deleteStore(int id){
         Store store = findstoreById(id);
-
-            store.setDeletedAt();
-        saveStoreRepository(store);
+        store.setDeletedAt();
+        storeRepository.delete(store);
 
     }
     private StorePaginationDTO findAllStorePaginationDTO (int page, int limit, List<StoreResponse> storeDTOS){

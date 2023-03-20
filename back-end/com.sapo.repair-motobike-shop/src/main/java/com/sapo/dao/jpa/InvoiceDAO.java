@@ -28,7 +28,14 @@ public class InvoiceDAO  extends  BaseDao<Invoice>{
     private EntityManager entityManager;
     private static final Logger LOGGER = LoggerFactory.getLogger(InvoiceServiceImpl.class.toString());
 
-
+public  Invoice finInvoiceByFixer(int fixer_id){
+    String sql = "SELECT * FROM tbl_invoices" +
+            " WHERE fixer_id = " + fixer_id + " AND  status = 3";
+    Query query = entityManager.createNativeQuery(sql, Invoice.class);
+    Invoice invoices = (Invoice) query.getSingleResult();
+    return invoices;
+//    return jdbc.queryForObject ("SELECT * FROM tbl_invoices WHERE tbl_invoices.status=3 AND tbl_invoices.fixer_id=4  ", new Object[]{fixer_id}, Invoice.class);
+}
 
     //Hàm lấy list hóa đơn theo trạng thái và keyword(nếu có)
     public List<Invoice> findAllInvoiceByStatusAndKeyword( int store_id,String keyword, List<Integer> status, String sort) {
@@ -51,6 +58,21 @@ public class InvoiceDAO  extends  BaseDao<Invoice>{
             sql = sql + statusSql + statusSql1 + " 1 = 2 )";
             System.out.println(sql);
         }
+        if(sort != null){
+            sql = sql + " ORDER BY tbl_invoices.status " +sort ;
+        }
+        Query query = entityManager.createNativeQuery(sql, Invoice.class);
+        List<Invoice> invoices = query.getResultList();
+        System.out.println(invoices.size());
+        return invoices;
+    }
+    public List<Invoice> findAllInvoiceByCustomer( int store_id, int custore_id, String sort) {
+        String sql = "SELECT * FROM tbl_invoices,tbl_vehicles,tbl_customers,tbl_vehicle_customer" +
+                " WHERE tbl_invoices.vehicle_customer_id =" +custore_id +
+                " AND tbl_invoices.store_id=" +store_id +
+                " AND tbl_vehicle_customer.customer_id = tbl_customers.id" +
+                " AND tbl_vehicle_customer.vehicle_id = tbl_vehicles.id";
+
         if(sort != null){
             sql = sql + " ORDER BY tbl_invoices.status " +sort ;
         }

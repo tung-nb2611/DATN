@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/invoices")
 @CrossOrigin(origins = "http://localhost:3000")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('FIXER') or hasRole('COORDINATOR') or hasRole('SUPER_ADMIN')")
 public class AdminInvoicesController {
   private final InvoiceService invoiceService;
   private final AreaService areaService;
@@ -56,10 +56,10 @@ public class AdminInvoicesController {
  return ResponseEntity.ok().build();
   }
 
-  //API hủy hóa đơn 1,2,7
+  //API hủy hóa đơn 1,2,3,7
   @PutMapping("/delete/{id}")
-  public ResponseEntity<Void> deleteInvoice(@PathVariable("id") int id) {
-    invoiceService.deleteInvoice(id);
+  public ResponseEntity<Void> deleteInvoice(@PathVariable("id") int id,@RequestParam String note) {
+    invoiceService.deleteInvoice(id,note);
     return ResponseEntity.ok().build();
   }
   //API tìm invoice và phụ kiện dịch vụ đã kh dc xác nhận theo id

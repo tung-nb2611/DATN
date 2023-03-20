@@ -14,7 +14,7 @@ import java.io.IOException;
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/admin/services")
-@PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR') or hasRole('SUPER_ADMIN')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('FIXER') or hasRole('COORDINATOR') or hasRole('SUPER_ADMIN')")
 public class AdminServiceController {
     private final ServiceService serviceService;
     

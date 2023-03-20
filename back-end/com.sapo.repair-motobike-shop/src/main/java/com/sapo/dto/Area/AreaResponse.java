@@ -38,13 +38,7 @@ public class AreaResponse {
     private Long updatedAt;
     private Long deletedAt;
 
-//    public AreaResponse(int id, String code, String name, int status, List<InvoiceMaterialResponseDTO> invoice) {
-//        this.id = id;
-//        this.code = code;
-//        this.name = name;
-//        this.status = status;
-//        this.invoice = invoice;
-//    }
+
 
     public int getId() {
         return id;

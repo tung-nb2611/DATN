@@ -13,7 +13,7 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/vehicle-customer")
-@PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('COORDINATOR') or hasRole('FIXER') or hasRole('SUPER_ADMIN')")
 public class VehicleCustomerController {
   private final VehicleCustomerService vehicleCustomerService;
   

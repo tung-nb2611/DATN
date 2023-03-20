@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/admin/receipts")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('FIXER') or hasRole('COORDINATOR') or hasRole('SUPER_ADMIN')")
 public class AdminReceiptController {
     private final ReceiptService receiptService;
     private final UserService userService;

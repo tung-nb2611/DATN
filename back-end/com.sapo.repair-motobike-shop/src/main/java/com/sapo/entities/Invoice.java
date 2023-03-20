@@ -31,7 +31,8 @@ public class Invoice extends BaseEntity {
     private Integer stroeId;
     @Column(name = "end_at")
     private Long endAt;
-
+    @Column(name = "confirm")
+    private int confirm;
 
 
     @Column(name = "vehicle_customer_id")

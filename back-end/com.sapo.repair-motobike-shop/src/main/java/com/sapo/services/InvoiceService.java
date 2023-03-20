@@ -11,9 +11,10 @@ public interface InvoiceService {
     //Hàm lấy list hóa đơn trạng thái chờ xử lý và đang xử lý
     InvoiceListPaginationResponseDTO findAllInvoiceByStatus( int store_id, int page, int limit, String keyword, List<Integer> status, int sort);
 
+    InvoiceResponse findInvoiceByfixer(int fixer_Id, String fixerName );
+
     //hàm lấy list hóa đơn trạng thái chờ thanh toán và thanh toán
     InvoiceMaterialPaginationResponseDTO findAllInvoiceAndBuyMaterialByStatus( int store_id ,int aera_id,int page, int limit, String keyword, List<Integer> status, int sort);
-
 
     //Hàm lấy list hóa đơn trạng thái đang xử lý
     InvoiceListPaginationResponseDTO findAllInvoiceInProcess(int page, int limit, String keyword);
@@ -34,6 +35,8 @@ public interface InvoiceService {
 
     //Hàm sửa hóa đơn
     void editInvoice(int id, InvoiceEditRequestDTO invoiceEditRequestDTO);
+    //Hàm sửa hóa đơn chờ
+    void editInvoice1(int id, InvoiceEditRequestDTO invoiceEditRequestDTO);
 
     //Hàm sửa trạng thái của material-order service-order
     void changeStatusOrderInvoice(int id, boolean agreement);
@@ -46,7 +49,7 @@ public interface InvoiceService {
 
     
     //Hàm xóa hóa đơn 1,2,7 (sửa status về 6)
-    void deleteInvoice (int id);
+    void deleteInvoice (int id, String note);
     
     //Hàm lấy list hóa đơn có thể xóa (status = 1,2,7)
     InvoiceListPaginationResponseDTO findAllInvoiceCanDelete (int page, int limit, String keyword);
@@ -58,7 +61,7 @@ public interface InvoiceService {
     void receiptInvoiceByFixer(int id);
 
     //Hàm hoàn thành của nhân viên sửa chữa
-    void finishInvoiceByFixer(int id,int status);
+    void finishInvoiceByFixer(int id,int status,int  confirm,String note);
 
     //hàm so sánh số lượng còn trong material
     void compareQuantityMaterial(int id, int quantity);

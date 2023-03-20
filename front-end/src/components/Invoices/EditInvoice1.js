@@ -6,13 +6,13 @@ import { Add, Search } from "@material-ui/icons";
 import { showPrice } from "../../helper/function";
 import "../../assets/css/search/InvoiceSearch.css";
 import CustomerService from "services/CustomerService";
-import Snackbars from "components/Snackbar/Snackbar.js";
+import Snackbars from "../../components/Snackbar/Snackbar.js";
 import "../../assets/css/invoices/InvoiceMaterialSearch.css";
 import MaterialService from "services/materialService";
 import ServicesService from "services/ServicesService";
 import EmployeeService from "services/EmployeeService";
 import "../../assets/css/invoices/InvoiceServiceSearch.css";
-import { withStyles } from "@material-ui/core";
+import { TextareaAutosize, withStyles } from "@material-ui/core";
 import IconIncrease from "common/iconIncrease";
 import { NumberFormatBase } from "react-number-format";
 import AreaService from "services/AreaService";
@@ -58,7 +58,7 @@ import {
   TabOutlined,
   TabTwoTone,
 } from "@material-ui/icons";
-function EditInvoice(props) {
+function EditInvoice1(props) {
   React.useEffect(() => {
     // Specify how to clean up after this effect:
     return function cleanup() {
@@ -72,7 +72,7 @@ function EditInvoice(props) {
   const [id, setId] = useState(props.match.params.id);
   // eslint-disable-next-line no-unused-vars
   const [tl, setTl] = React.useState(false);
-
+  const handleClose = () => setOpen1(false);
   const [listCustomerClass, setListCustomerClass] = useState("");
   const [showInfoCustomer, setShowInfoCustomer] = useState("");
   const [modalCustomerClass, setModalCustomerClass] = useState("");
@@ -92,6 +92,7 @@ function EditInvoice(props) {
   const [filters, setFilters] = useState({
     keyword: "",
   });
+  const [open1, setOpen1] = useState(false);
   const [sumMaterial, setSumMaterial] = useState(0);
   const [warningModalClass, setWarningModalClass] = useState("");
   const [warningClass, setWarningClass] = useState("");
@@ -119,6 +120,7 @@ function EditInvoice(props) {
   const [filterSum, setFilterSum] = useState({
     sum: 0,
   });
+  const [user, setUser] = React.useState({});
   const [filtersCustomer, setFiltersCustomer] = useState({
     idVehicle: 1,
     keyword: "",
@@ -197,6 +199,27 @@ function EditInvoice(props) {
     }
   };
 
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        EmployeeService.getStaffById().then((res) => {
+          let user = res.data;
+          console.log("555", user);
+          setUser({
+            user,
+          });
+          setEmployee({
+            id: user.id,
+            code: user.code,
+            name: user.name,
+            phone: user.phone,
+          });
+        });
+      } catch (error) {}
+    }
+    fetchUser();
+  }, []);
+
   const chooseEmployee = (employee) => {
     setEmployee(employee);
     setListEmployeeClass("");
@@ -273,7 +296,6 @@ function EditInvoice(props) {
           if (res.data.areaDTO !== null) {
             setAreaChose(res.data.areaDTO);
           }
-          setEmployee(res.data.userDTO);
           setVehicle(vehicle);
           setMaterialChoose(materials);
           setServiceChoose(services);
@@ -797,59 +819,156 @@ function EditInvoice(props) {
   };
   //Hàm sửa đơn hàng
   const editInvoice = (e) => {
-    if (!check()) {
-      e.preventDefault();
-      let materialDTOS = [];
-      materialChoose.map((material) => {
-        let material1 = {
-          id: material.id,
-          quantity: material.quantityBuy,
-          materialOrderId: material.materialOrderId,
-        };
-        materialDTOS.push(material1);
-      });
-
-      let serviceDTOS = [];
-      serviceChoose.map((service) => {
-        let service1 = {
-          id: service.id,
-          serviceOrderId: service.serviceOrderId,
-        };
-        serviceDTOS.push(service1);
-      });
-      let invoice = {
-        customerId: customer.id,
-        areaId: areaChose.id,
-        vehicleId: vehicle.id,
-        confirm: 2,
-        fixerId: employee.id,
-        note: noteInvoice,
-        payMethod,
-        total: sumMaterial + sumServices,
-        materialDTOS,
-        serviceDTOS,
+    e.preventDefault();
+    let materialDTOS = [];
+    materialChoose.map((material) => {
+      let material1 = {
+        id: material.id,
+        quantity: material.quantityBuy,
+        materialOrderId: material.materialOrderId,
       };
-      console.log("invoice => " + JSON.stringify(invoice));
-      InvoicesService.putInvoice(id, invoice)
-        .then(() => {
-          setTl(true);
-          // use this to make the notification autoclose
-          setTimeout(function () {
-            setTl(false);
-          }, 3000);
-          props.history.push("/admin/areas");
-        })
-        .catch(function (error) {
-          if (error.response.data.errors) {
-            console.log(error.response.data.errors[0].defaultMessage);
-          } else {
-            console.log(error.response.data.message);
-          }
-        });
-    } else {
-      setMessageError("Không được để trống khu vực hoặc nhân viên sửa");
-      setFail(true);
-    }
+      materialDTOS.push(material1);
+    });
+
+    let serviceDTOS = [];
+    serviceChoose.map((service) => {
+      let service1 = {
+        id: service.id,
+        serviceOrderId: service.serviceOrderId,
+      };
+      serviceDTOS.push(service1);
+    });
+    let invoice = {
+      customerId: customer.id,
+      areaId: areaChose.id,
+      vehicleId: vehicle.id,
+      fixerId: employee.id,
+      note: noteInvoice,
+      payMethod,
+      total: sumMaterial + sumServices,
+      materialDTOS,
+      serviceDTOS,
+      confirm: 1,
+    };
+    console.log("invoice => " + JSON.stringify(invoice));
+    InvoicesService.putInvoice1(id, invoice)
+      .then(() => {
+        setMessageSuccess("Gửi xác nhận phiếu thành công");
+        setTl(true);
+        // use this to make the notification autoclose
+        props.history.push("/admin/invoices-customer");
+      })
+      .catch(function (error) {
+        if (error.response.data.errors) {
+          console.log(error.response.data.errors[0].defaultMessage);
+        } else {
+          console.log(error.response.data.message);
+        }
+      });
+  };
+  // hoàn thành phiếu sửa
+  const okInvoice = (e) => {
+    e.preventDefault();
+    let materialDTOS = [];
+    materialChoose.map((material) => {
+      let material1 = {
+        id: material.id,
+        quantity: material.quantityBuy,
+        materialOrderId: material.materialOrderId,
+      };
+      materialDTOS.push(material1);
+    });
+
+    let serviceDTOS = [];
+    serviceChoose.map((service) => {
+      let service1 = {
+        id: service.id,
+        serviceOrderId: service.serviceOrderId,
+      };
+      serviceDTOS.push(service1);
+    });
+    let invoice = {
+      customerId: customer.id,
+      areaId: areaChose.id,
+      vehicleId: vehicle.id,
+      fixerId: employee.id,
+      note: noteInvoice,
+      payMethod,
+      total: sumMaterial + sumServices,
+      materialDTOS,
+      serviceDTOS,
+      confirm: 4,
+    };
+    console.log("invoice => " + JSON.stringify(invoice));
+    InvoicesService.putInvoice(id, invoice)
+      .then(() => {
+        setMessageSuccess("Hoàn thành phiếu thành công!");
+        setTl(true);
+        // use this to make the notification autoclose
+        setTimeout(function () {
+          setTl(false);
+        }, 3000);
+        props.history.push("/admin/invoices-customer");
+      })
+      .catch(function (error) {
+        if (error.response.data.errors) {
+          console.log(error.response.data.errors[0].defaultMessage);
+        } else {
+          console.log(error.response.data.message);
+        }
+      });
+  };
+  //Hàm sửa đơn hàng
+  const updateInvoice = (e) => {
+    e.preventDefault();
+    let materialDTOS = [];
+    materialChoose.map((material) => {
+      let material1 = {
+        id: material.id,
+        quantity: material.quantityBuy,
+        materialOrderId: material.materialOrderId,
+      };
+      materialDTOS.push(material1);
+    });
+
+    let serviceDTOS = [];
+    serviceChoose.map((service) => {
+      let service1 = {
+        id: service.id,
+        serviceOrderId: service.serviceOrderId,
+      };
+      serviceDTOS.push(service1);
+    });
+    let invoice = {
+      customerId: customer.id,
+      areaId: areaChose.id,
+      vehicleId: vehicle.id,
+      fixerId: employee.id,
+      note: noteInvoice,
+      payMethod,
+      total: sumMaterial + sumServices,
+      materialDTOS,
+      serviceDTOS,
+      confirm: 3,
+    };
+    console.log("invoice => " + JSON.stringify(invoice));
+    InvoicesService.putInvoice(id, invoice)
+      .then(() => {
+        setMessageSuccess("Cập nhật phiếu thành công!");
+        setTl(true);
+        // use this to make the notification autoclose
+        setTimeout(function () {
+          setTl(false);
+        }, 3000);
+        props.history.push("/admin/invoices-customer");
+      })
+      .catch(function (error) {
+        if (error.response.data.errors) {
+          console.log(error.response.data.errors[0].defaultMessage);
+        } else {
+          console.log(error.response.data.message);
+        }
+      });
   };
   console.log("arearChose", areaChose);
   const changePayMethod = (e) => {
@@ -867,7 +986,7 @@ function EditInvoice(props) {
   const changeLicensePlate = (e) => {
     setLicensePlate(e.target.value);
   };
-
+  console.log("oke", employee);
   //Hàm thêm khách hàng mới
   const addCustomer = (e) => {
     e.preventDefault();
@@ -947,9 +1066,11 @@ function EditInvoice(props) {
       });
   };
   const deleteInvoice = (e) => {
-    InvoicesService.deleteInvoice(id)
+    InvoicesService.deleteInvoice(id, noteInvoice)
       .then(() => {
-        props.history.push("/admin/areas");
+        setMessageSuccess("Hủy đơn thành công!");
+        setTl(true);
+        props.history.push("/admin/invoices-customer");
       })
       .catch(function (error) {
         if (error.response.data.errors) {
@@ -988,6 +1109,10 @@ function EditInvoice(props) {
           }, 3000);
         }
       });
+  };
+  const delete1 = () => {
+    updateInvoice();
+    deleteInvoice();
   };
   const closeWarning = () => {
     setWarningModalClass("");
@@ -1063,6 +1188,9 @@ function EditInvoice(props) {
     } else if (status.localeCompare("Đang sửa") == 0) {
       return <span style={{ color: "red" }}>{status}</span>;
     }
+  };
+  const modalDelete = () => {
+    setOpen1(true);
   };
   const TableHeaderCell = withStyles(() => ({
     root: {
@@ -1204,6 +1332,18 @@ function EditInvoice(props) {
       </React.Fragment>
     );
   }
+  const style = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "background.paper",
+    border: "1px solid rgb(167 165 165)",
+    boxShadow: 24,
+    p: 4,
+    borderRadius: "20px",
+  };
   return (
     <div className="body-add-invoice">
       <div className="body-edit-invoice">
@@ -1218,9 +1358,55 @@ function EditInvoice(props) {
               <span>Phiếu sửa chữa </span>{" "}
             </div>
           </div>
+          <Modal
+            open={open1}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box sx={style}>
+              <Typography variant="h5">Hủy hóa đơn</Typography>
+              <Box
+                style={{
+                  borderBottom: "1px solid #dfe4e8",
+                  borderTop: "1px solid #dfe4e8",
+                  height: "40px",
+                  padding: "10px",
+                }}
+              >
+                <Typography>Bạn có chắc muốn hủy hóa đơn này không!</Typography>
+              </Box>
+              <Button
+                style={{
+                  background: "linear-gradient(180deg,#fff,#f9fafb)",
+                  color: "#182537",
+                  height: "40px",
+                  marginBottom: "10px",
+                  marginTop: "15px",
+                  border: "1px solid #c4cdd5",
+                }}
+                onClick={handleClose}
+              >
+                Hủy
+              </Button>
+              <Button
+                style={{
+                  background: "#218FFE",
+                  color: "white",
+                  height: "40px",
+                  marginBottom: "10px",
+                  marginTop: "15px",
+                  marginLeft: "12px",
+                }}
+                onClick={() => deleteInvoice()}
+              >
+                Xác nhận hủy
+              </Button>
+            </Box>
+          </Modal>
           <Snackbars
             place="tc"
-            color="info"
+            color="success"
             message={messageSuccess}
             open={tl}
             closeNotification={() => setTl(false)}
@@ -1237,24 +1423,60 @@ function EditInvoice(props) {
           <div className="right-title-add-invoice">
             {/* <button id="btn-finish" className={btnFinish} onClick={finishInvoice}>Hoàn thành</button>
                         <button id="btn-comfirm" className={btnConfirm} onClick={receiptInvoice}>Xác nhận</button> */}
-            <Button
-              onClick={deleteInvoice}
-              variant="outlinedSizeLarge"
-              size="medium"
-              style={{
-                background: "#EC5739",
-                width: "136px",
-                height: "35px",
-                color: "white",
-                textAlign: "center",
-              }}
-            >
-              {" "}
-              Hủy phiếu
-            </Button>
-            <button className="btn-add" onClick={editInvoice}>
-              Cập nhật
-            </button>
+
+            {status.localeCompare("Chờ xử lý") == 0 ? (
+              <button className="btn-add" onClick={editInvoice}>
+                Hoàn thành
+              </button>
+            ) : (
+              <Box display="flex">
+                <Button
+                  onClick={updateInvoice}
+                  variant="outlinedSizeLarge"
+                  size="medium"
+                  style={{
+                    background: "rgb(244, 148, 35)",
+                    width: "160px",
+                    height: "40px",
+                    color: "white",
+                    textAlign: "center",
+                  }}
+                >
+                  {" "}
+                  Cập nhật phiếu
+                </Button>
+                <Button
+                  onClick={modalDelete}
+                  variant="outlinedSizeLarge"
+                  size="medium"
+                  style={{
+                    background: "#EC5739",
+                    width: "136px",
+                    height: "40px",
+                    color: "white",
+                    textAlign: "center",
+                    marginLeft: "12px",
+                  }}
+                >
+                  {" "}
+                  Hủy phiếu
+                </Button>
+                <Button
+                  className="btn-add"
+                  style={{
+                    background: "linear-gradient(180deg,#4697fe,#08f)",
+                    width: "128px",
+                    height: "40px",
+                    color: "white",
+                    textAlign: "center",
+                    marginLeft: "12px",
+                  }}
+                  onClick={okInvoice}
+                >
+                  Hoàn thành sửa
+                </Button>
+              </Box>
+            )}
           </div>
         </div>
 
@@ -1265,7 +1487,7 @@ function EditInvoice(props) {
             </div>
             <div className="content-warning">
               <div className="text-warning">
-                <span>Bạn muốn xác nhận phiếu sửa chữa ?</span>
+                <span>Bạn muốn xác nhận phiếu sửa chữa ưqqweqwqew ?</span>
               </div>
               <div className="button-warning">
                 <button
@@ -1935,7 +2157,7 @@ function EditInvoice(props) {
             </div>
           </div>
           <div className="right-invoice">
-            <div className="top-right-invoice">
+            {/* <div className="top-right-invoice">
               <div className="title-employee">
                 <span>Khu vực sửa chữa</span>
               </div>
@@ -1985,7 +2207,7 @@ function EditInvoice(props) {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
             <div className="top-right-invoice">
               <div className="title-employee">
                 <span>Thông tin nhân viên sửa chữa</span>
@@ -2018,7 +2240,7 @@ function EditInvoice(props) {
                       </div>
                     ))}
                   </div>
-                  <div id="info-name" className={showInfoEmployee}>
+                  <div id="info-name" className={"info-name"}>
                     <div className="info">
                       <div className="table">
                         <table>
@@ -2045,6 +2267,18 @@ function EditInvoice(props) {
                 </div>
               </div>
             </div>
+            <Box>
+              <Typography>Ghi chú</Typography>
+              <TextareaAutosize
+                label="Điền mô tả của phụ tùng"
+                id="outlined-basic"
+                variant="outlined"
+                required
+                value={noteInvoice}
+                onChange={changeNote}
+                style={{ width: "100%", height: "90px" }}
+              />
+            </Box>
             <div className="invoice">
               <div className="title-right-invoice">
                 <span>Hóa Đơn tạm tính</span>
@@ -2171,4 +2405,4 @@ function EditInvoice(props) {
     </div>
   );
 }
-export default EditInvoice;
+export default EditInvoice1;
