@@ -20,8 +20,8 @@ public class JPAConfig {
     @Bean(destroyMethod = "close")
     protected DataSource dataSource() {
         HikariConfig dataSourceConfig = new HikariConfig();
-        dataSourceConfig.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSourceConfig.setJdbcUrl("jdbc:mysql://localhost:3306/sua_xe?useUnicode=yes&characterEncoding=UTF-8");
+        // dataSourceConfig.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        // dataSourceConfig.setJdbcUrl("jdbc:mysql://localhost:3306/sua_xe?useUnicode=yes&characterEncoding=UTF-8");
 //        dataSourceConfig.setJdbcUrl("jdbc:mysql://localhost:3306/bike2");
         dataSourceConfig.setUsername("root");
         dataSourceConfig.setPassword("admin");
